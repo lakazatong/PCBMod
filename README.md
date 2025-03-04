@@ -1,17 +1,17 @@
 # PCB Mod
 
-This template is for Minecraft 1.12.4+ and uses:
-- forge 54.0.10
-- neoforge 21.4.33-beta
-- fabric 0.112.2
-- parchment 2024.12.22
+## Description
 
-You can use `sudo ./rename_author.sh your_name` and `sudo ./rename_mod.sh` to properly rename folders, files and files' content
+Implements Port and Hub Blocks that can be linked together with a circuit ID
 
-`rename_author.sh` accepts these names [a-z][_a-z]{9}
+Each Port block have a port number and can be either an Input or Output
 
-`rename_mod.sh` will use the root folder's name as its reference
+Each Hub block have one port number per side of the block
 
-# Credits
+## Setup
 
-Template extracted from https://github.com/North-West-Wind/ShortCircuit
+Generated files were not pushed, run the `generate.[sh|bat]` script to generate them (Python is required)
+
+## Notes
+
+This mod is not made for survival
