@@ -1,4 +1,4 @@
-# Example Mod
+# PCB Mod
 
 This template is for Minecraft 1.12.4+ and uses:
 - forge 54.0.10
