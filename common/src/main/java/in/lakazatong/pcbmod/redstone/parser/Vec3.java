@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Vec3 {
-    public int x;
-    public int y;
-    public int z;
+    public double x;
+    public double y;
+    public double z;
 
-    public Vec3(int x, int y, int z) {
+    public Vec3(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;

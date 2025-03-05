@@ -16,7 +16,7 @@ abstract public class Block {
         this.coords = coords;
         this.structure = structure;
         this.props = new HashMap<>();
-        this.uuid = UUID.fromString(coords.toString());
+        this.uuid = UUID.nameUUIDFromBytes(coords.toString().getBytes());
     }
 
     public Block withProps(Map<String, Object> props) {
