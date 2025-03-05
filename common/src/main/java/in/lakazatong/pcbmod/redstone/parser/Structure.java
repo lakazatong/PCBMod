@@ -21,7 +21,7 @@ public class Structure {
     private final double maxZ;
     private final List<List<List<Block>>> xyzGrid;
 
-    public Structure(int maxX, int maxY, int maxZ) {
+    private Structure(int maxX, int maxY, int maxZ) {
         this.maxX = maxX;
         this.maxY = maxY;
         this.maxZ = maxZ;
@@ -120,7 +120,7 @@ public class Structure {
 
         for (CompoundTag t : palette) {
             Map<String, Object> props = new HashMap<>();
-            props.put("facings", new ArrayList<Vec3>());
+            List<Vec3> facings = new ArrayList<>();
 
             BlockBuilder builder = (coords, structure) -> new Solid(coords, structure).withProps(props);
 
@@ -147,24 +147,25 @@ public class Structure {
                 for (String key : properties.keySet()) {
                     String value = properties.getString(key).getValue();
 
-                    if (key.equals("Facing")) {
-                        props.put("facings", Vec3.fromCardinal(value));
-                    } else if (Vec3.fromCardinal(key) != null && value.equals("Side")) {
-                        props.put("facings", Vec3.fromCardinal(key));
-                    } else if (key.equals("Lit")) {
+                    if (key.equals("facing")) {
+                        facings.add(Vec3.fromCardinal(value));
+                    } else if (Vec3.fromCardinal(key) != null && value.equals("side")) {
+                        facings.add(Vec3.fromCardinal(key));
+                    } else if (key.equals("lit")) {
                         props.put("lit", Boolean.parseBoolean(value));
-                    } else if (key.equals("Power")) {
+                    } else if (key.equals("power")) {
                         props.put("power", Integer.parseInt(value));
                     }
                 }
             }
+
+            props.put("facings", facings);
 
             result.add(builder);
         }
 
         return result;
     }
-
 
     public static Structure fromNBT(Path path) throws IOException {
         Nbt nbt = new Nbt();

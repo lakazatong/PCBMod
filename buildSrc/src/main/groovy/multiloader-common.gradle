@@ -122,3 +122,7 @@ publishing {
         }
     }
 }
+
+dependencies {
+    implementation "dev.dewy:nbt:1.5.1"
+}

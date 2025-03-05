@@ -13,7 +13,7 @@ public class Dust extends Block {
     @Override
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
-            case SOLID -> this.isFacing(neighbor);
+            case SOLID -> this.isFacing(neighbor) || (this.isAbove(neighbor) && neighbor.type == BlockType.SOLID);
             case DUST -> true;
             case REPEATER, COMPARATOR -> neighbor.isFacingAway(this);
             default -> false;

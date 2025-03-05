@@ -66,4 +66,8 @@ public class Vec3 {
     public String toString() {
         return this.x + " " + this.y + " " + this.z;
     }
+
+    public boolean equals(Vec3 other) {
+        return this.x == other.x && this.y == other.y && this.z == other.z;
+    }
 }
