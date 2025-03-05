@@ -18,13 +18,4 @@ public class Comparator extends Block {
             default -> false;
         };
     }
-
-    @Override
-    public boolean isOutputOf(Block neighbor) {
-        return switch (neighbor.type) {
-            case SOLID, TORCH -> this.isFacingAway(neighbor);
-            case DUST, REPEATER, COMPARATOR -> !this.isFacing(neighbor);
-            default -> false;
-        };
-    }
 }

@@ -18,13 +18,4 @@ public class Repeater extends Block {
             default -> false;
         };
     }
-
-    @Override
-    public boolean isOutputOf(Block neighbor) {
-        return switch (neighbor.type) {
-            case SOLID, DUST, TORCH -> this.isFacingAway(neighbor);
-            case REPEATER, COMPARATOR -> this.isFacingAway(neighbor) && neighbor.isFacing(this);
-            default -> false;
-        };
-    }
 }

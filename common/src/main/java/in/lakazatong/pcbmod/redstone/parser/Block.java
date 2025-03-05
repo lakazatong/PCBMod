@@ -69,5 +69,4 @@ abstract public class Block {
     }
 
     abstract public boolean isInputOf(Block neighbor);
-    abstract public boolean isOutputOf(Block neighbor);
 }

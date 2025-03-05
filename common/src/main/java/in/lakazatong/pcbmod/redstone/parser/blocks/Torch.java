@@ -19,12 +19,4 @@ public class Torch extends Block {
             default -> false;
         };
     }
-
-    @Override
-    public boolean isOutputOf(Block neighbor) {
-        if (neighbor.type == BlockType.SOLID) {
-            return (this.isAbove(neighbor) && !this.isOnWall()) || this.isOnWallOf(neighbor);
-        }
-        return false;
-    }
 }

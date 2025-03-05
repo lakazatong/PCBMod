@@ -19,13 +19,4 @@ public class Dust extends Block {
             default -> false;
         };
     }
-
-    @Override
-    public boolean isOutputOf(Block neighbor) {
-        return switch (neighbor.type) {
-            case SOLID, DUST, TORCH -> true;
-            case REPEATER, COMPARATOR -> neighbor.isFacing(this);
-            default -> false;
-        };
-    }
 }

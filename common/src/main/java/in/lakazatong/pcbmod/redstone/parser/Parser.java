@@ -29,19 +29,15 @@ public class Parser {
             visited.add(block.uuid);
 
             List<Block> blockInputs = new ArrayList<>();
-            List<Block> blockOutputs = new ArrayList<>();
             for (Block neighbor : structure.getNeighbors(block)) {
                 if (neighbor.isInputOf(block))
                     blockInputs.add(neighbor);
-                if (neighbor.isOutputOf(block))
-                    blockOutputs.add(neighbor);
                 queue.add(neighbor);
             }
 
             Map<String, Object> blockInfo = new HashMap<>();
             blockInfo.put("block", block);
             blockInfo.put("inputs", blockInputs);
-            blockInfo.put("outputs", blockOutputs);
 
             graph.put(block.uuid, blockInfo);
         }
@@ -56,7 +52,6 @@ public class Parser {
 
         Set<String> edges = new HashSet<>();
 
-        // Set graph background to black
         dotBuilder.append("    graph [bgcolor=\"black\"];\n");
 
         for (Map.Entry<UUID, Map<String, Object>> entry : graph.entrySet()) {
@@ -64,27 +59,16 @@ public class Parser {
             Map<String, Object> blockInfo = entry.getValue();
             Block block = (Block) blockInfo.get("block");
             List<Block> blockInputs = (List<Block>) blockInfo.get("inputs");
-            List<Block> blockOutputs = (List<Block>) blockInfo.get("outputs");
 
             String blockName = block.type.name().toLowerCase();
 
-            // Set the node fill color to black, text color to white, and border color to white
             dotBuilder.append("    \"").append(blockUUID).append("\" [label=\"").append(blockName).append("\", style=filled, fillcolor=\"black\", fontcolor=\"white\", color=\"white\", width=0.2, height=0.2];\n");
 
             for (Block input : blockInputs) {
                 String edge = "\"" + input.uuid + "\" -> \"" + blockUUID + "\"";
                 if (!edges.contains(edge)) {
                     dotBuilder.append("    ").append(edge)
-                            .append(" [color=\"white\", arrowhead=\"normal\", fontcolor=\"white\", penwidth=2];\n"); // Make edge lines and arrows white and thicker
-                    edges.add(edge);
-                }
-            }
-
-            for (Block output : blockOutputs) {
-                String edge = "\"" + blockUUID + "\" -> \"" + output.uuid + "\"";
-                if (!edges.contains(edge)) {
-                    dotBuilder.append("    ").append(edge)
-                            .append(" [color=\"white\", arrowhead=\"normal\", fontcolor=\"white\", penwidth=2];\n"); // Make edge lines and arrows white and thicker
+                            .append(" [color=\"white\", arrowhead=\"normal\", fontcolor=\"white\", penwidth=2];\n");
                     edges.add(edge);
                 }
             }
@@ -96,5 +80,4 @@ public class Parser {
             writer.write(dotBuilder.toString());
         }
     }
-
 }

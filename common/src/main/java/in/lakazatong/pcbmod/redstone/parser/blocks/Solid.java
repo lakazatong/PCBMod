@@ -19,14 +19,4 @@ public class Solid extends Block {
             default -> false;
         };
     }
-
-    @Override
-    public boolean isOutputOf(Block neighbor) {
-        return switch (neighbor.type) {
-            case DUST -> neighbor.isFacing(this);
-            case REPEATER, COMPARATOR -> neighbor.isFacing(this);
-            case TORCH -> neighbor.isBelow(this);
-            default -> false;
-        };
-    }
 }
