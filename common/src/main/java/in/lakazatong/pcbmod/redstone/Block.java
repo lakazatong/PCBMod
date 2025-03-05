@@ -1,8 +1,6 @@
-package in.lakazatong.pcbmod.redstone.parser;
+package in.lakazatong.pcbmod.redstone;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 abstract public class Block {
     public BlockType type;
@@ -11,12 +9,23 @@ abstract public class Block {
     public Map<String, Object> props;
     public UUID uuid;
 
+    public List<Block> inputs;
+    public int signal = 0;
+    public int previousSignal = 0;
+
     public Block(BlockType type, Vec3 coords, Structure structure) {
         this.type = type;
         this.coords = coords;
         this.structure = structure;
         this.props = new HashMap<>();
         this.uuid = UUID.nameUUIDFromBytes(coords.toString().getBytes());
+
+        this.inputs = new ArrayList<>();
+    }
+
+    @FunctionalInterface
+    public interface BlockBuilder {
+        Block apply(Vec3 coords, Structure Structure);
     }
 
     public Block withProps(Map<String, Object> props) {
@@ -69,4 +78,15 @@ abstract public class Block {
     }
 
     abstract public boolean isInputOf(Block neighbor);
+
+    public int tick(double t) {
+        previousSignal = signal;
+        return logic(t);
+    }
+
+    abstract public int logic(double t);
+
+    public boolean hasChanged() {
+        return signal != previousSignal;
+    }
 }

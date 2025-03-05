@@ -1,9 +1,9 @@
-package in.lakazatong.pcbmod.redstone.parser.blocks;
+package in.lakazatong.pcbmod.redstone.blocks;
 
-import in.lakazatong.pcbmod.redstone.parser.Block;
-import in.lakazatong.pcbmod.redstone.parser.BlockType;
-import in.lakazatong.pcbmod.redstone.parser.Structure;
-import in.lakazatong.pcbmod.redstone.parser.Vec3;
+import in.lakazatong.pcbmod.redstone.Block;
+import in.lakazatong.pcbmod.redstone.BlockType;
+import in.lakazatong.pcbmod.redstone.Structure;
+import in.lakazatong.pcbmod.redstone.Vec3;
 
 public class Dust extends Block {
     public Dust(Vec3 coords, Structure structure) {
@@ -18,5 +18,10 @@ public class Dust extends Block {
             case REPEATER, COMPARATOR -> neighbor.isFacingAway(this);
             default -> false;
         };
+    }
+
+    @Override
+    public int logic(double t) {
+        return 0;
     }
 }

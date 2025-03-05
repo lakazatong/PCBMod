@@ -1,19 +1,19 @@
-package in.lakazatong.pcbmod.redstone.parser;
+package in.lakazatong.pcbmod.redstone;
 
 import dev.dewy.nbt.Nbt;
 import dev.dewy.nbt.tags.collection.CompoundTag;
 import dev.dewy.nbt.tags.collection.ListTag;
 import dev.dewy.nbt.tags.primitive.IntTag;
-import in.lakazatong.pcbmod.redstone.parser.blocks.Dust;
-import in.lakazatong.pcbmod.redstone.parser.blocks.Solid;
-import in.lakazatong.pcbmod.redstone.parser.blocks.Torch;
+import in.lakazatong.pcbmod.redstone.Block.BlockBuilder;
+import in.lakazatong.pcbmod.redstone.blocks.Dust;
+import in.lakazatong.pcbmod.redstone.blocks.Solid;
+import in.lakazatong.pcbmod.redstone.blocks.Torch;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class Structure {
     private final double maxX;
@@ -39,36 +39,36 @@ public class Structure {
         }
     }
 
+    public boolean withinBounds(Vec3 coords) {
+        return coords.x >= 0 && coords.x < maxX &&
+                coords.y >= 0 && coords.y < maxY &&
+                coords.z >= 0 && coords.z < maxZ;
+    }
+
     public List<Block> getNeighbors(Block block) {
-        List<Block> neighbors = new ArrayList<>();
-
-        for (Vec3 coords : block.coords.neighbors()) {
-            if (coords.x >= 0 && coords.x < maxX &&
-                    coords.y >= 0 && coords.y < maxY &&
-                    coords.z >= 0 && coords.z < maxZ) {
-
-                List<List<Block>> yzPlane = xyzGrid.get((int) coords.x);
-                List<Block> zLine = yzPlane.get((int) coords.y);
-                Block neighbor = zLine.get((int) coords.z);
-
-                if (neighbor != null) {
-                    neighbors.add(neighbor);
-                }
-            }
-        }
-
-        return neighbors;
+        return block.coords.neighbors().stream()
+                .filter(this::withinBounds)
+                .map(coords -> xyzGrid.get((int) coords.x).get((int) coords.y).get((int) coords.z))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     public void setBlock(Block block) {
-        Vec3 coords = block.coords;
-        while (xyzGrid.size() <= coords.x)
-            xyzGrid.add(new ArrayList<>());
-        while (xyzGrid.get((int) coords.x).size() <= coords.y)
-            xyzGrid.get((int) coords.x).add(new ArrayList<>());
-        while (xyzGrid.get((int) coords.x).get((int) coords.y).size() <= coords.z)
-            xyzGrid.get((int) coords.x).get((int) coords.y).add(null);
-        xyzGrid.get((int) coords.x).get((int) coords.y).set((int) coords.z, block);
+        ensureCapacity(block.coords);
+        xyzGrid.get((int) block.coords.x)
+                .get((int) block.coords.y)
+                .set((int) block.coords.z, block);
+    }
+
+    private void ensureCapacity(Vec3 coords) {
+        expandList(xyzGrid, (int) coords.x, ArrayList::new);
+        expandList(xyzGrid.get((int) coords.x), (int) coords.y, ArrayList::new);
+        expandList(xyzGrid.get((int) coords.x).get((int) coords.y), (int) coords.z, () -> null);
+    }
+
+    private static <T> void expandList(List<T> list, int index, Supplier<T> supplier) {
+        while (list.size() <= index)
+            list.add(supplier.get());
     }
 
     @Override
@@ -108,11 +108,6 @@ public class Structure {
             }
         }
         return null;
-    }
-
-    @FunctionalInterface
-    public interface BlockBuilder {
-        Block apply(Vec3 coords, Structure Structure);
     }
 
     private static List<BlockBuilder> convertPalette(ListTag<CompoundTag> palette) {

@@ -1,4 +1,4 @@
-package in.lakazatong.pcbmod.redstone.parser;
+package in.lakazatong.pcbmod.redstone;
 
 import java.util.ArrayList;
 import java.util.List;

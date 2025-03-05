@@ -1,4 +1,4 @@
-package in.lakazatong.pcbmod.redstone.parser;
+package in.lakazatong.pcbmod.redstone;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -6,16 +6,42 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
-public class Parser {
-    private final Structure structure;
-    private final Map<UUID, Map<String, Object>> graph;
+public class Circuit {
+    public final Map<UUID, Block> graph;
+    private double time = 0; // in ticks
 
-    public Parser(Structure structure) {
-        this.structure = structure;
+    private Circuit() {
         this.graph = new HashMap<>();
     }
 
-    public Map<UUID, Map<String, Object>> parse() {
+    public void tick() {
+        Map<UUID, Integer> nextSignals = new HashMap<>(graph.size());
+
+        for (Block block : graph.values())
+            nextSignals.put(block.uuid, block.tick(time));
+
+        for (Map.Entry<UUID, Integer> entry : nextSignals.entrySet())
+            graph.get(entry.getKey()).signal = entry.getValue();
+    }
+
+    public boolean hasChanged() {
+        for (Block block : graph.values()) {
+            if (block.hasChanged())
+                return true;
+        }
+        return false;
+    }
+
+    public void simulateUntilUnchanged() {
+        tick();
+        while (hasChanged()) {
+            time++;
+            tick();
+        }
+    }
+
+    public static Circuit fromStructure(Structure structure) {
+        Circuit circuit = new Circuit();
         Queue<Block> queue = new LinkedList<>();
         Set<UUID> visited = new HashSet<>();
 
@@ -28,25 +54,20 @@ public class Parser {
                 continue;
             visited.add(block.uuid);
 
-            List<Block> blockInputs = new ArrayList<>();
             for (Block neighbor : structure.getNeighbors(block)) {
                 if (neighbor.isInputOf(block))
-                    blockInputs.add(neighbor);
+                    block.inputs.add(neighbor);
                 queue.add(neighbor);
             }
 
-            Map<String, Object> blockInfo = new HashMap<>();
-            blockInfo.put("block", block);
-            blockInfo.put("inputs", blockInputs);
-
-            graph.put(block.uuid, blockInfo);
+            circuit.graph.put(block.uuid, block);
         }
 
-        return graph;
+        return circuit;
     }
 
     @SuppressWarnings("unchecked")
-    public void saveGraphAsDot(Path path) throws IOException {
+    public void saveAsDot(Path path) throws IOException {
         StringBuilder dotBuilder = new StringBuilder();
         dotBuilder.append("digraph G {\n");
 
@@ -54,17 +75,15 @@ public class Parser {
 
         dotBuilder.append("    graph [bgcolor=\"black\"];\n");
 
-        for (Map.Entry<UUID, Map<String, Object>> entry : graph.entrySet()) {
+        for (Map.Entry<UUID, Block> entry : graph.entrySet()) {
             UUID blockUUID = entry.getKey();
-            Map<String, Object> blockInfo = entry.getValue();
-            Block block = (Block) blockInfo.get("block");
-            List<Block> blockInputs = (List<Block>) blockInfo.get("inputs");
+            Block block = entry.getValue();
 
             String blockName = block.type.name().toLowerCase();
 
             dotBuilder.append("    \"").append(blockUUID).append("\" [label=\"").append(blockName).append("\", style=filled, fillcolor=\"black\", fontcolor=\"white\", color=\"white\", width=0.2, height=0.2];\n");
 
-            for (Block input : blockInputs) {
+            for (Block input : block.inputs) {
                 String edge = "\"" + input.uuid + "\" -> \"" + blockUUID + "\"";
                 if (!edges.contains(edge)) {
                     dotBuilder.append("    ").append(edge)
