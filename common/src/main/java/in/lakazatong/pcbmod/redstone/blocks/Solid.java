@@ -20,6 +20,7 @@ public class Solid extends Block {
         };
     }
 
+    // Unused
     @Override
     public int logic(double t) {
         return 0;

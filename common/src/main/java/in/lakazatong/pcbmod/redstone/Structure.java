@@ -6,6 +6,7 @@ import dev.dewy.nbt.tags.collection.ListTag;
 import dev.dewy.nbt.tags.primitive.IntTag;
 import in.lakazatong.pcbmod.redstone.Block.BlockBuilder;
 import in.lakazatong.pcbmod.redstone.blocks.Dust;
+import in.lakazatong.pcbmod.redstone.blocks.Repeater;
 import in.lakazatong.pcbmod.redstone.blocks.Solid;
 import in.lakazatong.pcbmod.redstone.blocks.Torch;
 
@@ -126,6 +127,8 @@ public class Structure {
                 case "minecraft:redstone_wire":
                     builder = (coords, structure) -> new Dust(coords, structure).withProps(props);
                     break;
+                case "minecraft:repeater":
+                    builder = (coords, structure) -> new Repeater(coords, structure).withProps(props);
                 case "minecraft:redstone_torch":
                     builder = (coords, structure) -> new Torch(coords, structure).withProps(props);
                     break;
@@ -142,15 +145,29 @@ public class Structure {
                 for (String key : properties.keySet()) {
                     String value = properties.getString(key).getValue();
 
-                    if (key.equals("facing")) {
-                        facings.add(Vec3.fromCardinal(value));
-                    } else if (Vec3.fromCardinal(key) != null && value.equals("side")) {
-                        facings.add(Vec3.fromCardinal(key));
-                    } else if (key.equals("lit")) {
-                        props.put("lit", Boolean.parseBoolean(value));
-                    } else if (key.equals("power")) {
-                        props.put("power", Integer.parseInt(value));
+                    switch (key) {
+                        case "lit":
+                            props.put("initial_power", Boolean.parseBoolean(value) ? 15 : 0);
+                            break;
+                        case "power":
+                            props.put("initial_power", Integer.parseInt(value));
+                            break;
+                        case "powered":
+                            props.put("initial_power", 15);
+                            break;
+                        case "facing":
+                            facings.add(Vec3.fromCardinal(value));
+                            break;
+                        case "delay":
+                            props.put("delay", Integer.parseInt(value));
+                            break;
+                        case "locked":
+                            props.put("locked", Boolean.parseBoolean(value));
+                            break;
                     }
+
+                    if (Vec3.fromCardinal(key) != null && value.equals("side"))
+                        facings.add(Vec3.fromCardinal(key));
                 }
             }
 

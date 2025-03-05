@@ -8,6 +8,7 @@ import in.lakazatong.pcbmod.redstone.Vec3;
 public class Torch extends Block {
     public Torch(Vec3 coords, Structure structure) {
         super(BlockType.TORCH, coords, structure);
+        signal = props.getOrDefault("lit", "false").equals("true") ? 15 : 0;
     }
 
     @Override
@@ -22,6 +23,10 @@ public class Torch extends Block {
 
     @Override
     public int logic(double t) {
-        return 0;
+        for (Block block : inputs) {
+            if (block.signal > 0)
+                return 0;
+        }
+        return 15;
     }
 }
