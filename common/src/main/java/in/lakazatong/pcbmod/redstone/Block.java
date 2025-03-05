@@ -9,7 +9,8 @@ abstract public class Block {
     public Map<String, Object> props;
     public UUID uuid;
 
-    public List<Block> inputs;
+    public final Set<Block> inputs;
+    public final Set<Block> outputs; // for temporary caching, should not be used
     public int signal = 0;
     public int previousSignal = 0;
 
@@ -20,7 +21,8 @@ abstract public class Block {
         this.props = new HashMap<>();
         this.uuid = UUID.nameUUIDFromBytes(coords.toString().getBytes());
 
-        this.inputs = new ArrayList<>();
+        this.inputs = new HashSet<>();
+        this.outputs = new HashSet<>();
     }
 
     @FunctionalInterface

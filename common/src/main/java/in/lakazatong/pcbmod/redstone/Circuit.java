@@ -63,7 +63,40 @@ public class Circuit {
             circuit.graph.put(block.uuid, block);
         }
 
+        remove0TickNodes(circuit, BlockType.DUST);
+        remove0TickNodes(circuit, BlockType.SOLID);
+
         return circuit;
+    }
+
+    private static void remove0TickNodes(Circuit circuit, BlockType type) {
+        for (Block block : circuit.graph.values()) {
+            for (Block input : block.inputs)
+                input.outputs.add(block);
+        }
+
+        Set<UUID> toRemove = new HashSet<>();
+
+        for (Block block : circuit.graph.values()) {
+            if (block.type == type) {
+                for (Block input : block.inputs) {
+                    for (Block output : block.outputs) {
+                        if (input.uuid != output.uuid)
+                            output.inputs.add(input);
+                    }
+                }
+                toRemove.add(block.uuid);
+            }
+        }
+
+        for (UUID uuid : toRemove)
+            circuit.graph.remove(uuid);
+
+        for (Block block : circuit.graph.values())
+            block.inputs.removeIf(input -> toRemove.contains(input.uuid));
+
+        for (Block block : circuit.graph.values())
+            block.outputs.clear();
     }
 
     @SuppressWarnings("unchecked")

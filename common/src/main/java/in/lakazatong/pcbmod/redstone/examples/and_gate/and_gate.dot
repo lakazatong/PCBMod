@@ -1,25 +1,8 @@
 digraph G {
     graph [bgcolor="black"];
-    "222a7fb5-fd6f-31a6-969b-346b9d6d4a7b" [label="solid", style=filled, fillcolor="black", fontcolor="white", color="white", width=0.2, height=0.2];
-    "a0b8a2e1-807b-3ef1-8f82-0cbb61817378" -> "222a7fb5-fd6f-31a6-969b-346b9d6d4a7b" [color="white", arrowhead="normal", fontcolor="white", penwidth=2];
     "840df290-5421-3f72-a959-b34325057a81" [label="torch", style=filled, fillcolor="black", fontcolor="white", color="white", width=0.2, height=0.2];
-    "731819ad-7f4a-3e8a-9762-ef11a44172a9" -> "840df290-5421-3f72-a959-b34325057a81" [color="white", arrowhead="normal", fontcolor="white", penwidth=2];
     "29c179f9-a450-3f5d-8676-022c50f4696a" [label="torch", style=filled, fillcolor="black", fontcolor="white", color="white", width=0.2, height=0.2];
-    "009a3cb1-4a7e-3cf6-963d-5ec36d3ac40f" -> "29c179f9-a450-3f5d-8676-022c50f4696a" [color="white", arrowhead="normal", fontcolor="white", penwidth=2];
-    "a0b8a2e1-807b-3ef1-8f82-0cbb61817378" [label="dust", style=filled, fillcolor="black", fontcolor="white", color="white", width=0.2, height=0.2];
-    "222a7fb5-fd6f-31a6-969b-346b9d6d4a7b" -> "a0b8a2e1-807b-3ef1-8f82-0cbb61817378" [color="white", arrowhead="normal", fontcolor="white", penwidth=2];
-    "487a539f-9a52-3681-91bc-f626fbc8f3b1" [label="dust", style=filled, fillcolor="black", fontcolor="white", color="white", width=0.2, height=0.2];
-    "035adebe-47b8-309c-a258-8b94d8fd410b" -> "487a539f-9a52-3681-91bc-f626fbc8f3b1" [color="white", arrowhead="normal", fontcolor="white", penwidth=2];
-    "840df290-5421-3f72-a959-b34325057a81" -> "487a539f-9a52-3681-91bc-f626fbc8f3b1" [color="white", arrowhead="normal", fontcolor="white", penwidth=2];
-    "009a3cb1-4a7e-3cf6-963d-5ec36d3ac40f" -> "487a539f-9a52-3681-91bc-f626fbc8f3b1" [color="white", arrowhead="normal", fontcolor="white", penwidth=2];
-    "57d8dfcb-3e15-3785-a9f8-d92c67260304" [label="dust", style=filled, fillcolor="black", fontcolor="white", color="white", width=0.2, height=0.2];
-    "731819ad-7f4a-3e8a-9762-ef11a44172a9" -> "57d8dfcb-3e15-3785-a9f8-d92c67260304" [color="white", arrowhead="normal", fontcolor="white", penwidth=2];
-    "009a3cb1-4a7e-3cf6-963d-5ec36d3ac40f" [label="solid", style=filled, fillcolor="black", fontcolor="white", color="white", width=0.2, height=0.2];
-    "487a539f-9a52-3681-91bc-f626fbc8f3b1" -> "009a3cb1-4a7e-3cf6-963d-5ec36d3ac40f" [color="white", arrowhead="normal", fontcolor="white", penwidth=2];
+    "840df290-5421-3f72-a959-b34325057a81" -> "29c179f9-a450-3f5d-8676-022c50f4696a" [color="white", arrowhead="normal", fontcolor="white", penwidth=2];
+    "035adebe-47b8-309c-a258-8b94d8fd410b" -> "29c179f9-a450-3f5d-8676-022c50f4696a" [color="white", arrowhead="normal", fontcolor="white", penwidth=2];
     "035adebe-47b8-309c-a258-8b94d8fd410b" [label="torch", style=filled, fillcolor="black", fontcolor="white", color="white", width=0.2, height=0.2];
-    "222a7fb5-fd6f-31a6-969b-346b9d6d4a7b" -> "035adebe-47b8-309c-a258-8b94d8fd410b" [color="white", arrowhead="normal", fontcolor="white", penwidth=2];
-    "61219756-d840-3b11-bf42-37dbd296f7b4" [label="dust", style=filled, fillcolor="black", fontcolor="white", color="white", width=0.2, height=0.2];
-    "29c179f9-a450-3f5d-8676-022c50f4696a" -> "61219756-d840-3b11-bf42-37dbd296f7b4" [color="white", arrowhead="normal", fontcolor="white", penwidth=2];
-    "731819ad-7f4a-3e8a-9762-ef11a44172a9" [label="solid", style=filled, fillcolor="black", fontcolor="white", color="white", width=0.2, height=0.2];
-    "57d8dfcb-3e15-3785-a9f8-d92c67260304" -> "731819ad-7f4a-3e8a-9762-ef11a44172a9" [color="white", arrowhead="normal", fontcolor="white", penwidth=2];
 }
