@@ -27,7 +27,8 @@ public class Dust extends Block {
         return switch (neighbor.type) {
             case SOLID -> this.isFacing(neighbor) || this.isAbove(neighbor);
             case DUST -> true;
-            case REPEATER, COMPARATOR -> neighbor.isFacingAway(this);
+            case REPEATER -> neighbor.isFacingAway(this);
+            case COMPARATOR -> !neighbor.isFacing(this);
             default -> false;
         };
     }
