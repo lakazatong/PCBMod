@@ -12,10 +12,12 @@ import org.apache.commons.io.file.PathUtils;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Structure {
     public final Path path;
@@ -115,6 +117,10 @@ public class Structure {
             }
         }
         return null;
+    }
+
+    public Stream<Block> blocks() {
+        return xyzGrid.stream().flatMap(Collection::stream).flatMap(Collection::stream).filter(Objects::nonNull);
     }
 
     private static List<BlockBuilder> convertPalette(ListTag<CompoundTag> palette) {

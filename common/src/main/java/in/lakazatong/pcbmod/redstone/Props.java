@@ -21,9 +21,9 @@ public class Props {
     public boolean hardPowered; // solid
     // the following two could be changed with pistons
     public Vec3 coords;
-    public Set<Block> inputs;
+    public Set<Block> neighbors;
 
-    private Props(int delay, boolean onWall, boolean locked, boolean subtract, Set<Vec3> facings, int signal, boolean hardPowered, Vec3 coords, Set<Block> inputs) {
+    private Props(int delay, boolean onWall, boolean locked, boolean subtract, Set<Vec3> facings, int signal, boolean hardPowered, Vec3 coords, Set<Block> neighbors) {
         this.delay = delay;
         this.onWall = onWall;
         this.locked = locked;
@@ -32,7 +32,7 @@ public class Props {
         this.signal = signal;
         this.hardPowered = hardPowered;
         this.coords = coords;
-        this.inputs = inputs;
+        this.neighbors = neighbors;
     }
 
     public static Props defaults() {
@@ -42,7 +42,7 @@ public class Props {
     public Props dup() {
         return new Props(
             this.delay, this.onWall, this.locked, this.subtract,
-            new HashSet<>(this.facings), this.signal, this.hardPowered, this.coords.dup(), new HashSet<>(this.inputs)
+            new HashSet<>(this.facings), this.signal, this.hardPowered, this.coords.dup(), new HashSet<>()
         );
     }
 
@@ -58,7 +58,7 @@ public class Props {
                     hardPowered == other.hardPowered &&
                     Objects.equals(facings, other.facings) &&
                     Objects.equals(coords, other.coords) &&
-                    Objects.equals(inputs, other.inputs);
+                    Objects.equals(neighbors, other.neighbors);
         }
         return false;
     }

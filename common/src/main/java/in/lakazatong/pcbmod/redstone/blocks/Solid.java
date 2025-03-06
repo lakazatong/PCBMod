@@ -23,30 +23,30 @@ public class Solid extends Block {
     @Override
     public void logic(double t, Props p) {
         p.signal = 0;
-        for (Block block : inputs()) {
-            switch (block.type) {
+        inputs().forEach(input -> {
+            switch (input.type) {
                 case BlockType.REPEATER:
                 case BlockType.TORCH:
                 case BlockType.BUTTON:
-                    if (block.signal() > 0) {
+                    if (input.signal() > 0) {
                         p.hardPowered = true;
                         p.signal = 15;
                         return;
                     }
                     break;
                 case BlockType.COMPARATOR:
-                    if (block.signal() > p.signal) {
+                    if (input.signal() > p.signal) {
                         p.hardPowered = true;
-                        p.signal = block.signal();
+                        p.signal = input.signal();
                     }
                     break;
                 case BlockType.DUST:
-                    if (block.signal() > p.signal) {
+                    if (input.signal() > p.signal) {
                         p.hardPowered = false;
-                        p.signal = block.signal();
+                        p.signal = input.signal();
                     }
                     break;
             }
-        }
+        });
     }
 }

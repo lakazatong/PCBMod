@@ -8,19 +8,32 @@ import java.util.*;
 
 public class Circuit {
     public final Structure structure;
-    public final Map<UUID, Block> graph;
+    public final Map<UUID, Block> graph = new HashMap<>();
     private double time = 0; // in game ticks
 
-    private Circuit(Structure structure) {
+    public Circuit(Structure structure) {
         this.structure = structure;
-        this.graph = new HashMap<>();
+        structure.blocks().forEach(b -> graph.put(b.uuid, b));
+        for (Block b : graph.values())
+            b.props.neighbors.addAll(structure.getNeighbors(b));
     }
 
     public void tick() {
         Map<UUID, Props> nextProps = new HashMap<>(graph.size());
 
-        for (Block block : graph.values())
+        Queue<Block> queue = new LinkedList<>();
+
+        queue.add(structure.getFirstBlock());
+
+        while (!queue.isEmpty()) {
+            Block block = queue.poll();
+
+            if (nextProps.containsKey(block.uuid))
+                continue;
+
             nextProps.put(block.uuid, block.tick(time));
+            block.outputs().forEach(queue::add);
+        }
 
         for (Map.Entry<UUID, Props> entry : nextProps.entrySet())
             graph.get(entry.getKey()).props = entry.getValue();
@@ -43,65 +56,6 @@ public class Circuit {
         }
     }
 
-    public static Circuit fromStructure(Structure structure) {
-        Circuit circuit = new Circuit(structure);
-        Queue<Block> queue = new LinkedList<>();
-        Set<UUID> visited = new HashSet<>();
-
-        queue.add(structure.getFirstBlock());
-
-        while (!queue.isEmpty()) {
-            Block block = queue.poll();
-
-            if (visited.contains(block.uuid))
-                continue;
-            visited.add(block.uuid);
-
-            for (Block neighbor : structure.getNeighbors(block)) {
-                if (neighbor.isInputOf(block))
-                    block.inputs().add(neighbor);
-                queue.add(neighbor);
-            }
-
-            circuit.graph.put(block.uuid, block);
-        }
-
-//        remove0TickNodes(circuit, BlockType.DUST);
-//        remove0TickNodes(circuit, BlockType.SOLID);
-
-        return circuit;
-    }
-
-//    private static void remove0TickNodes(Circuit circuit, BlockType type) {
-//        for (Block block : circuit.graph.values()) {
-//            for (Block input : block.inputs)
-//                input.outputs.add(block);
-//        }
-//
-//        Set<UUID> toRemove = new HashSet<>();
-//
-//        for (Block block : circuit.graph.values()) {
-//            if (block.type == type) {
-//                for (Block input : block.inputs) {
-//                    for (Block output : block.outputs) {
-//                        if (input.uuid != output.uuid)
-//                            output.inputs.add(input);
-//                    }
-//                }
-//                toRemove.add(block.uuid);
-//            }
-//        }
-//
-//        for (UUID uuid : toRemove)
-//            circuit.graph.remove(uuid);
-//
-//        for (Block block : circuit.graph.values())
-//            block.inputs.removeIf(input -> toRemove.contains(input.uuid));
-//
-//        for (Block block : circuit.graph.values())
-//            block.outputs.clear();
-//    }
-
     public void saveAsDot() throws IOException, InterruptedException {
         StringBuilder dotBuilder = new StringBuilder();
         dotBuilder.append("digraph G {\n");
@@ -118,14 +72,14 @@ public class Circuit {
 
             dotBuilder.append("    \"").append(blockUUID).append("\" [label=\"").append(blockName).append("\", style=filled, fillcolor=\"black\", fontcolor=\"white\", color=\"white\", width=0.2, height=0.2];\n");
 
-            for (Block input : block.inputs()) {
+            block.inputs().forEach(input -> {
                 String edge = "\"" + input.uuid + "\" -> \"" + blockUUID + "\"";
                 if (!edges.contains(edge)) {
                     dotBuilder.append("    ").append(edge)
                             .append(" [color=\"white\", arrowhead=\"normal\", fontcolor=\"white\", penwidth=2];\n");
                     edges.add(edge);
                 }
-            }
+            });
         }
 
         dotBuilder.append("}\n");

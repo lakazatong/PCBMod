@@ -23,34 +23,30 @@ public abstract class RepeaterLike extends Block {
     }
 
     protected void lockableLogic(double t, Props p) {
-        boolean receivedPowered = inputs().stream()
-                .filter(i -> !isSideInputOf(this))
-                .anyMatch(i -> i.signal() > 0);
-        boolean receivedLocked = inputs().stream()
-                .filter(i -> isSideInputOf(this))
-                .anyMatch(i -> i.signal() > 0);
-        if (nextPowered != receivedPowered) {
-            nextPowered = receivedPowered;
-            if (!receivedLocked)
+        boolean receivingSignal = rearInputs().anyMatch(i -> i.signal() > 0);
+        boolean locked = locked();
+        if (nextPowered != receivingSignal) {
+            nextPowered = receivingSignal;
+            if (!locked)
                 stableTime = 0;
-        } else if (stableTime >= delay() && !receivedLocked) {
+        } else if (stableTime >= delay() && !locked) {
             powered = nextPowered;
             stableTime = 0;
-        } else if (!receivedLocked) {
+        } else if (!locked) {
             stableTime++;
         }
 
-        if (receivedLocked)
+        if (locked)
             stableTime = 0;
 
         setSignal(t, p);
+        p.locked = sideInputs().anyMatch(i -> i.signal() > 0);
     }
 
     protected void unlockableLogic(double t, Props p) {
-        boolean receivedPowered = inputs().stream()
-                .anyMatch(i -> i.signal() > 0);
-        if (nextPowered != receivedPowered) {
-            nextPowered = receivedPowered;
+        boolean receivedSignal = inputs().anyMatch(i -> i.signal() > 0);
+        if (nextPowered != receivedSignal) {
+            nextPowered = receivedSignal;
             stableTime = 0;
         } else if (stableTime >= delay()) {
             powered = nextPowered;

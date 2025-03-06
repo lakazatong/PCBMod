@@ -5,6 +5,8 @@ import in.lakazatong.pcbmod.redstone.BlockType;
 import in.lakazatong.pcbmod.redstone.Props;
 import in.lakazatong.pcbmod.redstone.Structure;
 
+import java.util.stream.Collectors;
+
 public class Dust extends Block {
     public Dust(Structure structure, Props p) {
         super(BlockType.DUST, structure, p);
@@ -25,7 +27,7 @@ public class Dust extends Block {
     public void logic(double t, Props p) {
         boolean degradeSignal = true;
         p.signal = 0;
-        for (Block block : inputs()) {
+        for (Block block : inputs().collect(Collectors.toSet())) {
             switch (block.type) {
                 case BlockType.REPEATER:
                 case BlockType.TORCH:

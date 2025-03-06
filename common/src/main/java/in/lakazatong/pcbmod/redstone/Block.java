@@ -2,10 +2,10 @@ package in.lakazatong.pcbmod.redstone;
 
 import in.lakazatong.pcbmod.utils.Vec3;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 abstract public class Block {
     // fixed properties
@@ -20,8 +20,6 @@ abstract public class Block {
 
     // temporary properties
 
-    // used in Circuit::remove0TickNodes
-    public final Set<Block> outputs = new HashSet<>();
     // used in Block::hasChanged
     public Props previousProps = Props.defaults();
 
@@ -103,8 +101,7 @@ abstract public class Block {
         return p;
     }
 
-    public void logic(double t, Props p) {
-    }
+    public abstract void logic(double t, Props p);
 
     public boolean hasChanged() {
         return !props.equals(previousProps);
@@ -142,7 +139,25 @@ abstract public class Block {
         return props.coords;
     }
 
-    public Set<Block> inputs() {
-        return props.inputs;
+    public Set<Block> neighbors() {
+        return props.neighbors;
+    }
+
+    public Stream<Block> inputs() {
+        return neighbors().stream()
+                .filter(neighbor -> neighbor.isInputOf(this));
+    }
+
+    public Stream<Block> outputs() {
+        return neighbors().stream()
+                .filter(neighbor -> !neighbor.isInputOf(this));
+    }
+
+    public Stream<Block> sideInputs() {
+        return inputs().filter(input -> input.isSideInputOf(this));
+    }
+
+    public Stream<Block> rearInputs() {
+        return inputs().filter(input -> !input.isSideInputOf(this));
     }
 }

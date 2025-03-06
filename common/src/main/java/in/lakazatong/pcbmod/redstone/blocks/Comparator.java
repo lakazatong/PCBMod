@@ -31,13 +31,13 @@ public class Comparator extends RepeaterLike {
             p.signal = 0;
             return;
         }
-        List<Block> rearInputs = inputs().stream().filter(i -> !isSideInputOf(this)).toList();
+        List<Block> rearInputs = rearInputs().toList();
         assert rearInputs.size() <= 1;
         if (rearInputs.isEmpty()) {
             p.signal = 0;
             return;
         }
-        List<Block> sideInputs = inputs().stream().filter(i -> isSideInputOf(this)).toList();
+        List<Block> sideInputs = sideInputs().toList();
         assert sideInputs.size() <= 2;
         int rearSignal = rearInputs.getFirst().signal();
         int maxSideSignal = sideInputs.stream()
@@ -52,13 +52,13 @@ public class Comparator extends RepeaterLike {
             p.signal = 0;
             return;
         }
-        List<Block> rearInputs = inputs().stream().filter(i -> !isSideInputOf(this)).toList();
+        List<Block> rearInputs = rearInputs().toList();
         assert rearInputs.size() <= 1;
         if (rearInputs.isEmpty()) {
             p.signal = 0;
             return;
         }
-        List<Block> sideInputs = inputs().stream().filter(i -> isSideInputOf(this)).toList();
+        List<Block> sideInputs = sideInputs().toList();
         assert sideInputs.size() <= 2;
         int rearSignal = rearInputs.getFirst().signal();
         p.signal = sideInputs.stream().anyMatch(i -> i.signal() > rearSignal) ? 0 : rearSignal;

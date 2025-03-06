@@ -12,7 +12,7 @@ public class Main {
         Structure structure = Structure.fromNBT(nbtPath);
         System.out.println(structure);
 
-        Circuit circuit = Circuit.fromStructure(structure);
+        Circuit circuit = new Circuit(structure);
         circuit.saveAsDot();
     }
 }
