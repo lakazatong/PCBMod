@@ -26,10 +26,8 @@ public class Repeater extends Block {
         signal = (int) props.get("signal");
         delay = (int) props.get("delay") * 2;
         logicImpl = (boolean) props.get("locked") ? this::lockedLogic : this::defaultLogic;
-        if (props.get("facings") instanceof Set<?> tmp) {
-            assert facings.isEmpty();
+        if (props.get("facings") instanceof Set<?> tmp)
             tmp.forEach(facing -> facings.add((((Vec3) facing).opposite())));
-        }
     }
 
     @Override

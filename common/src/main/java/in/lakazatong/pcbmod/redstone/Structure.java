@@ -5,10 +5,7 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
 import dev.dewy.nbt.tags.collection.ListTag;
 import dev.dewy.nbt.tags.primitive.IntTag;
 import in.lakazatong.pcbmod.redstone.Block.BlockBuilder;
-import in.lakazatong.pcbmod.redstone.blocks.Dust;
-import in.lakazatong.pcbmod.redstone.blocks.Repeater;
-import in.lakazatong.pcbmod.redstone.blocks.Solid;
-import in.lakazatong.pcbmod.redstone.blocks.Torch;
+import in.lakazatong.pcbmod.redstone.blocks.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -123,6 +120,8 @@ public class Structure {
                 case "minecraft:repeater" -> new BlockBuilder(Repeater::new);
                 case "minecraft:redstone_torch" -> new BlockBuilder(Torch::new);
                 case "minecraft:redstone_wall_torch" -> new BlockBuilder(Torch::new).withProp("onWall", true);
+                case "minecraft:stone_button" -> new BlockBuilder(Button::new).withProp("delay", 10);
+                case "minecraft:wooden_button" -> new BlockBuilder(Button::new).withProp("delay", 20);
                 default -> new BlockBuilder(Solid::new);
             };
 
