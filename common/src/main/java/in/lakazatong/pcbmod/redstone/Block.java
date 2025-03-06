@@ -10,7 +10,8 @@ abstract public class Block {
     public UUID uuid;
 
     public final Set<Block> inputs;
-    public final Set<Block> outputs; // for temporary caching, should not be used
+    // for temporary caching in Circuit::remove0TickNodes, should not be used
+    public final Set<Block> outputs;
     public int signal = 0;
     public int previousSignal = 0;
 
@@ -30,8 +31,12 @@ abstract public class Block {
         Block apply(Vec3 coords, Structure Structure);
     }
 
+    protected void initFromProps() {
+    }
+
     public Block withProps(Map<String, Object> props) {
         this.props = props;
+        initFromProps();
         return this;
     }
 
@@ -57,9 +62,8 @@ abstract public class Block {
     public boolean isFacing(Block other) {
         Object facings = this.props.get("facings");
         for (Vec3 facing : (Iterable<Vec3>) facings) {
-            if (this.coords.add(facing).equals(other.coords)) {
+            if (this.coords.add(facing).equals(other.coords))
                 return true;
-            }
         }
         return false;
     }

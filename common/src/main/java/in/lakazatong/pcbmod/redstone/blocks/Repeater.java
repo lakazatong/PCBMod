@@ -6,17 +6,21 @@ import in.lakazatong.pcbmod.redstone.Structure;
 import in.lakazatong.pcbmod.redstone.Vec3;
 
 public class Repeater extends Block {
-    private final int delay;
+    private int delay;
 
     @FunctionalInterface
     private interface LogicImpl {
         int apply(double t);
     }
 
-    private final LogicImpl logicImpl;
+    private LogicImpl logicImpl;
 
     public Repeater(Vec3 coords, Structure structure) {
         super(BlockType.REPEATER, coords, structure);
+    }
+
+    @Override
+    protected void initFromProps() {
         signal = (int) props.get("initial_power");
         delay = (int) props.get("delay") * 2;
         logicImpl = (boolean) props.get("locked") ? this::lockedLogic : this::defaultLogic;

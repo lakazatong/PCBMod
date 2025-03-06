@@ -129,14 +129,13 @@ public class Structure {
                     break;
                 case "minecraft:repeater":
                     builder = (coords, structure) -> new Repeater(coords, structure).withProps(props);
+                    break;
                 case "minecraft:redstone_torch":
                     builder = (coords, structure) -> new Torch(coords, structure).withProps(props);
                     break;
                 case "minecraft:redstone_wall_torch":
                     props.put("on_wall", true);
                     builder = (coords, structure) -> new Torch(coords, structure).withProps(props);
-                    break;
-                default:
                     break;
             }
 
@@ -146,14 +145,11 @@ public class Structure {
                     String value = properties.getString(key).getValue();
 
                     switch (key) {
-                        case "lit":
+                        case "lit", "powered":
                             props.put("initial_power", Boolean.parseBoolean(value) ? 15 : 0);
                             break;
                         case "power":
                             props.put("initial_power", Integer.parseInt(value));
-                            break;
-                        case "powered":
-                            props.put("initial_power", 15);
                             break;
                         case "facing":
                             facings.add(Vec3.fromCardinal(value));

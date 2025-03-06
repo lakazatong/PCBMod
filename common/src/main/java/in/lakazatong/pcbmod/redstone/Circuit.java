@@ -63,8 +63,8 @@ public class Circuit {
             circuit.graph.put(block.uuid, block);
         }
 
-        remove0TickNodes(circuit, BlockType.DUST);
-        remove0TickNodes(circuit, BlockType.SOLID);
+//        remove0TickNodes(circuit, BlockType.DUST);
+//        remove0TickNodes(circuit, BlockType.SOLID);
 
         return circuit;
     }
