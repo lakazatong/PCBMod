@@ -118,12 +118,18 @@ public class Structure {
             Set<Vec3> facings = new HashSet<>();
 
             BlockBuilder builder = switch (t.getString("Name").getValue()) {
+                case "minecraft:air" -> null;
                 case "minecraft:redstone_wire" -> new BlockBuilder(Dust::new);
                 case "minecraft:repeater" -> new BlockBuilder(Repeater::new);
                 case "minecraft:redstone_torch" -> new BlockBuilder(Torch::new);
                 case "minecraft:redstone_wall_torch" -> new BlockBuilder(Torch::new).withProp("onWall", true);
                 default -> new BlockBuilder(Solid::new);
             };
+
+            if (builder == null) {
+                result.add(null);
+                continue;
+            }
 
             if (t.contains("Properties")) {
                 CompoundTag properties = t.getCompound("Properties");
@@ -171,7 +177,7 @@ public class Structure {
         for (CompoundTag bTag : blocks) {
             ListTag<IntTag> pos = bTag.getList("pos");
             BlockBuilder builder = palette.get(bTag.getInt("state").getValue());
-
+            if (builder == null) continue;
             Vec3 coordinates = new Vec3(pos.get(0).intValue(), pos.get(1).intValue(), pos.get(2).intValue());
             Block block = builder.apply(coordinates, structure);
             structure.setBlock(block);
