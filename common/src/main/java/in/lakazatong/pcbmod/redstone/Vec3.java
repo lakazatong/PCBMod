@@ -38,6 +38,10 @@ public class Vec3 {
         return r;
     }
 
+    public Vec3 opposite() {
+        return new Vec3(-this.x, -this.y, -this.z);
+    }
+
     public Vec3 add(Vec3 other) {
         return new Vec3(this.x + other.x, this.y + other.y, this.z + other.z);
     }

@@ -116,14 +116,11 @@ public class Structure {
 
         for (CompoundTag t : palette) {
             Map<String, Object> props = new HashMap<>();
-            List<Vec3> facings = new ArrayList<>();
+            Set<Vec3> facings = new HashSet<>();
 
             BlockBuilder builder = (coords, structure) -> new Solid(coords, structure).withProps(props);
 
             switch (t.getString("Name").getValue()) {
-                case "minecraft:air":
-                    result.add(null);
-                    continue;
                 case "minecraft:redstone_wire":
                     builder = (coords, structure) -> new Dust(coords, structure).withProps(props);
                     break;
@@ -187,8 +184,6 @@ public class Structure {
         for (CompoundTag bTag : blocks) {
             ListTag<IntTag> pos = bTag.getList("pos");
             BlockBuilder builder = palette.get(bTag.getInt("state").getValue());
-
-            if (builder == null) continue;
 
             Vec3 coordinates = new Vec3(pos.get(0).intValue(), pos.get(1).intValue(), pos.get(2).intValue());
             Block block = builder.apply(coordinates, structure);

@@ -5,6 +5,8 @@ import in.lakazatong.pcbmod.redstone.BlockType;
 import in.lakazatong.pcbmod.redstone.Structure;
 import in.lakazatong.pcbmod.redstone.Vec3;
 
+import java.util.Set;
+
 public class Repeater extends Block {
     private int delay;
 
@@ -19,11 +21,13 @@ public class Repeater extends Block {
         super(BlockType.REPEATER, coords, structure);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void initFromProps() {
         signal = (int) props.get("initial_power");
         delay = (int) props.get("delay") * 2;
         logicImpl = (boolean) props.get("locked") ? this::lockedLogic : this::defaultLogic;
+        props.put("facings", ((Set<Vec3>) props.get("facings")).stream().map(Vec3::opposite));
     }
 
     @Override
