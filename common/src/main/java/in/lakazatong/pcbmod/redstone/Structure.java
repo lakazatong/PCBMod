@@ -128,17 +128,17 @@ public class Structure {
                 case "minecraft:redstone_torch" -> new BlockBuilder(Torch::new);
                 case "minecraft:redstone_wall_torch" -> {
                     BlockBuilder b = new BlockBuilder(Torch::new);
-                    b.initialProps.onWall = true;
+                    b.commonInitialProps.onWall = true;
                     yield b;
                 }
                 case "minecraft:stone_button" -> {
                     BlockBuilder b = new BlockBuilder(Button::new);
-                    b.initialProps.delay = 20;
+                    b.commonInitialProps.delay = 20;
                     yield b;
                 }
                 case "minecraft:wooden_button" -> {
                     BlockBuilder b = new BlockBuilder(Button::new);
-                    b.initialProps.delay = 40;
+                    b.commonInitialProps.delay = 40;
                     yield b;
                 }
                 case "minecraft:comparator" -> new BlockBuilder(Comparator::new);
@@ -157,27 +157,27 @@ public class Structure {
 
                     switch (key) {
                         case "lit", "powered":
-                            builder.initialProps.signal = Boolean.parseBoolean(value) ? 15 : 0;
+                            builder.commonInitialProps.signal = Boolean.parseBoolean(value) ? 15 : 0;
                             break;
                         case "power":
-                            builder.initialProps.signal = Integer.parseInt(value);
+                            builder.commonInitialProps.signal = Integer.parseInt(value);
                             break;
                         case "facing":
-                            builder.initialProps.facings.add(Vec3.fromCardinal(value));
+                            builder.commonInitialProps.facings.add(Vec3.fromCardinal(value));
                             break;
                         case "delay":
-                            builder.initialProps.delay = Integer.parseInt(value) * 2;
+                            builder.commonInitialProps.delay = Integer.parseInt(value) * 2;
                             break;
                         case "locked":
-                            builder.initialProps.locked = Boolean.parseBoolean(value);
+                            builder.commonInitialProps.locked = Boolean.parseBoolean(value);
                             break;
                         case "mode":
-                            builder.initialProps.subtract = value.equals("subtract");
+                            builder.commonInitialProps.subtract = value.equals("subtract");
                             break;
                     }
 
                     if (Vec3.fromCardinal(key) != null && value.equals("side"))
-                        builder.initialProps.facings.add(Vec3.fromCardinal(key));
+                        builder.commonInitialProps.facings.add(Vec3.fromCardinal(key));
                 }
             }
 

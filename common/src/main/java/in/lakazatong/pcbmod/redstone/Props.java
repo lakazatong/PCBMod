@@ -42,7 +42,7 @@ public class Props {
     public Props dup() {
         return new Props(
             this.delay, this.onWall, this.locked, this.subtract,
-            Set.copyOf(this.facings), this.signal, this.hardPowered, this.coords.dup(), Set.copyOf(this.inputs)
+            new HashSet<>(this.facings), this.signal, this.hardPowered, this.coords.dup(), new HashSet<>(this.inputs)
         );
     }
 

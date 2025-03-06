@@ -44,13 +44,14 @@ abstract public class Block {
         }
 
         private final BlockConstructor cons;
-        public final Props initialProps = Props.defaults();
+        public final Props commonInitialProps = Props.defaults();
 
         public BlockBuilder(BlockConstructor cons) {
             this.cons = cons;
         }
 
         public Block apply(Structure structure, Vec3 coords) {
+            Props initialProps = commonInitialProps.dup();
             initialProps.coords = coords;
             return cons.apply(structure, initialProps);
         }
