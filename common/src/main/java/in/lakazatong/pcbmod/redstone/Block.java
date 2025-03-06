@@ -100,7 +100,7 @@ abstract public class Block {
     }
 
     public boolean hasChanged() {
-        return props != previousProps;
+        return !props.equals(previousProps);
     }
 
     public int delay() {
