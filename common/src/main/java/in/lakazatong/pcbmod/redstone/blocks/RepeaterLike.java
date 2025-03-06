@@ -8,7 +8,7 @@ import in.lakazatong.pcbmod.redstone.Structure;
 public abstract class RepeaterLike extends Block {
     protected LogicImpl logicImpl;
 
-    protected abstract void setSignal(double t, Props p);
+    protected abstract void setSignal(long t, Props p);
 
     protected boolean powered = false;
     private boolean nextPowered = false;
