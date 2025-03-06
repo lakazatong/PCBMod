@@ -3,7 +3,7 @@ package in.lakazatong.pcbmod.redstone.blocks;
 import in.lakazatong.pcbmod.redstone.Block;
 import in.lakazatong.pcbmod.redstone.BlockType;
 import in.lakazatong.pcbmod.redstone.Structure;
-import in.lakazatong.pcbmod.redstone.Vec3;
+import in.lakazatong.pcbmod.utils.Vec3;
 
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +17,7 @@ public class Torch extends Block {
 
     @Override
     protected void initProps(Map<String, Object> props) {
+        onWall = (boolean) props.get("onWall");
         signal = (int) props.get("signal");
         if (props.get("facings") instanceof Set<?> tmp)
             tmp.forEach(facing -> facings.add(((Vec3) facing)));

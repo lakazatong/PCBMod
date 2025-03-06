@@ -5,8 +5,10 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
 import dev.dewy.nbt.tags.collection.ListTag;
 import dev.dewy.nbt.tags.primitive.IntTag;
 import in.lakazatong.pcbmod.redstone.Block.BlockBuilder;
-import in.lakazatong.pcbmod.redstone.blocks.*;
 import in.lakazatong.pcbmod.redstone.blocks.Comparator;
+import in.lakazatong.pcbmod.redstone.blocks.*;
+import in.lakazatong.pcbmod.utils.Vec3;
+import org.apache.commons.io.file.PathUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -24,10 +26,8 @@ public class Structure {
     private final List<List<List<Block>>> xyzGrid;
 
     private Structure(Path path, int maxX, int maxY, int maxZ) {
-        String filename = path.getFileName().toString();
-        int dotIndex = filename.lastIndexOf('.');
         this.path = path;
-        this.name = (dotIndex == -1) ? filename : filename.substring(0, dotIndex);
+        this.name = PathUtils.getBaseName(path.getFileName());
         this.maxX = maxX;
         this.maxY = maxY;
         this.maxZ = maxZ;
@@ -126,7 +126,7 @@ public class Structure {
                 case "minecraft:air" -> null;
                 case "minecraft:redstone_wire" -> new BlockBuilder(Dust::new);
                 case "minecraft:repeater" -> new BlockBuilder(Repeater::new);
-                case "minecraft:redstone_torch" -> new BlockBuilder(Torch::new);
+                case "minecraft:redstone_torch" -> new BlockBuilder(Torch::new).withProp("onWall", false);
                 case "minecraft:redstone_wall_torch" -> new BlockBuilder(Torch::new).withProp("onWall", true);
                 case "minecraft:stone_button" -> new BlockBuilder(Button::new).withProp("delay", 10);
                 case "minecraft:wooden_button" -> new BlockBuilder(Button::new).withProp("delay", 20);

@@ -1,5 +1,7 @@
 package in.lakazatong.pcbmod.redstone;
 
+import in.lakazatong.pcbmod.utils.Vec3;
+
 import java.util.*;
 
 abstract public class Block {
@@ -9,15 +11,15 @@ abstract public class Block {
     public final Structure structure;
     public final UUID uuid;
 
-    public int delay = 0;
+    public int delay; // all
     public boolean onWall = false; // button, torch
     public boolean locked = false; // repeater (might be useless)
     public boolean subtract = false; // comparator (might be useless)
 
     // dynamic properties
 
-    public final Set<Vec3> facings = new HashSet<>(); // button, comparator, repeater, torch
-    public int signal = 0;
+    public final Set<Vec3> facings = new HashSet<>(); // button, comparator, dust, repeater, torch
+    public int signal = 0; // all
     // the following two could be changed with pistons
     public Vec3 coords;
     public final Set<Block> inputs = new HashSet<>();

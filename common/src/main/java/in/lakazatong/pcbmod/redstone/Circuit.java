@@ -1,8 +1,9 @@
 package in.lakazatong.pcbmod.redstone;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import org.apache.commons.io.file.PathUtils;
+
+import java.io.*;
+import java.nio.file.Path;
 import java.util.*;
 
 public class Circuit {
@@ -128,14 +129,35 @@ public class Circuit {
 
         dotBuilder.append("}\n");
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(structure.path.toFile()))) {
+        String dotPath = structure.path.getParent().resolve(PathUtils.getBaseName(structure.path) + ".dot").toAbsolutePath().toString();
+        String pngPath = structure.path.getParent().resolve(PathUtils.getBaseName(structure.path) + ".png").toAbsolutePath().toString();
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(Path.of(dotPath).toFile()))) {
             writer.write(dotBuilder.toString());
         }
 
-        Process process = new ProcessBuilder("bash", "-c", "'",
-                "cd", "\"" + structure.path.getParent() + "\"", "&&",
-                "dot", "-Tpng", "\"" + structure.name + ".dot\"", "-o", "\"" + structure.name + ".png\"",
-                "'").start();
-        process.waitFor();
+        dotPath = "/mnt/" + dotPath.split(":")[0].toLowerCase() + dotPath.substring(dotPath.indexOf(":") + 1);
+        pngPath = "/mnt/" + pngPath.split(":")[0].toLowerCase() + pngPath.substring(pngPath.indexOf(":") + 1);
+
+        ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c",
+                "dot -Tpng " +
+                dotPath.replace("\\", "/") +
+                " -o " +
+                pngPath.replace("\\", "/"));
+
+        Process process = processBuilder.start();
+        int exitCode = process.waitFor();
+
+        if (exitCode == 0) {
+            System.out.println("PNG file generated successfully.");
+        } else {
+            System.out.println("Error generating PNG.");
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    System.err.println(line);
+                }
+            }
+        }
     }
 }

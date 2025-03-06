@@ -3,14 +3,13 @@ package in.lakazatong.pcbmod.redstone.blocks;
 import in.lakazatong.pcbmod.redstone.Block;
 import in.lakazatong.pcbmod.redstone.BlockType;
 import in.lakazatong.pcbmod.redstone.Structure;
-import in.lakazatong.pcbmod.redstone.Vec3;
+import in.lakazatong.pcbmod.utils.Vec3;
 
 public class Solid extends Block {
     public Solid(Vec3 coords, Structure structure) {
         super(BlockType.SOLID, coords, structure);
+        delay = 0;
     }
-
-    // no need to bother with the properties here since this block will not appear in the circuit graph
 
     @Override
     public boolean isInputOf(Block neighbor) {

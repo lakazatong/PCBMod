@@ -1,4 +1,4 @@
-package in.lakazatong.pcbmod.redstone;
+package in.lakazatong.pcbmod.utils;
 
 import java.util.HashSet;
 import java.util.Set;
