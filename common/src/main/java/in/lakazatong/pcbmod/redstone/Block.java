@@ -40,6 +40,9 @@ abstract public class Block {
 
         public BlockBuilder(BlockConstructor cons) {
             this.cons = cons;
+        }
+
+        public BlockBuilder withProp(String key, Object value) {
             props.put(key, value);
             return this;
         }
