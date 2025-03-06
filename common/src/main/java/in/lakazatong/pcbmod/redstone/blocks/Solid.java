@@ -4,11 +4,10 @@ import in.lakazatong.pcbmod.redstone.Block;
 import in.lakazatong.pcbmod.redstone.BlockType;
 import in.lakazatong.pcbmod.redstone.Props;
 import in.lakazatong.pcbmod.redstone.Structure;
-import in.lakazatong.pcbmod.utils.Vec3;
 
 public class Solid extends Block {
-    public Solid(Vec3 coords, Structure structure) {
-        super(BlockType.SOLID, coords, structure);
+    public Solid(Structure structure, Props p) {
+        super(BlockType.SOLID, structure, p);
     }
 
     @Override

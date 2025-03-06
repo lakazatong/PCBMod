@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 public class Comparator extends Block {
     private LogicImpl logicImpl;
 
-    public Comparator(Vec3 coords, Structure structure) {
-        super(BlockType.COMPARATOR, coords, structure);
+    public Comparator(Structure structure, Props p) {
+        super(BlockType.COMPARATOR, structure, p);
         props.delay = 2;
         logicImpl = subtract() ? this::SubtractLogic : this::defaultLogic;
         props.facings = facings().stream().map(Vec3::opposite).collect(Collectors.toSet());

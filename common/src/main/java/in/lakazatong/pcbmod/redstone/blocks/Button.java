@@ -4,11 +4,10 @@ import in.lakazatong.pcbmod.redstone.Block;
 import in.lakazatong.pcbmod.redstone.BlockType;
 import in.lakazatong.pcbmod.redstone.Props;
 import in.lakazatong.pcbmod.redstone.Structure;
-import in.lakazatong.pcbmod.utils.Vec3;
 
 public class Button extends Block {
-    public Button(Vec3 coords, Structure structure) {
-        super(BlockType.BUTTON, coords, structure);
+    public Button(Structure structure, Props p) {
+        super(BlockType.BUTTON, structure, p);
         props.onWall = true;
     }
 

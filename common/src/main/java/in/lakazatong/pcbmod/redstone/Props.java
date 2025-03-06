@@ -2,7 +2,7 @@ package in.lakazatong.pcbmod.redstone;
 
 import in.lakazatong.pcbmod.utils.Vec3;
 
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -36,7 +36,7 @@ public class Props {
     }
 
     public static Props defaults() {
-        return new Props(0, false, false, false, Collections.emptySet(), 0, false, new Vec3(0, 0, 0), Collections.emptySet());
+        return new Props(0, false, false, false, new HashSet<>(), 0, false, new Vec3(0, 0, 0), new HashSet<>());
     }
 
     public Props dup() {

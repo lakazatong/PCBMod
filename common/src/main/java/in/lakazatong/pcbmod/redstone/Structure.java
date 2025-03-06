@@ -200,8 +200,7 @@ public class Structure {
             ListTag<IntTag> pos = bTag.getList("pos");
             BlockBuilder builder = palette.get(bTag.getInt("state").getValue());
             if (builder == null) continue;
-            Vec3 coordinates = new Vec3(pos.get(0).intValue(), pos.get(1).intValue(), pos.get(2).intValue());
-            Block block = builder.apply(coordinates, structure);
+            Block block = builder.apply(structure, new Vec3(pos.get(0).intValue(), pos.get(1).intValue(), pos.get(2).intValue()));
             structure.setBlock(block);
         }
 

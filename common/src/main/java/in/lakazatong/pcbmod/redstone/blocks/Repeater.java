@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 public class Repeater extends Block {
     private LogicImpl logicImpl;
 
-    public Repeater(Vec3 coords, Structure structure) {
-        super(BlockType.REPEATER, coords, structure);
+    public Repeater(Structure structure, Props p) {
+        super(BlockType.REPEATER, structure, p);
         logicImpl = locked() ? this::lockedLogic : this::defaultLogic;
         props.facings = facings().stream().map(Vec3::opposite).collect(Collectors.toSet());
     }

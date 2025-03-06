@@ -24,13 +24,12 @@ abstract public class Block {
     // used in Block::hasChanged
     public Props previousProps = Props.defaults();
 
-    protected Block(BlockType type, Vec3 coords, Structure structure) {
+    protected Block(BlockType type, Structure structure, Props initialProps) {
         this.type = type;
         this.structure = structure;
-        this.uuid = UUID.nameUUIDFromBytes(coords.toString().getBytes());
+        this.props = initialProps;
 
-        this.props = Props.defaults();
-        this.props.coords = coords;
+        this.uuid = UUID.nameUUIDFromBytes(this.props.coords.toString().getBytes());
     }
 
     @FunctionalInterface
@@ -41,7 +40,7 @@ abstract public class Block {
     public static class BlockBuilder {
         @FunctionalInterface
         public interface BlockConstructor {
-            Block apply(Vec3 coords, Structure structure);
+            Block apply(Structure structure, Props initialProps);
         }
 
         private final BlockConstructor cons;
@@ -51,8 +50,9 @@ abstract public class Block {
             this.cons = cons;
         }
 
-        public Block apply(Vec3 coords, Structure structure) {
-            return cons.apply(coords, structure);
+        public Block apply(Structure structure, Vec3 coords) {
+            initialProps.coords = coords;
+            return cons.apply(structure, initialProps);
         }
     }
 

@@ -4,12 +4,11 @@ import in.lakazatong.pcbmod.redstone.Block;
 import in.lakazatong.pcbmod.redstone.BlockType;
 import in.lakazatong.pcbmod.redstone.Props;
 import in.lakazatong.pcbmod.redstone.Structure;
-import in.lakazatong.pcbmod.utils.Vec3;
 
 public class Torch extends Block {
 
-    public Torch(Vec3 coords, Structure structure) {
-        super(BlockType.TORCH, coords, structure);
+    public Torch(Structure structure, Props p) {
+        super(BlockType.TORCH, structure, p);
         props.delay = 2;
     }
 

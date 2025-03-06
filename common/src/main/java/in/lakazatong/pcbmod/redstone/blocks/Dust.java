@@ -4,11 +4,10 @@ import in.lakazatong.pcbmod.redstone.Block;
 import in.lakazatong.pcbmod.redstone.BlockType;
 import in.lakazatong.pcbmod.redstone.Props;
 import in.lakazatong.pcbmod.redstone.Structure;
-import in.lakazatong.pcbmod.utils.Vec3;
 
 public class Dust extends Block {
-    public Dust(Vec3 coords, Structure structure) {
-        super(BlockType.DUST, coords, structure);
+    public Dust(Structure structure, Props p) {
+        super(BlockType.DUST, structure, p);
     }
 
     @Override
