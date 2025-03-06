@@ -12,7 +12,7 @@ public class Torch extends Block {
 
     public Torch(Vec3 coords, Structure structure) {
         super(BlockType.TORCH, coords, structure);
-        delay = 2; // 1 redstone tick * 2 = 2
+        delay = 2;
     }
 
     @Override

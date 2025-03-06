@@ -5,28 +5,40 @@ import java.util.*;
 abstract public class Block {
     // static properties
 
-    public final Set<Vec3> facings = new HashSet<>();
     public final BlockType type;
     public final Structure structure;
     public final UUID uuid;
-    public boolean onWall = false;
+
     public int delay = 0;
+    public boolean onWall = false; // button, torch
+    public boolean locked = false; // repeater (might be useless)
+    public boolean subtract = false; // comparator (might be useless)
 
     // dynamic properties
 
+    public final Set<Vec3> facings = new HashSet<>(); // button, comparator, repeater, torch
     public int signal = 0;
-    public int previousSignal = 0;
     // the following two could be changed with pistons
     public Vec3 coords;
     public final Set<Block> inputs = new HashSet<>();
-    // for temporary caching in Circuit::remove0TickNodes, should not be used
+
+    // temporary properties
+
+    // used in Circuit::remove0TickNodes
     public final Set<Block> outputs = new HashSet<>();
+    // used in Block::hasChanged
+    public int previousSignal = 0;
 
     public Block(BlockType type, Vec3 coords, Structure structure) {
         this.type = type;
         this.coords = coords;
         this.structure = structure;
         this.uuid = UUID.nameUUIDFromBytes(coords.toString().getBytes());
+    }
+
+    @FunctionalInterface
+    protected interface LogicImpl {
+        int apply(double t);
     }
 
     public static class BlockBuilder {
@@ -98,7 +110,9 @@ abstract public class Block {
         return logic(t);
     }
 
-    abstract public int logic(double t);
+    public int logic(double t) {
+        return 0;
+    }
 
     public boolean hasChanged() {
         return signal != previousSignal;

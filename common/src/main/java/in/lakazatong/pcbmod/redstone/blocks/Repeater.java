@@ -9,11 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class Repeater extends Block {
-    @FunctionalInterface
-    private interface LogicImpl {
-        int apply(double t);
-    }
-
     private LogicImpl logicImpl;
 
     public Repeater(Vec3 coords, Structure structure) {
@@ -25,7 +20,8 @@ public class Repeater extends Block {
     protected void initProps(Map<String, Object> props) {
         signal = (int) props.get("signal");
         delay = (int) props.get("delay") * 2;
-        logicImpl = (boolean) props.get("locked") ? this::lockedLogic : this::defaultLogic;
+        locked = (boolean) props.get("locked");
+        logicImpl = locked ? this::lockedLogic : this::defaultLogic;
         if (props.get("facings") instanceof Set<?> tmp)
             tmp.forEach(facing -> facings.add((((Vec3) facing).opposite())));
     }

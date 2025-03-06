@@ -21,10 +21,4 @@ public class Dust extends Block {
             default -> false;
         };
     }
-
-    // Unused
-    @Override
-    public int logic(double t) {
-        return 0;
-    }
 }
