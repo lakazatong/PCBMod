@@ -2,24 +2,13 @@ package in.lakazatong.pcbmod.redstone.blocks;
 
 import in.lakazatong.pcbmod.redstone.Block;
 import in.lakazatong.pcbmod.redstone.BlockType;
+import in.lakazatong.pcbmod.redstone.Props;
 import in.lakazatong.pcbmod.redstone.Structure;
 import in.lakazatong.pcbmod.utils.Vec3;
-
-import java.util.Map;
-import java.util.Set;
 
 public class Dust extends Block {
     public Dust(Vec3 coords, Structure structure) {
         super(BlockType.DUST, coords, structure);
-        delay = 0;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    protected void initProps(Map<String, Object> props) {
-        signal = (int) props.get("signal");
-        if (props.get("facings") instanceof Set<?> tmp)
-            tmp.forEach(facing -> facings.add(((Vec3) facing)));
     }
 
     @Override
@@ -31,5 +20,43 @@ public class Dust extends Block {
             case COMPARATOR -> !neighbor.isFacing(this);
             default -> false;
         };
+    }
+
+    @Override
+    public void logic(double t, Props p) {
+        boolean degradeSignal = true;
+        p.signal = 0;
+        for (Block block : inputs()) {
+            switch (block.type) {
+                case BlockType.REPEATER:
+                case BlockType.TORCH:
+                case BlockType.BUTTON:
+                    if (block.signal() > 0) {
+                        p.signal = 15;
+                        return;
+                    }
+                    break;
+                case BlockType.SOLID:
+                    if (block.signal() > p.signal && block.hardPowered()) {
+                        degradeSignal = false;
+                        p.signal = block.signal();
+                    }
+                    break;
+                case BlockType.COMPARATOR:
+                    if (block.signal() > p.signal) {
+                        degradeSignal = false;
+                        p.signal = block.signal();
+                    }
+                    break;
+                case BlockType.DUST:
+                    if (block.signal() > p.signal) {
+                        degradeSignal = true;
+                        p.signal = block.signal();
+                    }
+                    break;
+            }
+        }
+        if (degradeSignal)
+            p.signal--;
     }
 }

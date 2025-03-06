@@ -2,25 +2,15 @@ package in.lakazatong.pcbmod.redstone.blocks;
 
 import in.lakazatong.pcbmod.redstone.Block;
 import in.lakazatong.pcbmod.redstone.BlockType;
+import in.lakazatong.pcbmod.redstone.Props;
 import in.lakazatong.pcbmod.redstone.Structure;
 import in.lakazatong.pcbmod.utils.Vec3;
-
-import java.util.Map;
-import java.util.Set;
 
 public class Torch extends Block {
 
     public Torch(Vec3 coords, Structure structure) {
         super(BlockType.TORCH, coords, structure);
-        delay = 2;
-    }
-
-    @Override
-    protected void initProps(Map<String, Object> props) {
-        onWall = (boolean) props.get("onWall");
-        signal = (int) props.get("signal");
-        if (props.get("facings") instanceof Set<?> tmp)
-            tmp.forEach(facing -> facings.add(((Vec3) facing)));
+        props.delay = 2;
     }
 
     @Override
@@ -34,12 +24,13 @@ public class Torch extends Block {
     }
 
     @Override
-    public int logic(double t) {
+    public void logic(double t, Props p) {
         // TODO: consider the 1 redstone tick delay of the torch
-        for (Block block : inputs) {
-            if (block.signal > 0)
-                return 0;
+        p.signal = 0;
+        for (Block block : inputs()) {
+            if (block.signal() > 0)
+                return;
         }
-        return 15;
+        p.signal = 15;
     }
 }

@@ -2,28 +2,20 @@ package in.lakazatong.pcbmod.redstone.blocks;
 
 import in.lakazatong.pcbmod.redstone.Block;
 import in.lakazatong.pcbmod.redstone.BlockType;
+import in.lakazatong.pcbmod.redstone.Props;
 import in.lakazatong.pcbmod.redstone.Structure;
 import in.lakazatong.pcbmod.utils.Vec3;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Comparator extends Block {
     private LogicImpl logicImpl;
 
     public Comparator(Vec3 coords, Structure structure) {
         super(BlockType.COMPARATOR, coords, structure);
-        delay = 2;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    protected void initProps(Map<String, Object> props) {
-        signal = (int) props.get("signal");
-        subtract = (boolean) props.get("subtract");
-        logicImpl = subtract ? this::SubtractLogic : this::defaultLogic;
-        if (props.get("facings") instanceof Set<?> tmp)
-            tmp.forEach(facing -> facings.add((((Vec3) facing).opposite())));
+        props.delay = 2;
+        logicImpl = subtract() ? this::SubtractLogic : this::defaultLogic;
+        props.facings = facings().stream().map(Vec3::opposite).collect(Collectors.toSet());
     }
 
     @Override
@@ -35,18 +27,16 @@ public class Comparator extends Block {
         };
     }
 
-    private int defaultLogic(double t) {
+    private void defaultLogic(double t, Props p) {
         // TODO
-        return 0;
     }
 
-    private int SubtractLogic(double t) {
+    private void SubtractLogic(double t, Props p) {
         // TODO
-        return 0;
     }
 
     @Override
-    public int logic(double t) {
-        return logicImpl.apply(t);
+    public void logic(double t, Props p) {
+        logicImpl.apply(t, p);
     }
 }

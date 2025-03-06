@@ -30,15 +30,15 @@ public record Vec3(double x, double y, double z) {
     }
 
     public Vec3 opposite() {
-        return new Vec3(-this.x, -this.y, -this.z);
+        return new Vec3(-x, -y, -z);
     }
 
     public Vec3 add(Vec3 other) {
-        return new Vec3(this.x + other.x, this.y + other.y, this.z + other.z);
+        return new Vec3(x + other.x, y + other.y, z + other.z);
     }
 
     public Vec3 subtract(Vec3 other) {
-        return new Vec3(this.x - other.x, this.y - other.y, this.z - other.z);
+        return new Vec3(x - other.x, y - other.y, z - other.z);
     }
 
     public static Vec3 fromCardinal(String cardinal) {
@@ -55,10 +55,19 @@ public record Vec3(double x, double y, double z) {
 
     @Override
     public String toString() {
-        return this.x + " " + this.y + " " + this.z;
+        return x + " " + y + " " + z;
     }
 
-    public boolean equals(Vec3 other) {
-        return this.x == other.x && this.y == other.y && this.z == other.z;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj instanceof Vec3(double x1, double y1, double z1)) {
+            return x == x1 && y == y1 && z == z1;
+        }
+        return false;
+    }
+
+    public Vec3 dup() {
+        return new Vec3(x, y, z);
     }
 }

@@ -2,25 +2,14 @@ package in.lakazatong.pcbmod.redstone.blocks;
 
 import in.lakazatong.pcbmod.redstone.Block;
 import in.lakazatong.pcbmod.redstone.BlockType;
+import in.lakazatong.pcbmod.redstone.Props;
 import in.lakazatong.pcbmod.redstone.Structure;
 import in.lakazatong.pcbmod.utils.Vec3;
-
-import java.util.Map;
-import java.util.Set;
 
 public class Button extends Block {
     public Button(Vec3 coords, Structure structure) {
         super(BlockType.BUTTON, coords, structure);
-        onWall = true;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    protected void initProps(Map<String, Object> props) {
-        signal = (int) props.get("signal");
-        delay = (int) props.get("delay") * 2;
-        if (props.get("facings") instanceof Set<?> tmp)
-            tmp.forEach(facing -> facings.add(((Vec3) facing)));
+        props.onWall = true;
     }
 
     @Override
@@ -34,7 +23,7 @@ public class Button extends Block {
     }
 
     @Override
-    public int logic(double t) {
-        return t < delay ? 15 : 0;
+    public void logic(double t, Props p) {
+        p.signal = t < delay() ? 15 : 0;
     }
 }

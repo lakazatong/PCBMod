@@ -2,45 +2,40 @@ package in.lakazatong.pcbmod.redstone;
 
 import in.lakazatong.pcbmod.utils.Vec3;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 abstract public class Block {
-    // static properties
+    // fixed properties
 
     public final BlockType type;
     public final Structure structure;
     public final UUID uuid;
 
-    public int delay; // all
-    public boolean onWall = false; // button, torch
-    public boolean locked = false; // repeater (might be useless)
-    public boolean subtract = false; // comparator (might be useless)
+    // editable properties
 
-    // dynamic properties
-
-    public final Set<Vec3> facings = new HashSet<>(); // button, comparator, dust, repeater, torch
-    public int signal = 0; // all
-    // the following two could be changed with pistons
-    public Vec3 coords;
-    public final Set<Block> inputs = new HashSet<>();
+    public Props props;
 
     // temporary properties
 
     // used in Circuit::remove0TickNodes
     public final Set<Block> outputs = new HashSet<>();
     // used in Block::hasChanged
-    public int previousSignal = 0;
+    public Props previousProps = Props.defaults();
 
-    public Block(BlockType type, Vec3 coords, Structure structure) {
+    protected Block(BlockType type, Vec3 coords, Structure structure) {
         this.type = type;
-        this.coords = coords;
         this.structure = structure;
         this.uuid = UUID.nameUUIDFromBytes(coords.toString().getBytes());
+
+        this.props = Props.defaults();
+        this.props.coords = coords;
     }
 
     @FunctionalInterface
     protected interface LogicImpl {
-        int apply(double t);
+        void apply(double t, Props p);
     }
 
     public static class BlockBuilder {
@@ -50,47 +45,34 @@ abstract public class Block {
         }
 
         private final BlockConstructor cons;
-        private final Map<String, Object> props = new HashMap<>();
+        public final Props initialProps = Props.defaults();
 
         public BlockBuilder(BlockConstructor cons) {
             this.cons = cons;
         }
 
-        public BlockBuilder withProp(String key, Object value) {
-            props.put(key, value);
-            return this;
-        }
-
         public Block apply(Vec3 coords, Structure structure) {
-            return cons.apply(coords, structure).withProps(props);
+            return cons.apply(coords, structure);
         }
-    }
-
-    protected void initProps(Map<String, Object> props) {
-    }
-
-    public Block withProps(Map<String, Object> props) {
-        initProps(props);
-        return this;
     }
 
     public boolean isAbove(Block other) {
-        return this.coords.y() > other.coords.y();
+        return this.coords().y() > other.coords().y();
     }
 
     public boolean isBelow(Block other) {
-        return this.coords.y() < other.coords.y();
+        return this.coords().y() < other.coords().y();
     }
 
     public boolean isOnWallOf(Block other) {
         // This checks if the block is on a wall relative to the other block
         // This can be interpreted as being "on the wall" and facing away from it
-        return this.onWall && this.isFacingAway(other);
+        return this.onWall() && this.isFacingAway(other);
     }
 
     public boolean isFacing(Block other) {
-        for (Vec3 facing : this.facings) {
-            if (this.coords.add(facing).equals(other.coords))
+        for (Vec3 facing : this.facings()) {
+            if (this.coords().add(facing).equals(other.coords()))
                 return true;
         }
         return false;
@@ -98,8 +80,8 @@ abstract public class Block {
 
     public boolean isFacingAway(Block other) {
         // Check if this block is facing away from the given neighbor
-        for (Vec3 facing : this.facings) {
-            if (this.coords.subtract(facing).equals(other.coords))
+        for (Vec3 facing : this.facings()) {
+            if (this.coords().subtract(facing).equals(other.coords()))
                 return true;
         }
         return false;
@@ -107,16 +89,53 @@ abstract public class Block {
 
     abstract public boolean isInputOf(Block neighbor);
 
-    public int tick(double t) {
-        previousSignal = signal;
-        return logic(t);
+    public Props tick(double t) {
+        previousProps = props.dup();
+        Props p = props.dup();
+        logic(t, p);
+        return p;
     }
 
-    public int logic(double t) {
-        return 0;
+    public void logic(double t, Props p) {
     }
 
     public boolean hasChanged() {
-        return signal != previousSignal;
+        return props != previousProps;
+    }
+
+    public int delay() {
+        return props.delay;
+    }
+
+    public boolean onWall() {
+        return props.onWall;
+    }
+
+    public boolean locked() {
+        return props.locked;
+    }
+
+    public boolean subtract() {
+        return props.subtract;
+    }
+
+    public Set<Vec3> facings() {
+        return props.facings;
+    }
+
+    public int signal() {
+        return props.signal;
+    }
+
+    public boolean hardPowered() {
+        return props.hardPowered;
+    }
+
+    public Vec3 coords() {
+        return props.coords;
+    }
+
+    public Set<Block> inputs() {
+        return props.inputs;
     }
 }

@@ -5,14 +5,15 @@ import dev.dewy.nbt.tags.collection.CompoundTag;
 import dev.dewy.nbt.tags.collection.ListTag;
 import dev.dewy.nbt.tags.primitive.IntTag;
 import in.lakazatong.pcbmod.redstone.Block.BlockBuilder;
-import in.lakazatong.pcbmod.redstone.blocks.Comparator;
 import in.lakazatong.pcbmod.redstone.blocks.*;
 import in.lakazatong.pcbmod.utils.Vec3;
 import org.apache.commons.io.file.PathUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -52,7 +53,7 @@ public class Structure {
     }
 
     public List<Block> getNeighbors(Block block) {
-        return block.coords.neighbors().stream()
+        return block.coords().neighbors().stream()
                 .filter(this::withinBounds)
                 .map(coords -> xyzGrid.get((int) coords.x()).get((int) coords.y()).get((int) coords.z()))
                 .filter(Objects::nonNull)
@@ -60,10 +61,10 @@ public class Structure {
     }
 
     public void setBlock(Block block) {
-        ensureCapacity(block.coords);
-        xyzGrid.get((int) block.coords.x())
-                .get((int) block.coords.y())
-                .set((int) block.coords.z(), block);
+        ensureCapacity(block.coords());
+        xyzGrid.get((int) block.coords().x())
+                .get((int) block.coords().y())
+                .set((int) block.coords().z(), block);
     }
 
     private void ensureCapacity(Vec3 coords) {
@@ -120,16 +121,26 @@ public class Structure {
         List<BlockBuilder> result = new ArrayList<>();
 
         for (CompoundTag t : palette) {
-            Set<Vec3> facings = new HashSet<>();
-
             BlockBuilder builder = switch (t.getString("Name").getValue()) {
                 case "minecraft:air" -> null;
                 case "minecraft:redstone_wire" -> new BlockBuilder(Dust::new);
                 case "minecraft:repeater" -> new BlockBuilder(Repeater::new);
-                case "minecraft:redstone_torch" -> new BlockBuilder(Torch::new).withProp("onWall", false);
-                case "minecraft:redstone_wall_torch" -> new BlockBuilder(Torch::new).withProp("onWall", true);
-                case "minecraft:stone_button" -> new BlockBuilder(Button::new).withProp("delay", 10);
-                case "minecraft:wooden_button" -> new BlockBuilder(Button::new).withProp("delay", 20);
+                case "minecraft:redstone_torch" -> new BlockBuilder(Torch::new);
+                case "minecraft:redstone_wall_torch" -> {
+                    BlockBuilder b = new BlockBuilder(Torch::new);
+                    b.initialProps.onWall = true;
+                    yield b;
+                }
+                case "minecraft:stone_button" -> {
+                    BlockBuilder b = new BlockBuilder(Button::new);
+                    b.initialProps.delay = 20;
+                    yield b;
+                }
+                case "minecraft:wooden_button" -> {
+                    BlockBuilder b = new BlockBuilder(Button::new);
+                    b.initialProps.delay = 40;
+                    yield b;
+                }
                 case "minecraft:comparator" -> new BlockBuilder(Comparator::new);
                 default -> new BlockBuilder(Solid::new);
             };
@@ -146,31 +157,31 @@ public class Structure {
 
                     switch (key) {
                         case "lit", "powered":
-                            builder.withProp("signal", Boolean.parseBoolean(value) ? 15 : 0);
+                            builder.initialProps.signal = Boolean.parseBoolean(value) ? 15 : 0;
                             break;
                         case "power":
-                            builder.withProp("signal", Integer.parseInt(value));
+                            builder.initialProps.signal = Integer.parseInt(value);
                             break;
                         case "facing":
-                            facings.add(Vec3.fromCardinal(value));
+                            builder.initialProps.facings.add(Vec3.fromCardinal(value));
                             break;
                         case "delay":
-                            builder.withProp("delay", Integer.parseInt(value));
+                            builder.initialProps.delay = Integer.parseInt(value) * 2;
                             break;
                         case "locked":
-                            builder.withProp("locked", Boolean.parseBoolean(value));
+                            builder.initialProps.locked = Boolean.parseBoolean(value);
                             break;
                         case "mode":
-                            builder.withProp("subtract", value.equals("subtract"));
+                            builder.initialProps.subtract = value.equals("subtract");
                             break;
                     }
 
                     if (Vec3.fromCardinal(key) != null && value.equals("side"))
-                        facings.add(Vec3.fromCardinal(key));
+                        builder.initialProps.facings.add(Vec3.fromCardinal(key));
                 }
             }
 
-            result.add(builder.withProp("facings", facings));
+            result.add(builder);
         }
 
         return result;

@@ -17,13 +17,13 @@ public class Circuit {
     }
 
     public void tick() {
-        Map<UUID, Integer> nextSignals = new HashMap<>(graph.size());
+        Map<UUID, Props> nextProps = new HashMap<>(graph.size());
 
         for (Block block : graph.values())
-            nextSignals.put(block.uuid, block.tick(time));
+            nextProps.put(block.uuid, block.tick(time));
 
-        for (Map.Entry<UUID, Integer> entry : nextSignals.entrySet())
-            graph.get(entry.getKey()).signal = entry.getValue();
+        for (Map.Entry<UUID, Props> entry : nextProps.entrySet())
+            graph.get(entry.getKey()).props = entry.getValue();
     }
 
     public boolean hasChanged() {
@@ -58,49 +58,48 @@ public class Circuit {
 
             for (Block neighbor : structure.getNeighbors(block)) {
                 if (neighbor.isInputOf(block))
-                    block.inputs.add(neighbor);
+                    block.inputs().add(neighbor);
                 queue.add(neighbor);
             }
 
             circuit.graph.put(block.uuid, block);
         }
 
-// TODO: fix pruning
 //        remove0TickNodes(circuit, BlockType.DUST);
 //        remove0TickNodes(circuit, BlockType.SOLID);
 
         return circuit;
     }
 
-    private static void remove0TickNodes(Circuit circuit, BlockType type) {
-        for (Block block : circuit.graph.values()) {
-            for (Block input : block.inputs)
-                input.outputs.add(block);
-        }
-
-        Set<UUID> toRemove = new HashSet<>();
-
-        for (Block block : circuit.graph.values()) {
-            if (block.type == type) {
-                for (Block input : block.inputs) {
-                    for (Block output : block.outputs) {
-                        if (input.uuid != output.uuid)
-                            output.inputs.add(input);
-                    }
-                }
-                toRemove.add(block.uuid);
-            }
-        }
-
-        for (UUID uuid : toRemove)
-            circuit.graph.remove(uuid);
-
-        for (Block block : circuit.graph.values())
-            block.inputs.removeIf(input -> toRemove.contains(input.uuid));
-
-        for (Block block : circuit.graph.values())
-            block.outputs.clear();
-    }
+//    private static void remove0TickNodes(Circuit circuit, BlockType type) {
+//        for (Block block : circuit.graph.values()) {
+//            for (Block input : block.inputs)
+//                input.outputs.add(block);
+//        }
+//
+//        Set<UUID> toRemove = new HashSet<>();
+//
+//        for (Block block : circuit.graph.values()) {
+//            if (block.type == type) {
+//                for (Block input : block.inputs) {
+//                    for (Block output : block.outputs) {
+//                        if (input.uuid != output.uuid)
+//                            output.inputs.add(input);
+//                    }
+//                }
+//                toRemove.add(block.uuid);
+//            }
+//        }
+//
+//        for (UUID uuid : toRemove)
+//            circuit.graph.remove(uuid);
+//
+//        for (Block block : circuit.graph.values())
+//            block.inputs.removeIf(input -> toRemove.contains(input.uuid));
+//
+//        for (Block block : circuit.graph.values())
+//            block.outputs.clear();
+//    }
 
     public void saveAsDot() throws IOException, InterruptedException {
         StringBuilder dotBuilder = new StringBuilder();
@@ -118,7 +117,7 @@ public class Circuit {
 
             dotBuilder.append("    \"").append(blockUUID).append("\" [label=\"").append(blockName).append("\", style=filled, fillcolor=\"black\", fontcolor=\"white\", color=\"white\", width=0.2, height=0.2];\n");
 
-            for (Block input : block.inputs) {
+            for (Block input : block.inputs()) {
                 String edge = "\"" + input.uuid + "\" -> \"" + blockUUID + "\"";
                 if (!edges.contains(edge)) {
                     dotBuilder.append("    ").append(edge)
