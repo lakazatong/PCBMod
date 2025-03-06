@@ -17,7 +17,6 @@ public class Torch extends Block {
 
     @Override
     protected void initProps(Map<String, Object> props) {
-        onWall = (boolean) props.get("onWall");
         signal = (int) props.get("signal");
         if (props.get("facings") instanceof Set<?> tmp)
             tmp.forEach(facing -> facings.add(((Vec3) facing)));

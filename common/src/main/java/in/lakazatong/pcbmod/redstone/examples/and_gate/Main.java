@@ -8,13 +8,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-        String wd = Paths.get("common/src/main/java/in/lakazatong/pcbmod/redstone/examples/and_gate").toAbsolutePath().toString();
-
-        Structure structure = Structure.fromNBT(Path.of(wd, "and_gate.nbt"));
+    public static void main(String[] args) throws IOException, InterruptedException {
+        Structure structure = Structure.fromNBT(Path.of("common/src/main/java/in/lakazatong/pcbmod/redstone/examples/and_gate/and_gate.nbt"));
         System.out.println(structure);
 
         Circuit circuit = Circuit.fromStructure(structure);
-        circuit.saveAsDot(Path.of(wd, "and_gate.dot"));
+        circuit.saveAsDot();
     }
 }

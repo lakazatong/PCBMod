@@ -3,14 +3,15 @@ package in.lakazatong.pcbmod.redstone;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.*;
 
 public class Circuit {
+    public final Structure structure;
     public final Map<UUID, Block> graph;
     private double time = 0; // in ticks
 
-    private Circuit() {
+    private Circuit(Structure structure) {
+        this.structure = structure;
         this.graph = new HashMap<>();
     }
 
@@ -41,7 +42,7 @@ public class Circuit {
     }
 
     public static Circuit fromStructure(Structure structure) {
-        Circuit circuit = new Circuit();
+        Circuit circuit = new Circuit(structure);
         Queue<Block> queue = new LinkedList<>();
         Set<UUID> visited = new HashSet<>();
 
@@ -99,7 +100,7 @@ public class Circuit {
             block.outputs.clear();
     }
 
-    public void saveAsDot(Path path) throws IOException {
+    public void saveAsDot() throws IOException, InterruptedException {
         StringBuilder dotBuilder = new StringBuilder();
         dotBuilder.append("digraph G {\n");
 
@@ -127,8 +128,14 @@ public class Circuit {
 
         dotBuilder.append("}\n");
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path.toFile()))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(structure.path.toFile()))) {
             writer.write(dotBuilder.toString());
         }
+
+        Process process = new ProcessBuilder("bash", "-c", "'",
+                "cd", "\"" + structure.path.getParent() + "\"", "&&",
+                "dot", "-Tpng", "\"" + structure.name + ".dot\"", "-o", "\"" + structure.name + ".png\"",
+                "'").start();
+        process.waitFor();
     }
 }

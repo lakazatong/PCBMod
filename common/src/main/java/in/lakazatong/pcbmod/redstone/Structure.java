@@ -15,12 +15,19 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class Structure {
+    public final Path path;
+    public final String name;
+
     private final double maxX;
     private final double maxY;
     private final double maxZ;
     private final List<List<List<Block>>> xyzGrid;
 
-    private Structure(int maxX, int maxY, int maxZ) {
+    private Structure(Path path, int maxX, int maxY, int maxZ) {
+        String filename = path.getFileName().toString();
+        int dotIndex = filename.lastIndexOf('.');
+        this.path = path;
+        this.name = (dotIndex == -1) ? filename : filename.substring(0, dotIndex);
         this.maxX = maxX;
         this.maxY = maxY;
         this.maxZ = maxZ;
@@ -176,7 +183,7 @@ public class Structure {
         List<BlockBuilder> palette = convertPalette(tag.getList("palette"));
         ListTag<IntTag> dimensions = tag.getList("size");
 
-        Structure structure = new Structure(dimensions.get(0).intValue(), dimensions.get(1).intValue(), dimensions.get(2).intValue());
+        Structure structure = new Structure(path, dimensions.get(0).intValue(), dimensions.get(1).intValue(), dimensions.get(2).intValue());
 
         for (CompoundTag bTag : blocks) {
             ListTag<IntTag> pos = bTag.getList("pos");

@@ -1,8 +1,0 @@
-digraph G {
-    graph [bgcolor="black"];
-    "840df290-5421-3f72-a959-b34325057a81" [label="torch", style=filled, fillcolor="black", fontcolor="white", color="white", width=0.2, height=0.2];
-    "29c179f9-a450-3f5d-8676-022c50f4696a" [label="torch", style=filled, fillcolor="black", fontcolor="white", color="white", width=0.2, height=0.2];
-    "840df290-5421-3f72-a959-b34325057a81" -> "29c179f9-a450-3f5d-8676-022c50f4696a" [color="white", arrowhead="normal", fontcolor="white", penwidth=2];
-    "035adebe-47b8-309c-a258-8b94d8fd410b" -> "29c179f9-a450-3f5d-8676-022c50f4696a" [color="white", arrowhead="normal", fontcolor="white", penwidth=2];
-    "035adebe-47b8-309c-a258-8b94d8fd410b" [label="torch", style=filled, fillcolor="black", fontcolor="white", color="white", width=0.2, height=0.2];
-}
