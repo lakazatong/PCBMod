@@ -5,6 +5,7 @@ import in.lakazatong.pcbmod.redstone.BlockType;
 import in.lakazatong.pcbmod.redstone.Structure;
 import in.lakazatong.pcbmod.redstone.Vec3;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class Repeater extends Block {
@@ -27,7 +28,10 @@ public class Repeater extends Block {
         signal = (int) props.get("initial_power");
         delay = (int) props.get("delay") * 2;
         logicImpl = (boolean) props.get("locked") ? this::lockedLogic : this::defaultLogic;
-        props.put("facings", ((Set<Vec3>) props.get("facings")).stream().map(Vec3::opposite));
+        Iterable<Vec3> facings = (Iterable<Vec3>) props.get("facings");
+        var newFacings = new HashSet<>();
+        facings.forEach(facing -> newFacings.add(facing.opposite()));
+        props.put("facings", newFacings);
     }
 
     @Override

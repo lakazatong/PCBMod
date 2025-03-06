@@ -61,7 +61,7 @@ abstract public class Block {
     @SuppressWarnings("unchecked")
     public boolean isFacing(Block other) {
         Object facings = this.props.get("facings");
-        for (Vec3 facing : (Set<Vec3>) facings) {
+        for (Vec3 facing : (Iterable<Vec3>) facings) {
             if (this.coords.add(facing).equals(other.coords))
                 return true;
         }
@@ -74,7 +74,7 @@ abstract public class Block {
         Object facings = this.props.get("facings");
         if (facings == null)
             return false;
-        for (Vec3 facing : (Set<Vec3>) facings) {
+        for (Vec3 facing : (Iterable<Vec3>) facings) {
             if (this.coords.subtract(facing).equals(other.coords))
                 return true;
         }
