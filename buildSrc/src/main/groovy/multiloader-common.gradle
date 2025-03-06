@@ -125,4 +125,9 @@ publishing {
 
 dependencies {
     implementation "dev.dewy:nbt:1.5.1"
+    // https://mvnrepository.com/artifact/guru.nidi/graphviz-java
+    implementation 'guru.nidi:graphviz-java:0.18.1'
+    implementation 'com.eclipsesource.j2v8_win32_x86_64:4.6.0:4.6.0'
+    // https://mvnrepository.com/artifact/com.github.kokorin.jaffree/jaffree
+    implementation 'com.github.kokorin.jaffree:jaffree:2024.08.29'
 }

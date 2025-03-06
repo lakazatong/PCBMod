@@ -1,8 +1,19 @@
 package in.lakazatong.pcbmod.redstone;
 
+import com.github.kokorin.jaffree.ffmpeg.*;
+import guru.nidi.graphviz.engine.Format;
+import guru.nidi.graphviz.engine.Graphviz;
+import guru.nidi.graphviz.model.MutableGraph;
+import guru.nidi.graphviz.parse.Parser;
 import org.apache.commons.io.file.PathUtils;
 
-import java.io.*;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -48,15 +59,22 @@ public class Circuit {
     }
 
     public void simulateUntilUnchanged() {
+        try {
+            Files.createDirectories(structure.path.resolveSibling("frames"));
+        } catch (IOException ignored) {
+            return;
+        }
         time = 0;
+        saveAsDot(0);
         tick();
         while (hasChanged()) {
-            time++;
+            saveAsDot(++time);
             tick();
         }
+        animate();
     }
 
-    public void saveAsDot() throws IOException, InterruptedException {
+    public String toDot() {
         StringBuilder dotBuilder = new StringBuilder();
         dotBuilder.append("digraph G {\n");
 
@@ -64,61 +82,86 @@ public class Circuit {
 
         dotBuilder.append("    graph [bgcolor=\"black\"];\n");
 
-        for (Map.Entry<UUID, Block> entry : graph.entrySet()) {
-            Block block = entry.getValue();
+        for (Block block : graph.values()) {
+            int signal = block.props.signal;
+            int red = (int) ((signal / 15.0) * 255);
+            String color = String.format("#%02x0000", red);
 
-            String blockName = block.type.name().toLowerCase();
-
-            dotBuilder
-                .append("    \"")
-                .append(block.uuid)
-                .append("\" [label=\"")
-                .append(blockName)
-                .append("\", style=filled, fillcolor=\"black\", fontcolor=\"white\", color=\"white\", width=0.2, height=0.2];\n");
+            dotBuilder.append("    \"").append(block.uuid).append("\" ")
+                    .append("[label=\"").append(block.type.name().toLowerCase())
+                    .append("\n").append(signal).append("\", style=filled, fillcolor=\"")
+                    .append(color).append("\", fontcolor=\"white\", color=\"white\"];\n");
 
             block.inputs().forEach(input -> {
                 String edge = "\"" + input.uuid + "\" -> \"" + block.uuid + "\"";
-                if (!edges.contains(edge)) {
-                    dotBuilder
-                        .append("    ")
-                        .append(edge)
-                        .append(" [color=\"white\", arrowhead=\"normal\", fontcolor=\"white\", penwidth=2];\n");
-                    edges.add(edge);
+                if (edges.add(edge)) {
+                    dotBuilder.append("    ").append(edge).append(" [color=\"white\", penwidth=2];\n");
                 }
             });
         }
 
-        dotBuilder.append("}\n");
+        return dotBuilder.append("}\n").toString();
+    }
 
-        String dotPath = structure.path.getParent().resolve(PathUtils.getBaseName(structure.path) + ".dot").toAbsolutePath().toString();
-        String pngPath = structure.path.getParent().resolve(PathUtils.getBaseName(structure.path) + ".png").toAbsolutePath().toString();
+    public void animate() {
+        Path framesDir = structure.path.resolveSibling("frames");
+        Path outputPath = structure.path.resolveSibling(PathUtils.getBaseName(structure.path) + ".mp4").toAbsolutePath();
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(Path.of(dotPath).toFile()))) {
-            writer.write(dotBuilder.toString());
-        }
+        FrameProducer producer = new FrameProducer() {
+            private long index = 0;
 
-        dotPath = "/mnt/" + dotPath.split(":")[0].toLowerCase() + dotPath.substring(dotPath.indexOf(":") + 1);
-        pngPath = "/mnt/" + pngPath.split(":")[0].toLowerCase() + pngPath.substring(pngPath.indexOf(":") + 1);
+            @Override
+            public List<Stream> produceStreams() {
+                File firstFrameFile = framesDir.resolve(PathUtils.getBaseName(structure.path) + index + ".png").toAbsolutePath().toFile();
+                BufferedImage firstImage;
+                try {
+                    firstImage = ImageIO.read(firstFrameFile);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
 
-        ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c",
-                "dot -Tpng " +
-                dotPath.replace("\\", "/") +
-                " -o " +
-                pngPath.replace("\\", "/"));
+                int width = firstImage.getWidth();
+                int height = firstImage.getHeight();
 
-        Process process = processBuilder.start();
-        int exitCode = process.waitFor();
+                return Collections.singletonList(new Stream()
+                        .setType(Stream.Type.VIDEO)
+                        .setTimebase(1000L)
+                        .setWidth(width)
+                        .setHeight(height)
+                );
+            }
 
-        if (exitCode == 0) {
-            System.out.println("PNG file generated successfully.");
-        } else {
-            System.out.println("Error generating PNG.");
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    System.err.println(line);
+            @Override
+            public Frame produce() {
+                File frameFile = framesDir.resolve(PathUtils.getBaseName(structure.path) + index + ".png").toAbsolutePath().toFile();
+                try {
+                    return frameFile.exists() ? Frame.createVideoFrame(0, (index++) * 1000, ImageIO.read(frameFile)) : null;
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
             }
+        };
+
+        FFmpeg.atPath()
+                .addInput(FrameInput.withProducer(producer))
+                .addOutput(UrlOutput.toUrl(outputPath.toString()))
+                .execute();
+    }
+
+    public void saveAsDot(double index) {
+        String dotPath = structure.path.resolveSibling("frames/" + PathUtils.getBaseName(structure.path) + index + ".dot").toAbsolutePath().toString();
+        String pngPath = structure.path.resolveSibling("frames/" + PathUtils.getBaseName(structure.path) + index + ".png").toAbsolutePath().toString();
+
+        String dot = toDot();
+
+        try {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(Path.of(dotPath).toFile()))) {
+                writer.write(dot);
+            }
+
+            MutableGraph graph = new Parser().read(dot);
+            Graphviz.fromGraph(graph).render(Format.PNG).toFile(new File(pngPath));
+        } catch (IOException ignored) {
         }
     }
 }

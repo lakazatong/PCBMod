@@ -13,6 +13,6 @@ public class Main {
         System.out.println(structure);
 
         Circuit circuit = new Circuit(structure);
-        circuit.saveAsDot();
+        circuit.simulateUntilUnchanged();
     }
 }
