@@ -9,7 +9,7 @@ import java.util.*;
 public class Circuit {
     public final Structure structure;
     public final Map<UUID, Block> graph;
-    private double time = 0; // in ticks
+    private double time = 0; // in game ticks
 
     private Circuit(Structure structure) {
         this.structure = structure;
@@ -35,6 +35,7 @@ public class Circuit {
     }
 
     public void simulateUntilUnchanged() {
+        time = 0;
         tick();
         while (hasChanged()) {
             time++;
