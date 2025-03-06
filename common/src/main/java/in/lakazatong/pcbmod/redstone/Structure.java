@@ -115,18 +115,14 @@ public class Structure {
         List<BlockBuilder> result = new ArrayList<>();
 
         for (CompoundTag t : palette) {
-            Map<String, Object> props = new HashMap<>();
             Set<Vec3> facings = new HashSet<>();
 
             BlockBuilder builder = switch (t.getString("Name").getValue()) {
-                case "minecraft:redstone_wire" -> (coords, structure) -> new Dust(coords, structure).withProps(props);
-                case "minecraft:repeater" -> (coords, structure) -> new Repeater(coords, structure).withProps(props);
-                case "minecraft:redstone_torch" -> (coords, structure) -> new Torch(coords, structure).withProps(props);
-                case "minecraft:redstone_wall_torch" -> {
-                    props.put("on_wall", true);
-                    yield (coords, structure) -> new Torch(coords, structure).withProps(props);
-                }
-                default -> (coords, structure) -> new Solid(coords, structure).withProps(props);
+                case "minecraft:redstone_wire" -> new BlockBuilder(Dust::new);
+                case "minecraft:repeater" -> new BlockBuilder(Repeater::new);
+                case "minecraft:redstone_torch" -> new BlockBuilder(Torch::new);
+                case "minecraft:redstone_wall_torch" -> new BlockBuilder(Torch::new).withProp("onWall", true);
+                default -> new BlockBuilder(Solid::new);
             };
 
             if (t.contains("Properties")) {
@@ -136,19 +132,19 @@ public class Structure {
 
                     switch (key) {
                         case "lit", "powered":
-                            props.put("initial_power", Boolean.parseBoolean(value) ? 15 : 0);
+                            builder.withProp("signal", Boolean.parseBoolean(value) ? 15 : 0);
                             break;
                         case "power":
-                            props.put("initial_power", Integer.parseInt(value));
+                            builder.withProp("signal", Integer.parseInt(value));
                             break;
                         case "facing":
                             facings.add(Vec3.fromCardinal(value));
                             break;
                         case "delay":
-                            props.put("delay", Integer.parseInt(value));
+                            builder.withProp("delay", Integer.parseInt(value));
                             break;
                         case "locked":
-                            props.put("locked", Boolean.parseBoolean(value));
+                            builder.withProp("locked", Boolean.parseBoolean(value));
                             break;
                     }
 
@@ -157,9 +153,7 @@ public class Structure {
                 }
             }
 
-            props.put("facings", facings);
-
-            result.add(builder);
+            result.add(builder.withProp("facings", facings));
         }
 
         return result;

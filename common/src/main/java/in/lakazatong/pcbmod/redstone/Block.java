@@ -3,40 +3,57 @@ package in.lakazatong.pcbmod.redstone;
 import java.util.*;
 
 abstract public class Block {
-    public BlockType type;
-    public Vec3 coords;
-    public Structure structure;
-    public Map<String, Object> props;
-    public UUID uuid;
+    // static properties
 
-    public final Set<Block> inputs;
-    // for temporary caching in Circuit::remove0TickNodes, should not be used
-    public final Set<Block> outputs;
+    public final Set<Vec3> facings = new HashSet<>();
+    public final BlockType type;
+    public final Structure structure;
+    public final UUID uuid;
+    public boolean onWall = false;
+    public int delay = 0;
+
+    // dynamic properties
+
     public int signal = 0;
     public int previousSignal = 0;
+    // the following two could be changed with pistons
+    public Vec3 coords;
+    public final Set<Block> inputs = new HashSet<>();
+    // for temporary caching in Circuit::remove0TickNodes, should not be used
+    public final Set<Block> outputs = new HashSet<>();
 
     public Block(BlockType type, Vec3 coords, Structure structure) {
         this.type = type;
         this.coords = coords;
         this.structure = structure;
-        this.props = new HashMap<>();
         this.uuid = UUID.nameUUIDFromBytes(coords.toString().getBytes());
-
-        this.inputs = new HashSet<>();
-        this.outputs = new HashSet<>();
     }
 
-    @FunctionalInterface
-    public interface BlockBuilder {
-        Block apply(Vec3 coords, Structure Structure);
+    public static class BlockBuilder {
+        @FunctionalInterface
+        public interface BlockConstructor {
+            Block apply(Vec3 coords, Structure structure);
+        }
+
+        private final BlockConstructor cons;
+        private final Map<String, Object> props = new HashMap<>();
+
+        public BlockBuilder(BlockConstructor cons) {
+            this.cons = cons;
+            props.put(key, value);
+            return this;
+        }
+
+        public Block apply(Vec3 coords, Structure structure) {
+            return cons.apply(coords, structure).withProps(props);
+        }
     }
 
-    protected void initFromProps() {
+    protected void initProps(Map<String, Object> props) {
     }
 
     public Block withProps(Map<String, Object> props) {
-        this.props = props;
-        initFromProps();
+        initProps(props);
         return this;
     }
 
@@ -48,33 +65,23 @@ abstract public class Block {
         return this.coords.y() < other.coords.y();
     }
 
-    public boolean isOnWall() {
-        return this.props.getOrDefault("on_wall", false).equals(true);
-    }
-
     public boolean isOnWallOf(Block other) {
         // This checks if the block is on a wall relative to the other block
         // This can be interpreted as being "on the wall" and facing away from it
-        return this.isOnWall() && this.isFacingAway(other);
+        return this.onWall && this.isFacingAway(other);
     }
 
-    @SuppressWarnings("unchecked")
     public boolean isFacing(Block other) {
-        Object facings = this.props.get("facings");
-        for (Vec3 facing : (Iterable<Vec3>) facings) {
+        for (Vec3 facing : this.facings) {
             if (this.coords.add(facing).equals(other.coords))
                 return true;
         }
         return false;
     }
 
-    @SuppressWarnings("unchecked")
     public boolean isFacingAway(Block other) {
         // Check if this block is facing away from the given neighbor
-        Object facings = this.props.get("facings");
-        if (facings == null)
-            return false;
-        for (Vec3 facing : (Iterable<Vec3>) facings) {
+        for (Vec3 facing : this.facings) {
             if (this.coords.subtract(facing).equals(other.coords))
                 return true;
         }

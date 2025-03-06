@@ -99,7 +99,6 @@ public class Circuit {
             block.outputs.clear();
     }
 
-    @SuppressWarnings("unchecked")
     public void saveAsDot(Path path) throws IOException {
         StringBuilder dotBuilder = new StringBuilder();
         dotBuilder.append("digraph G {\n");

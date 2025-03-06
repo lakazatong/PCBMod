@@ -5,11 +5,10 @@ import in.lakazatong.pcbmod.redstone.BlockType;
 import in.lakazatong.pcbmod.redstone.Structure;
 import in.lakazatong.pcbmod.redstone.Vec3;
 
-import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class Repeater extends Block {
-    private int delay;
-
     @FunctionalInterface
     private interface LogicImpl {
         int apply(double t);
@@ -23,14 +22,14 @@ public class Repeater extends Block {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected void initFromProps() {
-        signal = (int) props.get("initial_power");
+    protected void initProps(Map<String, Object> props) {
+        signal = (int) props.get("signal");
         delay = (int) props.get("delay") * 2;
         logicImpl = (boolean) props.get("locked") ? this::lockedLogic : this::defaultLogic;
-        Iterable<Vec3> facings = (Iterable<Vec3>) props.get("facings");
-        var newFacings = new HashSet<>();
-        facings.forEach(facing -> newFacings.add(facing.opposite()));
-        props.put("facings", newFacings);
+        if (props.get("facings") instanceof Set<?> tmp) {
+            assert facings.isEmpty();
+            tmp.forEach(facing -> facings.add((((Vec3) facing).opposite())));
+        }
     }
 
     @Override

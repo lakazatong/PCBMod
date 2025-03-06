@@ -10,12 +10,14 @@ public class Solid extends Block {
         super(BlockType.SOLID, coords, structure);
     }
 
+    // no need to bother with the properties here since this block will not appear in the circuit graph
+
     @Override
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
             case DUST -> true;
             case REPEATER, COMPARATOR -> neighbor.isFacingAway(this);
-            case TORCH -> (neighbor.isAbove(this) && !neighbor.isOnWall()) || neighbor.isOnWallOf(this);
+            case TORCH -> (neighbor.isAbove(this) && !neighbor.onWall) || neighbor.isOnWallOf(this);
             default -> false;
         };
     }

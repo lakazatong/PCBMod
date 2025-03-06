@@ -10,6 +10,8 @@ public class Dust extends Block {
         super(BlockType.DUST, coords, structure);
     }
 
+    // no need to bother with the properties here since this block will not appear in the circuit graph
+
     @Override
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
