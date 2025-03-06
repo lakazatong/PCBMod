@@ -21,7 +21,7 @@ public class Solid extends Block {
     }
 
     @Override
-    public void logic(double t, Props p) {
+    public void logic(long t, Props p) {
         p.signal = 0;
         inputs().forEach(input -> {
             switch (input.type) {

@@ -24,7 +24,7 @@ public class Torch extends RepeaterLike {
     }
 
     @Override
-    protected void setSignal(double t, Props p) {
+    protected void setSignal(long t, Props p) {
         p.signal = powered ? 0 : 15;
     }
 }

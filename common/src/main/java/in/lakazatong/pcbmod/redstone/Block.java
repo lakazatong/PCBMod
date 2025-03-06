@@ -33,7 +33,7 @@ abstract public class Block {
 
     @FunctionalInterface
     public interface LogicImpl {
-        void apply(double t, Props p);
+        void apply(long t, Props p);
     }
 
     public static class BlockBuilder {
@@ -94,14 +94,14 @@ abstract public class Block {
         return this.facings().stream().allMatch(f -> neighborFacings.stream().allMatch(f::isPerpendicular));
     }
 
-    public Props tick(double t) {
+    public Props tick(long t) {
         previousProps = props.dup();
         Props p = props.dup();
         logic(t, p);
         return p;
     }
 
-    public abstract void logic(double t, Props p);
+    public abstract void logic(long t, Props p);
 
     public boolean hasChanged() {
         return !props.equals(previousProps);

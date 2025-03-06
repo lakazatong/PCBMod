@@ -23,9 +23,9 @@ public class Structure {
     public final Path path;
     public final String name;
 
-    private final double maxX;
-    private final double maxY;
-    private final double maxZ;
+    private final long maxX;
+    private final long maxY;
+    private final long maxZ;
     private final List<List<List<Block>>> xyzGrid;
 
     private Structure(Path path, int maxX, int maxY, int maxZ) {

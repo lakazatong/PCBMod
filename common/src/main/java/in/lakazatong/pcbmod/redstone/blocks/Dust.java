@@ -24,7 +24,7 @@ public class Dust extends Block {
     }
 
     @Override
-    public void logic(double t, Props p) {
+    public void logic(long t, Props p) {
         boolean degradeSignal = true;
         p.signal = 0;
         for (Block block : inputs().collect(Collectors.toSet())) {

@@ -1,5 +1,6 @@
 package in.lakazatong.pcbmod.redstone;
 
+
 import com.github.kokorin.jaffree.ffmpeg.*;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
@@ -16,17 +17,31 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Stream;
 
 public class Circuit {
     public final Structure structure;
     public final Map<UUID, Block> graph = new HashMap<>();
-    private double time = 0; // in game ticks
+    private long time = 0; // in game ticks
 
     public Circuit(Structure structure) {
         this.structure = structure;
         structure.blocks().forEach(b -> graph.put(b.uuid, b));
         for (Block b : graph.values())
             b.props.neighbors.addAll(structure.getNeighbors(b));
+
+        Path framesDir = structure.path.resolveSibling("frames");
+        try (Stream<Path> paths = Files.walk(framesDir)) {
+            paths.sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+        } catch (IOException ignored) {
+        }
+
+        try {
+            Files.createDirectory(framesDir);
+        } catch (IOException ignored) {
+        }
     }
 
     public void tick() {
@@ -59,11 +74,6 @@ public class Circuit {
     }
 
     public void simulateUntilUnchanged() {
-        try {
-            Files.createDirectories(structure.path.resolveSibling("frames"));
-        } catch (IOException ignored) {
-            return;
-        }
         time = 0;
         saveAsDot(0);
         tick();
@@ -89,8 +99,8 @@ public class Circuit {
 
             dotBuilder.append("    \"").append(block.uuid).append("\" ")
                     .append("[label=\"").append(block.type.name().toLowerCase())
-                    .append("\n").append(signal).append("\", style=filled, fillcolor=\"")
-                    .append(color).append("\", fontcolor=\"white\", color=\"white\"];\n");
+                    .append("\n").append(signal).append("\", style=filled, fillcolor=\"black\", fontcolor=\"white\", color=\"")
+                    .append(color).append("\", penwidth=2];\n");
 
             block.inputs().forEach(input -> {
                 String edge = "\"" + input.uuid + "\" -> \"" + block.uuid + "\"";
@@ -111,7 +121,7 @@ public class Circuit {
             private long index = 0;
 
             @Override
-            public List<Stream> produceStreams() {
+            public List<com.github.kokorin.jaffree.ffmpeg.Stream> produceStreams() {
                 File firstFrameFile = framesDir.resolve(PathUtils.getBaseName(structure.path) + index + ".png").toAbsolutePath().toFile();
                 BufferedImage firstImage;
                 try {
@@ -123,8 +133,8 @@ public class Circuit {
                 int width = firstImage.getWidth();
                 int height = firstImage.getHeight();
 
-                return Collections.singletonList(new Stream()
-                        .setType(Stream.Type.VIDEO)
+                return Collections.singletonList(new com.github.kokorin.jaffree.ffmpeg.Stream()
+                        .setType(com.github.kokorin.jaffree.ffmpeg.Stream.Type.VIDEO)
                         .setTimebase(1000L)
                         .setWidth(width)
                         .setHeight(height)
@@ -135,7 +145,7 @@ public class Circuit {
             public Frame produce() {
                 File frameFile = framesDir.resolve(PathUtils.getBaseName(structure.path) + index + ".png").toAbsolutePath().toFile();
                 try {
-                    return frameFile.exists() ? Frame.createVideoFrame(0, (index++) * 1000, ImageIO.read(frameFile)) : null;
+                    return frameFile.exists() ? Frame.createVideoFrame(0, ((index++) * 1000), ImageIO.read(frameFile)) : null;
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -148,7 +158,7 @@ public class Circuit {
                 .execute();
     }
 
-    public void saveAsDot(double index) {
+    public void saveAsDot(long index) {
         String dotPath = structure.path.resolveSibling("frames/" + PathUtils.getBaseName(structure.path) + index + ".dot").toAbsolutePath().toString();
         String pngPath = structure.path.resolveSibling("frames/" + PathUtils.getBaseName(structure.path) + index + ".png").toAbsolutePath().toString();
 

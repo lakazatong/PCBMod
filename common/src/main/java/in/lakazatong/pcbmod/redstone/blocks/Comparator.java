@@ -29,7 +29,7 @@ public class Comparator extends RepeaterLike {
         };
     }
 
-    protected void setSignalSubtract(double t, Props p) {
+    protected void setSignalSubtract(long t, Props p) {
         if (!powered) {
             p.signal = 0;
             return;
@@ -50,7 +50,7 @@ public class Comparator extends RepeaterLike {
         p.signal = Math.max(0, rearSignal - maxSideSignal);
     }
 
-    protected void setSignalNormal(double t, Props p) {
+    protected void setSignalNormal(long t, Props p) {
         if (!powered) {
             p.signal = 0;
             return;
@@ -68,7 +68,7 @@ public class Comparator extends RepeaterLike {
     }
 
     @Override
-    protected void setSignal(double t, Props p) {
+    protected void setSignal(long t, Props p) {
         setSignalImpl.apply(t, p);
     }
 }

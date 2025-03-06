@@ -25,7 +25,7 @@ public class Repeater extends RepeaterLike {
     }
 
     @Override
-    protected void setSignal(double t, Props p) {
+    protected void setSignal(long t, Props p) {
         p.signal = powered ? 15 : 0;
     }
 }

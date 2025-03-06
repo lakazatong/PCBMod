@@ -22,7 +22,7 @@ public class Button extends Block {
     }
 
     @Override
-    public void logic(double t, Props p) {
+    public void logic(long t, Props p) {
         p.signal = t < delay() ? 15 : 0;
     }
 }

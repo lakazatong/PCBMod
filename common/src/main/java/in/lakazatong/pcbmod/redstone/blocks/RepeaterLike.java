@@ -18,7 +18,7 @@ public abstract class RepeaterLike extends Block {
         super(type, structure, p);
     }
 
-    protected void lockableLogic(double t, Props p) {
+    protected void lockableLogic(long t, Props p) {
         boolean receivingSignal = rearInputs().anyMatch(i -> i.signal() > 0);
         boolean locked = locked();
         if (nextPowered != receivingSignal) {
@@ -39,7 +39,7 @@ public abstract class RepeaterLike extends Block {
         p.locked = sideInputs().anyMatch(i -> i.signal() > 0);
     }
 
-    protected void unlockableLogic(double t, Props p) {
+    protected void unlockableLogic(long t, Props p) {
         boolean receivedSignal = inputs().anyMatch(i -> i.signal() > 0);
         if (nextPowered != receivedSignal) {
             nextPowered = receivedSignal;
@@ -55,7 +55,7 @@ public abstract class RepeaterLike extends Block {
     }
 
     @Override
-    public void logic(double t, Props p) {
+    public void logic(long t, Props p) {
         logicImpl.apply(t, p);
     }
 }
