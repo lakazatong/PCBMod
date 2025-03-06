@@ -41,11 +41,11 @@ abstract public class Block {
     }
 
     public boolean isAbove(Block other) {
-        return this.coords.y > other.coords.y;
+        return this.coords.y() > other.coords.y();
     }
 
     public boolean isBelow(Block other) {
-        return this.coords.y < other.coords.y;
+        return this.coords.y() < other.coords.y();
     }
 
     public boolean isOnWall() {

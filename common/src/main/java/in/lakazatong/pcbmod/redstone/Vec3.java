@@ -1,18 +1,9 @@
 package in.lakazatong.pcbmod.redstone;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-public class Vec3 {
-    public double x;
-    public double y;
-    public double z;
-
-    public Vec3(double x, double y, double z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
+public record Vec3(double x, double y, double z) {
 
     public Vec3 above() {
         return new Vec3(x, y + 1, z);
@@ -22,8 +13,8 @@ public class Vec3 {
         return new Vec3(x, y - 1, z);
     }
 
-    public List<Vec3> around() {
-        return List.of(
+    public Set<Vec3> around() {
+        return Set.of(
                 new Vec3(x + 1, y, z),
                 new Vec3(x - 1, y, z),
                 new Vec3(x, y, z + 1),
@@ -31,8 +22,8 @@ public class Vec3 {
         );
     }
 
-    public List<Vec3> neighbors() {
-        List<Vec3> r = new ArrayList<>(around());
+    public Set<Vec3> neighbors() {
+        Set<Vec3> r = new HashSet<>(around());
         r.add(above());
         r.add(below());
         return r;

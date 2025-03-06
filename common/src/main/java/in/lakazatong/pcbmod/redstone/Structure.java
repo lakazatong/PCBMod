@@ -41,30 +41,30 @@ public class Structure {
     }
 
     public boolean withinBounds(Vec3 coords) {
-        return coords.x >= 0 && coords.x < maxX &&
-                coords.y >= 0 && coords.y < maxY &&
-                coords.z >= 0 && coords.z < maxZ;
+        return coords.x() >= 0 && coords.x() < maxX &&
+                coords.y() >= 0 && coords.y() < maxY &&
+                coords.z() >= 0 && coords.z() < maxZ;
     }
 
     public List<Block> getNeighbors(Block block) {
         return block.coords.neighbors().stream()
                 .filter(this::withinBounds)
-                .map(coords -> xyzGrid.get((int) coords.x).get((int) coords.y).get((int) coords.z))
+                .map(coords -> xyzGrid.get((int) coords.x()).get((int) coords.y()).get((int) coords.z()))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
     public void setBlock(Block block) {
         ensureCapacity(block.coords);
-        xyzGrid.get((int) block.coords.x)
-                .get((int) block.coords.y)
-                .set((int) block.coords.z, block);
+        xyzGrid.get((int) block.coords.x())
+                .get((int) block.coords.y())
+                .set((int) block.coords.z(), block);
     }
 
     private void ensureCapacity(Vec3 coords) {
-        expandList(xyzGrid, (int) coords.x, ArrayList::new);
-        expandList(xyzGrid.get((int) coords.x), (int) coords.y, ArrayList::new);
-        expandList(xyzGrid.get((int) coords.x).get((int) coords.y), (int) coords.z, () -> null);
+        expandList(xyzGrid, (int) coords.x(), ArrayList::new);
+        expandList(xyzGrid.get((int) coords.x()), (int) coords.y(), ArrayList::new);
+        expandList(xyzGrid.get((int) coords.x()).get((int) coords.y()), (int) coords.z(), () -> null);
     }
 
     private static <T> void expandList(List<T> list, int index, Supplier<T> supplier) {
@@ -118,23 +118,16 @@ public class Structure {
             Map<String, Object> props = new HashMap<>();
             Set<Vec3> facings = new HashSet<>();
 
-            BlockBuilder builder = (coords, structure) -> new Solid(coords, structure).withProps(props);
-
-            switch (t.getString("Name").getValue()) {
-                case "minecraft:redstone_wire":
-                    builder = (coords, structure) -> new Dust(coords, structure).withProps(props);
-                    break;
-                case "minecraft:repeater":
-                    builder = (coords, structure) -> new Repeater(coords, structure).withProps(props);
-                    break;
-                case "minecraft:redstone_torch":
-                    builder = (coords, structure) -> new Torch(coords, structure).withProps(props);
-                    break;
-                case "minecraft:redstone_wall_torch":
+            BlockBuilder builder = switch (t.getString("Name").getValue()) {
+                case "minecraft:redstone_wire" -> (coords, structure) -> new Dust(coords, structure).withProps(props);
+                case "minecraft:repeater" -> (coords, structure) -> new Repeater(coords, structure).withProps(props);
+                case "minecraft:redstone_torch" -> (coords, structure) -> new Torch(coords, structure).withProps(props);
+                case "minecraft:redstone_wall_torch" -> {
                     props.put("on_wall", true);
-                    builder = (coords, structure) -> new Torch(coords, structure).withProps(props);
-                    break;
-            }
+                    yield (coords, structure) -> new Torch(coords, structure).withProps(props);
+                }
+                default -> (coords, structure) -> new Solid(coords, structure).withProps(props);
+            };
 
             if (t.contains("Properties")) {
                 CompoundTag properties = t.getCompound("Properties");

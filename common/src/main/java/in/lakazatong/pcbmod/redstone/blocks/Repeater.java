@@ -6,7 +6,6 @@ import in.lakazatong.pcbmod.redstone.Structure;
 import in.lakazatong.pcbmod.redstone.Vec3;
 
 import java.util.HashSet;
-import java.util.Set;
 
 public class Repeater extends Block {
     private int delay;
