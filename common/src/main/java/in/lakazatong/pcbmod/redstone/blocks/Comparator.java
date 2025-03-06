@@ -4,8 +4,10 @@ import in.lakazatong.pcbmod.redstone.Block;
 import in.lakazatong.pcbmod.redstone.BlockType;
 import in.lakazatong.pcbmod.redstone.Props;
 import in.lakazatong.pcbmod.redstone.Structure;
+import in.lakazatong.pcbmod.utils.Vec3;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Comparator extends RepeaterLike {
     private final LogicImpl setSignalImpl;
@@ -15,6 +17,7 @@ public class Comparator extends RepeaterLike {
         props.delay = 2;
         setSignalImpl = subtract() ? this::setSignalSubtract : this::setSignalNormal;
         logicImpl = super::unlockableLogic;
+        props.facings = facings().stream().map(Vec3::opposite).collect(Collectors.toSet());
     }
 
     @Override

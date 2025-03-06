@@ -65,18 +65,24 @@ public class Circuit {
         dotBuilder.append("    graph [bgcolor=\"black\"];\n");
 
         for (Map.Entry<UUID, Block> entry : graph.entrySet()) {
-            UUID blockUUID = entry.getKey();
             Block block = entry.getValue();
 
             String blockName = block.type.name().toLowerCase();
 
-            dotBuilder.append("    \"").append(blockUUID).append("\" [label=\"").append(blockName).append("\", style=filled, fillcolor=\"black\", fontcolor=\"white\", color=\"white\", width=0.2, height=0.2];\n");
+            dotBuilder
+                .append("    \"")
+                .append(block.uuid)
+                .append("\" [label=\"")
+                .append(blockName)
+                .append("\", style=filled, fillcolor=\"black\", fontcolor=\"white\", color=\"white\", width=0.2, height=0.2];\n");
 
             block.inputs().forEach(input -> {
-                String edge = "\"" + input.uuid + "\" -> \"" + blockUUID + "\"";
+                String edge = "\"" + input.uuid + "\" -> \"" + block.uuid + "\"";
                 if (!edges.contains(edge)) {
-                    dotBuilder.append("    ").append(edge)
-                            .append(" [color=\"white\", arrowhead=\"normal\", fontcolor=\"white\", penwidth=2];\n");
+                    dotBuilder
+                        .append("    ")
+                        .append(edge)
+                        .append(" [color=\"white\", arrowhead=\"normal\", fontcolor=\"white\", penwidth=2];\n");
                     edges.add(edge);
                 }
             });

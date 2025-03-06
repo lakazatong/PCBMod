@@ -71,7 +71,7 @@ abstract public class Block {
     }
 
     public boolean isFacing(Block other) {
-        for (Vec3 facing : this.facings()) {
+        for (Vec3 facing : facings()) {
             if (this.coords().add(facing).equals(other.coords()))
                 return true;
         }
@@ -80,7 +80,7 @@ abstract public class Block {
 
     public boolean isFacingAway(Block other) {
         // Check if this block is facing away from the given neighbor
-        for (Vec3 facing : this.facings()) {
+        for (Vec3 facing : facings()) {
             if (this.coords().subtract(facing).equals(other.coords()))
                 return true;
         }
@@ -144,13 +144,11 @@ abstract public class Block {
     }
 
     public Stream<Block> inputs() {
-        return neighbors().stream()
-                .filter(neighbor -> neighbor.isInputOf(this));
+        return neighbors().stream().filter(neighbor -> neighbor.isInputOf(this));
     }
 
     public Stream<Block> outputs() {
-        return neighbors().stream()
-                .filter(neighbor -> !neighbor.isInputOf(this));
+        return neighbors().stream().filter(neighbor -> !neighbor.isInputOf(this));
     }
 
     public Stream<Block> sideInputs() {

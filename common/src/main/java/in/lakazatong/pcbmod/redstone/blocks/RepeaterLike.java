@@ -4,9 +4,6 @@ import in.lakazatong.pcbmod.redstone.Block;
 import in.lakazatong.pcbmod.redstone.BlockType;
 import in.lakazatong.pcbmod.redstone.Props;
 import in.lakazatong.pcbmod.redstone.Structure;
-import in.lakazatong.pcbmod.utils.Vec3;
-
-import java.util.stream.Collectors;
 
 public abstract class RepeaterLike extends Block {
     protected LogicImpl logicImpl;
@@ -19,7 +16,6 @@ public abstract class RepeaterLike extends Block {
 
     public RepeaterLike(BlockType type, Structure structure, Props p) {
         super(type, structure, p);
-        props.facings = facings().stream().map(Vec3::opposite).collect(Collectors.toSet());
     }
 
     protected void lockableLogic(double t, Props p) {
