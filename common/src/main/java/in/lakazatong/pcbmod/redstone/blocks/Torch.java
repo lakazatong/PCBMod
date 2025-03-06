@@ -5,11 +5,12 @@ import in.lakazatong.pcbmod.redstone.BlockType;
 import in.lakazatong.pcbmod.redstone.Props;
 import in.lakazatong.pcbmod.redstone.Structure;
 
-public class Torch extends Block {
+public class Torch extends RepeaterLike {
 
     public Torch(Structure structure, Props p) {
         super(BlockType.TORCH, structure, p);
         props.delay = 2;
+        logicImpl = super::unlockableLogic;
     }
 
     @Override
@@ -23,13 +24,7 @@ public class Torch extends Block {
     }
 
     @Override
-    public void logic(double t, Props p) {
-        // TODO: consider the 1 redstone tick delay of the torch
-        p.signal = 0;
-        for (Block block : inputs()) {
-            if (block.signal() > 0)
-                return;
-        }
-        p.signal = 15;
+    protected void setSignal(double t, Props p) {
+        p.signal = powered ? 0 : 15;
     }
 }

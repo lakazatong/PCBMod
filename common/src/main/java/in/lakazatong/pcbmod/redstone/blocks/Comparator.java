@@ -4,18 +4,17 @@ import in.lakazatong.pcbmod.redstone.Block;
 import in.lakazatong.pcbmod.redstone.BlockType;
 import in.lakazatong.pcbmod.redstone.Props;
 import in.lakazatong.pcbmod.redstone.Structure;
-import in.lakazatong.pcbmod.utils.Vec3;
 
-import java.util.stream.Collectors;
+import java.util.List;
 
-public class Comparator extends Block {
-    private LogicImpl logicImpl;
+public class Comparator extends RepeaterLike {
+    private final LogicImpl setSignalImpl;
 
     public Comparator(Structure structure, Props p) {
         super(BlockType.COMPARATOR, structure, p);
         props.delay = 2;
-        logicImpl = subtract() ? this::SubtractLogic : this::defaultLogic;
-        props.facings = facings().stream().map(Vec3::opposite).collect(Collectors.toSet());
+        setSignalImpl = subtract() ? this::setSignalSubtract : this::setSignalNormal;
+        logicImpl = super::unlockableLogic;
     }
 
     @Override
@@ -27,16 +26,46 @@ public class Comparator extends Block {
         };
     }
 
-    private void defaultLogic(double t, Props p) {
-        // TODO
+    protected void setSignalSubtract(double t, Props p) {
+        if (!powered) {
+            p.signal = 0;
+            return;
+        }
+        List<Block> rearInputs = inputs().stream().filter(i -> !isSideInputOf(this)).toList();
+        assert rearInputs.size() <= 1;
+        if (rearInputs.isEmpty()) {
+            p.signal = 0;
+            return;
+        }
+        List<Block> sideInputs = inputs().stream().filter(i -> isSideInputOf(this)).toList();
+        assert sideInputs.size() <= 2;
+        int rearSignal = rearInputs.getFirst().signal();
+        int maxSideSignal = sideInputs.stream()
+                .mapToInt(Block::signal)
+                .max()
+                .orElse(0);
+        p.signal = Math.max(0, rearSignal - maxSideSignal);
     }
 
-    private void SubtractLogic(double t, Props p) {
-        // TODO
+    protected void setSignalNormal(double t, Props p) {
+        if (!powered) {
+            p.signal = 0;
+            return;
+        }
+        List<Block> rearInputs = inputs().stream().filter(i -> !isSideInputOf(this)).toList();
+        assert rearInputs.size() <= 1;
+        if (rearInputs.isEmpty()) {
+            p.signal = 0;
+            return;
+        }
+        List<Block> sideInputs = inputs().stream().filter(i -> isSideInputOf(this)).toList();
+        assert sideInputs.size() <= 2;
+        int rearSignal = rearInputs.getFirst().signal();
+        p.signal = sideInputs.stream().anyMatch(i -> i.signal() > rearSignal) ? 0 : rearSignal;
     }
 
     @Override
-    public void logic(double t, Props p) {
-        logicImpl.apply(t, p);
+    protected void setSignal(double t, Props p) {
+        setSignalImpl.apply(t, p);
     }
 }

@@ -34,7 +34,13 @@ public class Solid extends Block {
                         return;
                     }
                     break;
-                case BlockType.COMPARATOR, BlockType.DUST:
+                case BlockType.COMPARATOR:
+                    if (block.signal() > p.signal) {
+                        p.hardPowered = true;
+                        p.signal = block.signal();
+                    }
+                    break;
+                case BlockType.DUST:
                     if (block.signal() > p.signal) {
                         p.hardPowered = false;
                         p.signal = block.signal();

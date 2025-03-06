@@ -3,6 +3,7 @@ package in.lakazatong.pcbmod.redstone;
 import in.lakazatong.pcbmod.utils.Vec3;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -33,7 +34,7 @@ abstract public class Block {
     }
 
     @FunctionalInterface
-    protected interface LogicImpl {
+    public interface LogicImpl {
         void apply(double t, Props p);
     }
 
@@ -89,6 +90,11 @@ abstract public class Block {
     }
 
     abstract public boolean isInputOf(Block neighbor);
+
+    public boolean isSideInputOf(Block neighbor) {
+        List<Vec3> neighborFacings = neighbor.facings().stream().toList();
+        return this.facings().stream().allMatch(f -> neighborFacings.stream().allMatch(f::isPerpendicular));
+    }
 
     public Props tick(double t) {
         previousProps = props.dup();

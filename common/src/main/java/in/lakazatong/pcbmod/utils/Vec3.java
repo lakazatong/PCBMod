@@ -70,4 +70,8 @@ public record Vec3(double x, double y, double z) {
     public Vec3 dup() {
         return new Vec3(x, y, z);
     }
+
+    public boolean isPerpendicular(Vec3 other) {
+        return x * other.x + y * other.y + z * other.z == 0;
+    }
 }
