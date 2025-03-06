@@ -65,6 +65,7 @@ public class Circuit {
             circuit.graph.put(block.uuid, block);
         }
 
+// TODO: fix pruning
 //        remove0TickNodes(circuit, BlockType.DUST);
 //        remove0TickNodes(circuit, BlockType.SOLID);
 
