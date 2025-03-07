@@ -11,8 +11,6 @@ public class SccGraph {
 
     private final Map<UUID, Set<UUID>> inputs = new HashMap<>();
 
-    private final Map<UUID, UUID> blockToScc = new HashMap<>();
-
     public SccGraph(Map<UUID, Block> original) {
         this.original = original;
         buildSCCGraph();
