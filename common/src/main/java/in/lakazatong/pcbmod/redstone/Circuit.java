@@ -39,6 +39,7 @@ public class Circuit {
             paths.sorted(Comparator.reverseOrder())
                     .map(Path::toFile)
                     .forEach(File::delete);
+            structure.path.resolveSibling(PathUtils.getBaseName(structure.path) + ".mp4").toFile().delete();
         } catch (IOException ignored) {
         }
 
