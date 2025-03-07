@@ -6,6 +6,7 @@ import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.parse.Parser;
+import in.lakazatong.pcbmod.utils.SccGraph;
 import org.apache.commons.io.file.PathUtils;
 
 import javax.imageio.ImageIO;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Circuit {
@@ -47,18 +49,17 @@ public class Circuit {
     public void tick() {
         Map<UUID, Props> nextProps = new HashMap<>(graph.size());
 
-        Queue<Block> queue = new LinkedList<>();
+        SccGraph sccGraph = new SccGraph(graph);
 
-        queue.add(structure.getFirstBlock());
+        Queue<UUID> queue = sccGraph.graph.keySet().stream()
+                .filter(sccUuid -> sccGraph.outputs(sccUuid).isEmpty())
+                .collect(Collectors.toCollection(LinkedList::new));
 
         while (!queue.isEmpty()) {
-            Block block = queue.poll();
-
-            if (nextProps.containsKey(block.uuid))
-                continue;
-
-            nextProps.put(block.uuid, block.tick(time));
-            block.outputs().forEach(queue::add);
+            UUID sccUuid = queue.poll();
+            for (Block block : sccGraph.graph.get(sccUuid))
+                nextProps.put(block.uuid, block.tick(time));
+            queue.addAll(sccGraph.inputs(sccUuid));
         }
 
         for (Map.Entry<UUID, Props> entry : nextProps.entrySet())
@@ -94,13 +95,12 @@ public class Circuit {
 
         for (Block block : graph.values()) {
             int signal = block.props.signal;
-            int red = (int) ((signal / 15.0) * 255);
-            String color = String.format("#%02x0000", red);
-
+            int greenBlue = 255 - (int) ((signal / 15.0) * 255);
             dotBuilder.append("    \"").append(block.uuid).append("\" ")
                     .append("[label=\"").append(block.type.name().toLowerCase())
                     .append("\n").append(signal).append("\", style=filled, fillcolor=\"black\", fontcolor=\"white\", color=\"")
-                    .append(color).append("\", penwidth=2];\n");
+                    .append(String.format("#ff%02x%02x", greenBlue, greenBlue))
+                    .append("\", penwidth=2];\n");
 
             block.inputs().forEach(input -> {
                 String edge = "\"" + input.uuid + "\" -> \"" + block.uuid + "\"";
