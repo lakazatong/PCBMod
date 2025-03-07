@@ -5,7 +5,7 @@ import in.lakazatong.pcbmod.redstone.BlockType;
 import in.lakazatong.pcbmod.redstone.Props;
 import in.lakazatong.pcbmod.redstone.Structure;
 
-public class Torch extends RepeaterLike {
+public class Torch extends Delayed {
 
     public Torch(Structure structure, Props p) {
         super(BlockType.TORCH, structure, p);

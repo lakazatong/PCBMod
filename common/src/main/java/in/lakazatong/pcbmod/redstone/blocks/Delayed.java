@@ -5,7 +5,7 @@ import in.lakazatong.pcbmod.redstone.BlockType;
 import in.lakazatong.pcbmod.redstone.Props;
 import in.lakazatong.pcbmod.redstone.Structure;
 
-public abstract class RepeaterLike extends Block {
+public abstract class Delayed extends Block {
     protected LogicImpl logicImpl;
 
     protected abstract void setSignal(long t, Props p);
@@ -14,7 +14,7 @@ public abstract class RepeaterLike extends Block {
     private boolean nextPowered = false;
     private int stableTime = 0;
 
-    public RepeaterLike(BlockType type, Structure structure, Props p) {
+    public Delayed(BlockType type, Structure structure, Props p) {
         super(type, structure, p);
     }
 

@@ -8,7 +8,7 @@ import in.lakazatong.pcbmod.utils.Vec3;
 
 import java.util.stream.Collectors;
 
-public class Repeater extends RepeaterLike {
+public class Repeater extends Delayed {
     public Repeater(Structure structure, Props p) {
         super(BlockType.REPEATER, structure, p);
         logicImpl = super::lockableLogic;

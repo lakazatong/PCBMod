@@ -9,7 +9,7 @@ import in.lakazatong.pcbmod.utils.Vec3;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Comparator extends RepeaterLike {
+public class Comparator extends Delayed {
     private final LogicImpl setSignalImpl;
 
     public Comparator(Structure structure, Props p) {
