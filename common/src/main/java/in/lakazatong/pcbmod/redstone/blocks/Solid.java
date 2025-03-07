@@ -29,20 +29,20 @@ public class Solid extends Block {
                 case BlockType.TORCH:
                 case BlockType.BUTTON:
                     if (input.signal() > 0) {
-                        p.hardPowered = true;
+                        p.weakPowered = false;
                         p.signal = 15;
                         return;
                     }
                     break;
                 case BlockType.COMPARATOR:
                     if (input.signal() > p.signal) {
-                        p.hardPowered = true;
+                        p.weakPowered = false;
                         p.signal = input.signal();
                     }
                     break;
                 case BlockType.DUST:
                     if (input.signal() > p.signal) {
-                        p.hardPowered = false;
+                        p.weakPowered = true;
                         p.signal = input.signal();
                     }
                     break;

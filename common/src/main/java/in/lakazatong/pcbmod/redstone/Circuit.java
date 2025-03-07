@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Circuit {
@@ -51,15 +50,16 @@ public class Circuit {
 
         SccGraph sccGraph = new SccGraph(graph);
 
-        Queue<UUID> queue = sccGraph.graph.keySet().stream()
-                .filter(sccUuid -> sccGraph.outputs(sccUuid).isEmpty())
-                .collect(Collectors.toCollection(LinkedList::new));
-
+        Queue<Integer> queue = new LinkedList<>();
+        for (int sccId = 0; sccId < sccGraph.sccGraph.size(); sccId++) {
+            if (sccGraph.outputs(sccId).isEmpty())
+                queue.add(sccId);
+        }
         while (!queue.isEmpty()) {
-            UUID sccUuid = queue.poll();
-            for (Block block : sccGraph.graph.get(sccUuid))
+            int sccId = queue.poll();
+            for (Block block : sccGraph.sccMap.get(sccId))
                 nextProps.put(block.uuid, block.tick(time));
-            queue.addAll(sccGraph.inputs(sccUuid));
+            queue.addAll(sccGraph.inputs(sccId));
         }
 
         for (Map.Entry<UUID, Props> entry : nextProps.entrySet())
@@ -76,12 +76,11 @@ public class Circuit {
 
     public void simulateUntilUnchanged() {
         time = 0;
-        saveAsDot(0);
-        tick();
-        while (hasChanged()) {
-            saveAsDot(++time);
+        do {
+            saveAsDot();
             tick();
-        }
+            time++;
+        }  while (hasChanged());
         animate();
     }
 
@@ -158,9 +157,9 @@ public class Circuit {
                 .execute();
     }
 
-    public void saveAsDot(long index) {
-        String dotPath = structure.path.resolveSibling("frames/" + PathUtils.getBaseName(structure.path) + index + ".dot").toAbsolutePath().toString();
-        String pngPath = structure.path.resolveSibling("frames/" + PathUtils.getBaseName(structure.path) + index + ".png").toAbsolutePath().toString();
+    public void saveAsDot() {
+        String dotPath = structure.path.resolveSibling("frames/" + PathUtils.getBaseName(structure.path) + time + ".dot").toAbsolutePath().toString();
+        String pngPath = structure.path.resolveSibling("frames/" + PathUtils.getBaseName(structure.path) + time + ".png").toAbsolutePath().toString();
 
         String dot = toDot();
 

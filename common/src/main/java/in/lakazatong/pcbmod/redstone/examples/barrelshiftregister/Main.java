@@ -14,6 +14,6 @@ public class Main {
 
         Circuit circuit = new Circuit(structure);
 //        circuit.simulateUntilUnchanged();
-        circuit.saveAsDot(0);
+        circuit.saveAsDot();
     }
 }

@@ -131,8 +131,8 @@ abstract public class Block {
         return props.signal;
     }
 
-    public boolean hardPowered() {
-        return props.hardPowered;
+    public boolean weakPowered() {
+        return props.weakPowered;
     }
 
     public Vec3 coords() {

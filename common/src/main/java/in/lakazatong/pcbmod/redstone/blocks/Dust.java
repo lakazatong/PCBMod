@@ -38,7 +38,7 @@ public class Dust extends Block {
                     }
                     break;
                 case BlockType.SOLID:
-                    if (block.signal() > p.signal && block.hardPowered()) {
+                    if (block.signal() > p.signal && !block.weakPowered()) {
                         degradeSignal = false;
                         p.signal = block.signal();
                     }

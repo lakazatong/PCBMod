@@ -18,19 +18,19 @@ public class Props {
 
     public Set<Vec3> facings; // button, comparator, dust, repeater, torch
     public int signal; // all
-    public boolean hardPowered; // solid
+    public boolean weakPowered; // solid
     // the following two could be changed with pistons
     public Vec3 coords;
     public Set<Block> neighbors;
 
-    private Props(int delay, boolean onWall, boolean locked, boolean subtract, Set<Vec3> facings, int signal, boolean hardPowered, Vec3 coords, Set<Block> neighbors) {
+    private Props(int delay, boolean onWall, boolean locked, boolean subtract, Set<Vec3> facings, int signal, boolean weakPowered, Vec3 coords, Set<Block> neighbors) {
         this.delay = delay;
         this.onWall = onWall;
         this.locked = locked;
         this.subtract = subtract;
         this.facings = facings;
         this.signal = signal;
-        this.hardPowered = hardPowered;
+        this.weakPowered = weakPowered;
         this.coords = coords;
         this.neighbors = neighbors;
     }
@@ -42,7 +42,7 @@ public class Props {
     public Props dup() {
         return new Props(
             this.delay, this.onWall, this.locked, this.subtract,
-            new HashSet<>(this.facings), this.signal, this.hardPowered, this.coords.dup(), new HashSet<>()
+            new HashSet<>(this.facings), this.signal, this.weakPowered, this.coords.dup(), new HashSet<>()
         );
     }
 
@@ -55,7 +55,7 @@ public class Props {
                     locked == other.locked &&
                     subtract == other.subtract &&
                     signal == other.signal &&
-                    hardPowered == other.hardPowered &&
+                    weakPowered == other.weakPowered &&
                     Objects.equals(facings, other.facings) &&
                     Objects.equals(coords, other.coords) &&
                     Objects.equals(neighbors, other.neighbors);
