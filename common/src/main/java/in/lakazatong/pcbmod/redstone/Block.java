@@ -16,6 +16,9 @@ abstract public class Block {
 
     // editable properties
 
+    // makes more sense to be here as it's managed within the same tick
+    public boolean dirty = true;
+    // holds all states that can changes over time (and some more for convenience)
     public Props props;
 
     // temporary properties
@@ -98,14 +101,13 @@ abstract public class Block {
         previousProps = props.dup();
         Props p = props.dup();
         logic(t, p);
+        if (!p.equals(props))
+            outputs().forEach(output -> output.dirty = true);
+        dirty = false;
         return p;
     }
 
     public abstract void logic(long t, Props p);
-
-    public boolean hasChanged() {
-        return !props.equals(previousProps);
-    }
 
     public int delay() {
         return props.delay;
@@ -148,7 +150,7 @@ abstract public class Block {
     }
 
     public Stream<Block> outputs() {
-        return neighbors().stream().filter(neighbor -> !neighbor.isInputOf(this));
+        return neighbors().stream().filter(this::isInputOf);
     }
 
     public Stream<Block> sideInputs() {

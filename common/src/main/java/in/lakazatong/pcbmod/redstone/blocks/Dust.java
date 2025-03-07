@@ -25,7 +25,7 @@ public class Dust extends Block {
 
     @Override
     public void logic(long t, Props p) {
-        boolean degradeSignal = true;
+        boolean decay = true;
         p.signal = 0;
         for (Block block : inputs().collect(Collectors.toSet())) {
             switch (block.type) {
@@ -39,25 +39,25 @@ public class Dust extends Block {
                     break;
                 case BlockType.SOLID:
                     if (block.signal() > p.signal && !block.weakPowered()) {
-                        degradeSignal = false;
+                        decay = false;
                         p.signal = block.signal();
                     }
                     break;
                 case BlockType.COMPARATOR:
                     if (block.signal() > p.signal) {
-                        degradeSignal = false;
+                        decay = false;
                         p.signal = block.signal();
                     }
                     break;
                 case BlockType.DUST:
                     if (block.signal() > p.signal) {
-                        degradeSignal = true;
+                        decay = true;
                         p.signal = block.signal();
                     }
                     break;
             }
         }
-        if (degradeSignal && p.signal > 0)
+        if (decay && p.signal > 0)
             p.signal--;
     }
 }

@@ -16,7 +16,7 @@ public class Props {
 
     // dynamic properties
 
-    public Set<Vec3> facings; // button, comparator, dust, repeater, torch
+    public Set<Vec3> facings; // button, delayed, dust
     public int signal; // all
     public boolean weakPowered; // solid
     // the following two could be changed with pistons

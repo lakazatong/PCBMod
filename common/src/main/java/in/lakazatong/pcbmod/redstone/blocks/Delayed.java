@@ -11,12 +11,13 @@ public abstract class Delayed extends Block {
     protected abstract void setSignal(long t, Props p);
 
     protected boolean powered;
-    private boolean nextPowered = false;
+    private boolean nextPowered;
     private int stableTime = 0;
 
     public Delayed(BlockType type, Structure structure, Props p) {
         super(type, structure, p);
-        powered = p.signal > 0;
+        powered = outputs().anyMatch(output -> output.signal() > 0);
+        nextPowered = powered;
     }
 
     protected void lockableLogic(long t, Props p) {

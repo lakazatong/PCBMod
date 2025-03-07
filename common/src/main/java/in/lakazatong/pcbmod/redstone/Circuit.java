@@ -1,8 +1,8 @@
 package in.lakazatong.pcbmod.redstone;
 
 
-import com.github.kokorin.jaffree.ffmpeg.*;
 import com.github.kokorin.jaffree.ffmpeg.Frame;
+import com.github.kokorin.jaffree.ffmpeg.*;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
@@ -19,8 +19,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
 import java.util.List;
+import java.util.Queue;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Circuit {
@@ -40,10 +42,6 @@ public class Circuit {
                     .map(Path::toFile)
                     .forEach(File::delete);
             structure.path.resolveSibling(PathUtils.getBaseName(structure.path) + ".mp4").toFile().delete();
-        } catch (IOException ignored) {
-        }
-
-        try {
             Files.createDirectory(framesDir);
         } catch (IOException ignored) {
         }
@@ -51,19 +49,33 @@ public class Circuit {
 
     public void tick() {
         Map<UUID, Props> nextProps = new HashMap<>(graph.size());
-
         SccGraph sccGraph = new SccGraph(graph);
-
         Queue<Integer> queue = new LinkedList<>();
-        for (int sccId = 0; sccId < sccGraph.sccGraph.size(); sccId++) {
-            if (sccGraph.outputs(sccId).isEmpty())
+
+        for (int sccId = 0; sccId < sccGraph.sccs.size(); sccId++) {
+            if (sccGraph.inputs(sccId).isEmpty())
                 queue.add(sccId);
         }
+
         while (!queue.isEmpty()) {
             int sccId = queue.poll();
-            for (Block block : sccGraph.sccs.get(sccId))
-                nextProps.put(block.uuid, block.tick(time));
-            queue.addAll(sccGraph.inputs(sccId));
+            Set<Block> blocks = sccGraph.sccs.get(sccId);
+
+            var x = 0;
+
+            do {
+                Set<Block> dirtyBlocks = blocks.stream().filter(b -> b.dirty).collect(Collectors.toSet());
+                if (dirtyBlocks.isEmpty()) break;
+                dirtyBlocks.forEach(b -> {
+                    Props p = b.tick(time);
+                    if (b.delay() == 0)
+                        b.props = p;
+                    else
+                        nextProps.put(b.uuid, p);
+                });
+            } while (true);
+
+            queue.addAll(sccGraph.outputs(sccId));
         }
 
         for (Map.Entry<UUID, Props> entry : nextProps.entrySet())
@@ -71,11 +83,7 @@ public class Circuit {
     }
 
     public boolean hasChanged() {
-        for (Block block : graph.values()) {
-            if (block.hasChanged())
-                return true;
-        }
-        return false;
+        return graph.values().stream().anyMatch(b -> b.dirty);
     }
 
     public void simulateUntilUnchanged() {

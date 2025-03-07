@@ -7,7 +7,8 @@ import java.util.*;
 public class SccGraph {
     private final Map<UUID, Block> graph;
     public final List<Set<Block>> sccs = new ArrayList<>();
-    public final List<Set<Integer>> sccGraph = new ArrayList<>();
+    public final List<Set<Integer>> outputs = new ArrayList<>();
+    public final List<Set<Integer>> inputs = new ArrayList<>();
     public final Map<UUID, Integer> nodeToSCC = new HashMap<>();
 
     public SccGraph(Map<UUID, Block> inputGraph) {
@@ -29,7 +30,7 @@ public class SccGraph {
             }
         }
 
-        buildSCCGraph();
+        computeEdges();
     }
 
     private void dfs(Block block, Map<UUID, Integer> indices, Map<UUID, Integer> lowLink,
@@ -61,33 +62,30 @@ public class SccGraph {
                 nodeToSCC.put(v, sccId[0]);
             } while (!v.equals(id));
             sccs.add(scc);
-            sccGraph.add(new HashSet<>());
+            outputs.add(new HashSet<>());
+            inputs.add(new HashSet<>());
             sccId[0]++;
         }
     }
 
-    private void buildSCCGraph() {
+    private void computeEdges() {
         for (Block block : graph.values()) {
             int sccU = nodeToSCC.get(block.uuid);
-            block.inputs().forEach(neighbor -> {
-                int sccV = nodeToSCC.get(neighbor.uuid);
+            block.outputs().forEach(output -> {
+                int sccV = nodeToSCC.get(output.uuid);
                 if (sccU != sccV) {
-                    sccGraph.get(sccV).add(sccU);
+                    outputs.get(sccU).add(sccV);
+                    inputs.get(sccV).add(sccU);
                 }
             });
         }
     }
 
-    public Set<Integer> inputs(int sccId) {
-        return sccGraph.get(sccId);
+    public Set<Integer> outputs(int sccId) {
+        return outputs.get(sccId);
     }
 
-    public Set<Integer> outputs(int sccId) {
-        Set<Integer> outputs = new HashSet<>();
-        for (int i = 0; i < sccGraph.size(); i++) {
-            if (sccGraph.get(i).contains(sccId))
-                outputs.add(i);
-        }
-        return outputs;
+    public Set<Integer> inputs(int sccId) {
+        return inputs.get(sccId);
     }
 }
