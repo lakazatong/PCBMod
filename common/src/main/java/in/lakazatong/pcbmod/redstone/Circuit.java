@@ -57,7 +57,7 @@ public class Circuit {
         }
         while (!queue.isEmpty()) {
             int sccId = queue.poll();
-            for (Block block : sccGraph.sccMap.get(sccId))
+            for (Block block : sccGraph.sccs.get(sccId))
                 nextProps.put(block.uuid, block.tick(time));
             queue.addAll(sccGraph.inputs(sccId));
         }

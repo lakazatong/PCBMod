@@ -41,8 +41,8 @@ public class Props {
 
     public Props dup() {
         return new Props(
-            this.delay, this.onWall, this.locked, this.subtract,
-            new HashSet<>(this.facings), this.signal, this.weakPowered, this.coords.dup(), new HashSet<>()
+            delay, onWall, locked, subtract,
+            new HashSet<>(facings), signal, weakPowered, coords.dup(), new HashSet<>(neighbors)
         );
     }
 

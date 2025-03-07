@@ -57,7 +57,7 @@ public class Dust extends Block {
                     break;
             }
         }
-        if (degradeSignal)
+        if (degradeSignal && p.signal > 0)
             p.signal--;
     }
 }

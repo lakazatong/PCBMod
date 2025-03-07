@@ -6,7 +6,7 @@ import java.util.*;
 
 public class SccGraph {
     private final Map<UUID, Block> graph;
-    public final List<Set<Block>> sccMap = new ArrayList<>();
+    public final List<Set<Block>> sccs = new ArrayList<>();
     public final List<Set<Integer>> sccGraph = new ArrayList<>();
     public final Map<UUID, Integer> nodeToSCC = new HashMap<>();
 
@@ -60,7 +60,7 @@ public class SccGraph {
                 scc.add(graph.get(v));
                 nodeToSCC.put(v, sccId[0]);
             } while (!v.equals(id));
-            sccMap.add(scc);
+            sccs.add(scc);
             sccGraph.add(new HashSet<>());
             sccId[0]++;
         }
@@ -72,7 +72,7 @@ public class SccGraph {
             block.inputs().forEach(neighbor -> {
                 int sccV = nodeToSCC.get(neighbor.uuid);
                 if (sccU != sccV) {
-                    sccGraph.get(sccU).add(sccV);
+                    sccGraph.get(sccV).add(sccU);
                 }
             });
         }
