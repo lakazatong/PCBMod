@@ -2,6 +2,7 @@ package in.lakazatong.pcbmod.redstone;
 
 
 import com.github.kokorin.jaffree.ffmpeg.*;
+import com.github.kokorin.jaffree.ffmpeg.Frame;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
@@ -10,6 +11,7 @@ import in.lakazatong.pcbmod.utils.SccGraph;
 import org.apache.commons.io.file.PathUtils;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -18,6 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class Circuit {
@@ -142,9 +145,16 @@ public class Circuit {
 
             @Override
             public Frame produce() {
-                File frameFile = framesDir.resolve(PathUtils.getBaseName(structure.path) + index + ".png").toAbsolutePath().toFile();
+                if (index >= time)
+                    return null;
                 try {
-                    return frameFile.exists() ? Frame.createVideoFrame(0, ((index++) * 1000), ImageIO.read(frameFile)) : null;
+                    File frameFile = framesDir.resolve(PathUtils.getBaseName(structure.path) + index + ".png").toAbsolutePath().toFile();
+                    BufferedImage original = ImageIO.read(frameFile);
+                    BufferedImage formatted = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+                    Graphics2D g = formatted.createGraphics();
+                    g.drawImage(original, 0, 0, null);
+                    g.dispose();
+                    return Frame.createVideoFrame(0, (index++ * 1000), formatted);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -152,9 +162,9 @@ public class Circuit {
         };
 
         FFmpeg.atPath()
-                .addInput(FrameInput.withProducer(producer))
-                .addOutput(UrlOutput.toUrl(outputPath.toString()))
-                .execute();
+            .addInput(FrameInput.withProducer(producer).setFrameRate(1))
+            .addOutput(UrlOutput.toUrl(outputPath.toString()))
+            .execute();
     }
 
     public void saveAsDot() {
