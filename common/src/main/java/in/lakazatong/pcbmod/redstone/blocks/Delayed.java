@@ -7,11 +7,11 @@ import in.lakazatong.pcbmod.redstone.Structure;
 
 public abstract class Delayed extends Block {
 
-    protected abstract boolean getShouldPowered();
+    public abstract boolean getShouldPowered();
     protected abstract void setSignal(long t, Props p);
     protected abstract void clearSignal(long t, Props p);
 
-    protected boolean nextPowered;
+    public boolean nextPowered;
     private int stableTime = 0;
 
     public Delayed(BlockType type, Structure structure, Props p) {

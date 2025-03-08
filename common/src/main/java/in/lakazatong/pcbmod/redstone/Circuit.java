@@ -7,6 +7,7 @@ import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.parse.Parser;
+import in.lakazatong.pcbmod.redstone.blocks.Delayed;
 import in.lakazatong.pcbmod.utils.SccGraph;
 import org.apache.commons.io.file.PathUtils;
 
@@ -32,7 +33,7 @@ public class Circuit {
 
     public Circuit(Structure structure) {
         this.structure = structure;
-        
+
         structure.blocks().forEach(b -> graph.put(b.uuid, b));
         for (Block b : graph.values())
             b.props.neighbors.addAll(structure.getNeighbors(b));
@@ -89,8 +90,14 @@ public class Circuit {
             queue.addAll(sccGraph.outputs(sccId));
         }
 
-        for (Map.Entry<UUID, Props> entry : nextProps.entrySet())
-            graph.get(entry.getKey()).props = entry.getValue();
+        for (Map.Entry<UUID, Props> entry : nextProps.entrySet()) {
+            Block b = graph.get(entry.getKey());
+            b.props = entry.getValue();
+            if (b instanceof Delayed delayed) {
+                boolean powered = b.signal() > 0;
+                b.dirty = powered != delayed.nextPowered || powered != delayed.getShouldPowered();
+            }
+        }
     }
 
     public boolean hasChanged() {

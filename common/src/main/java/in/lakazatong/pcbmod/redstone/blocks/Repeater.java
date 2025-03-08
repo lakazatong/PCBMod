@@ -25,7 +25,7 @@ public class Repeater extends Delayed {
     }
 
     @Override
-    protected boolean getShouldPowered() {
+    public boolean getShouldPowered() {
         return rearInputs().anyMatch(i -> i.signal() > 0);
     }
 
