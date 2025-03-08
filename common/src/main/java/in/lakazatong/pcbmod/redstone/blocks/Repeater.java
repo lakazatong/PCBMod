@@ -19,10 +19,10 @@ public class Repeater extends Delayed {
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
             case AIR -> false;
-            case SOLID, DUST -> isFacing(neighbor);
+            case SOLID, DUST -> !locked() && isFacing(neighbor);
             case REPEATER -> isSideInputOf(neighbor) || (!neighbor.locked() && isFacing(neighbor) && !neighbor.isFacing(this));
             case TORCH -> false;
-            case COMPARATOR -> isFacing(neighbor) && !neighbor.isFacing(this);
+            case COMPARATOR -> !locked() && isFacing(neighbor) && !neighbor.isFacing(this);
             case BUTTON -> false;
             case LEVER -> false;
             case REDSTONE_BLOCK -> false;
@@ -31,7 +31,13 @@ public class Repeater extends Delayed {
 
     @Override
     public boolean getShouldPowered() {
-        return rearInputs().anyMatch(i -> i.signal() > 0);
+        for (Block input : rearInputs().collect(Collectors.toSet())) {
+            var x = 0;
+            if (input.signal() > 0)
+                return true;
+        }
+        return false;
+//        return rearInputs().anyMatch(i -> i.signal() > 0);
     }
 
     @Override

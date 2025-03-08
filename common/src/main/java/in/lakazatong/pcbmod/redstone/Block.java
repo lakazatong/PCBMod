@@ -6,7 +6,7 @@ import in.lakazatong.pcbmod.utils.Vec3;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 abstract public class Block {
@@ -217,7 +217,8 @@ abstract public class Block {
     }
 
     public Stream<Block> rearInputs() {
-        return inputs().filter(input -> !input.isSideInputOf(this) && isFacingAway(input));
+        var inputs = inputs().collect(Collectors.toSet());
+        return inputs.stream().filter(input -> !input.isSideInputOf(this) && isFacingAway(input));
     }
 
     public Stream<Block> nextRearInputs() {

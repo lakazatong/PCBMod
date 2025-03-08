@@ -12,8 +12,8 @@ public abstract class Delayed extends Block {
     protected abstract void setSignal(long t);
     protected abstract void clearSignal(long t);
 
-    public boolean nextPowered;
-    private long stableTime = 1;
+    public boolean prevShouldPowered;
+    private long stableTime = 0;
 
     public Delayed(BlockType type, Structure structure, Props p) {
         super(type, structure, p);
@@ -21,31 +21,33 @@ public abstract class Delayed extends Block {
 
     @Override
     public void init() {
-        nextPowered = getShouldPowered();
+        prevShouldPowered = getShouldPowered();
         super.init();
     }
 
     protected void unlockedLogic(long t) {
         boolean powered = signal() > 0;
         boolean shouldPowered = getShouldPowered();
-        boolean delayOver = stableTime >= delay();
+        boolean delayOver = stableTime + 1 >= delay();
 
-        boolean updateSignal = delayOver && (powered != nextPowered);
-        stableTime = updateSignal ? 1 : stableTime + 1;
-
-        if (updateSignal) {
-            if (nextPowered)
-                setSignal(t);
-            else
-                clearSignal(t);
+        if (delayOver) {
+            if (powered != prevShouldPowered) {
+                stableTime = 0;
+                if (prevShouldPowered)
+                    setSignal(t);
+                else
+                    clearSignal(t);
+            }
+        } else if (powered != shouldPowered) {
+            stableTime++;
         }
 
-        nextPowered = shouldPowered;
+        prevShouldPowered = shouldPowered;
     }
 
     protected void lockedLogic(long t) {
-        stableTime = 1;
-        nextPowered = getShouldPowered();
+        stableTime = 0;
+        prevShouldPowered = getShouldPowered();
     }
 
     protected void unlockableLogic(long t) {

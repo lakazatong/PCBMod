@@ -7,6 +7,7 @@ import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.parse.Parser;
+import in.lakazatong.pcbmod.redstone.blocks.Button;
 import in.lakazatong.pcbmod.redstone.blocks.Delayed;
 import in.lakazatong.pcbmod.redstone.blocks.Solid;
 import in.lakazatong.pcbmod.utils.SccGraph;
@@ -65,14 +66,19 @@ public class Circuit {
             var x = 0;
             b.props = b.nextProps.dup();
         }
-        graph.values().stream()
-            .filter(Delayed.class::isInstance)
-            .map(Delayed.class::cast)
-            .forEach(delayed -> {
-                boolean powered = delayed.signal() > 0;
-                delayed.dirty = powered != delayed.nextPowered || powered != delayed.getShouldPowered();
+        for (Block b : graph.values()) {
+            if (b instanceof Delayed delayed) {
+                delayed.dirty = true;
                 var x = 0;
-            });
+            } else if (b instanceof Button button) {
+                button.dirty = true;
+            }
+        }
+//        graph.values().stream()
+//            .filter(Delayed.class::isInstance)
+//            .map(Delayed.class::cast)
+//            .forEach(delayed -> {
+//            });
     }
 
     public void tick() {
