@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 public class Comparator extends Delayed {
     public Comparator(Structure structure, Props p) {
         super(BlockType.COMPARATOR, structure, p);
-        props.delay = 2;
         props.facings = facings().stream().map(Vec3::opposite).collect(Collectors.toSet());
     }
 
@@ -24,6 +23,11 @@ public class Comparator extends Delayed {
             case COMPARATOR -> this.isFacing(neighbor) && !neighbor.isFacing(this);
             default -> false;
         };
+    }
+
+    @Override
+    protected boolean getShouldPowered() {
+        return inputs().anyMatch(i -> i.signal() > 0);
     }
 
     protected void setSignalSubtract(long t, Props p) {

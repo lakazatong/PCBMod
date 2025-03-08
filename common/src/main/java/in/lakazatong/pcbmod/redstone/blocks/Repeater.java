@@ -25,6 +25,11 @@ public class Repeater extends Delayed {
     }
 
     @Override
+    protected boolean getShouldPowered() {
+        return rearInputs().anyMatch(i -> i.signal() > 0);
+    }
+
+    @Override
     protected void setSignal(long t, Props p) {
         p.signal = 15;
     }
@@ -32,5 +37,11 @@ public class Repeater extends Delayed {
     @Override
     protected void clearSignal(long t, Props p) {
         p.signal = 0;
+    }
+
+    @Override
+    public void logic(long t, Props p) {
+        super.logic(t, p);
+        p.locked = sideInputs().anyMatch(i -> i.signal() > 0);
     }
 }

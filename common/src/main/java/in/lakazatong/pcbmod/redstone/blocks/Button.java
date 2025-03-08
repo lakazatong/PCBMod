@@ -8,7 +8,6 @@ import in.lakazatong.pcbmod.redstone.Structure;
 public class Button extends Block {
     public Button(Structure structure, Props p) {
         super(BlockType.BUTTON, structure, p);
-        props.onWall = true;
     }
 
     @Override

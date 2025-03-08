@@ -2,7 +2,10 @@ package in.lakazatong.pcbmod.redstone;
 
 import in.lakazatong.pcbmod.utils.Vec3;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 abstract public class Block {
@@ -32,6 +35,7 @@ abstract public class Block {
         this.uuid = UUID.nameUUIDFromBytes(this.props.coords.toString().getBytes());
     }
 
+    // stuff that must wait until all Blocks are initialized (once in a circuit)
     public void init() {
     }
 
@@ -75,20 +79,11 @@ abstract public class Block {
     }
 
     public boolean isFacing(Block other) {
-        for (Vec3 facing : facings()) {
-            if (this.coords().add(facing).equals(other.coords()))
-                return true;
-        }
-        return false;
+        return facings().stream().anyMatch(f -> this.coords().add(f).equals(other.coords()));
     }
 
     public boolean isFacingAway(Block other) {
-        // Check if this block is facing away from the given neighbor
-        for (Vec3 facing : facings()) {
-            if (this.coords().subtract(facing).equals(other.coords()))
-                return true;
-        }
-        return false;
+        return facings().stream().anyMatch(f -> this.coords().subtract(f).equals(other.coords()));
     }
 
     abstract public boolean isInputOf(Block neighbor);
@@ -164,7 +159,11 @@ abstract public class Block {
         return inputs().filter(input -> input.isSideInputOf(this));
     }
 
+    public Stream<Block> frontInputs() {
+        return inputs().filter(input -> !input.isSideInputOf(this) && isFacing(input));
+    }
+
     public Stream<Block> rearInputs() {
-        return inputs().filter(input -> !input.isSideInputOf(this));
+        return inputs().filter(input -> !input.isSideInputOf(this) && isFacingAway(input));
     }
 }

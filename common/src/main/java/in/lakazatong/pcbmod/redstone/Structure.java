@@ -131,23 +131,34 @@ public class Structure {
                 case "minecraft:air" -> null;
                 case "minecraft:redstone_wire" -> new BlockBuilder(Dust::new);
                 case "minecraft:repeater" -> new BlockBuilder(Repeater::new);
-                case "minecraft:redstone_torch" -> new BlockBuilder(Torch::new);
+                case "minecraft:redstone_torch" -> {
+                    BlockBuilder b = new BlockBuilder(Torch::new);
+                    b.commonInitialProps.delay = 2;
+                    yield b;
+                }
                 case "minecraft:redstone_wall_torch" -> {
                     BlockBuilder b = new BlockBuilder(Torch::new);
+                    b.commonInitialProps.delay = 2;
                     b.commonInitialProps.onWall = true;
                     yield b;
                 }
                 case "minecraft:stone_button" -> {
                     BlockBuilder b = new BlockBuilder(Button::new);
+                    b.commonInitialProps.onWall = true;
                     b.commonInitialProps.delay = 20;
                     yield b;
                 }
                 case "minecraft:wooden_button" -> {
                     BlockBuilder b = new BlockBuilder(Button::new);
+                    b.commonInitialProps.onWall = true;
                     b.commonInitialProps.delay = 40;
                     yield b;
                 }
-                case "minecraft:comparator" -> new BlockBuilder(Comparator::new);
+                case "minecraft:comparator" ->{
+                    BlockBuilder b = new BlockBuilder(Comparator::new);
+                    b.commonInitialProps.delay = 2;
+                    yield b;
+                }
                 default -> new BlockBuilder(Solid::new);
             };
 

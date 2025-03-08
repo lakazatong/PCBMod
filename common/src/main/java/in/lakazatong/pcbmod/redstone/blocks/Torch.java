@@ -9,7 +9,6 @@ public class Torch extends Delayed {
 
     public Torch(Structure structure, Props p) {
         super(BlockType.TORCH, structure, p);
-        props.delay = 2;
     }
 
     @Override
@@ -21,6 +20,11 @@ public class Torch extends Delayed {
             case COMPARATOR -> neighbor.isFacingAway(this);
             default -> false;
         };
+    }
+
+    @Override
+    protected boolean getShouldPowered() {
+        return inputs().anyMatch(i -> i.signal() > 0);
     }
 
     @Override

@@ -32,6 +32,7 @@ public class Circuit {
 
     public Circuit(Structure structure) {
         this.structure = structure;
+        
         structure.blocks().forEach(b -> graph.put(b.uuid, b));
         for (Block b : graph.values())
             b.props.neighbors.addAll(structure.getNeighbors(b));
