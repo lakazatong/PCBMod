@@ -179,40 +179,57 @@ public class Circuit {
         Path framesDir = structure.path.resolveSibling("frames");
         Path outputPath = structure.path.resolveSibling(PathUtils.getBaseName(structure.path) + ".mp4").toAbsolutePath();
 
-        FrameProducer producer = new FrameProducer() {
+        int maxWidth = 0, maxHeight = 0;
+        for (File file : Objects.requireNonNull(framesDir.toFile().listFiles((dir, name) -> name.endsWith(".png")))) {
+            try {
+                BufferedImage img = ImageIO.read(file);
+                if (img != null) {
+                    maxWidth = Math.max(maxWidth, img.getWidth());
+                    maxHeight = Math.max(maxHeight, img.getHeight());
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Error reading frame: " + file.getName(), e);
+            }
+        }
+
+        FrameProducer producer = getFrameProducer(maxWidth, maxHeight, framesDir);
+
+        FFmpeg.atPath()
+            .addInput(FrameInput.withProducer(producer).setFrameRate(1))
+                .addOutput(UrlOutput.toUrl(outputPath.toString()).setDuration(2000))
+            .execute();
+    }
+
+    private FrameProducer getFrameProducer(int maxWidth, int maxHeight, Path framesDir) {
+        return new FrameProducer() {
             private long index = 0;
 
             @Override
             public List<com.github.kokorin.jaffree.ffmpeg.Stream> produceStreams() {
-                File firstFrameFile = framesDir.resolve(PathUtils.getBaseName(structure.path) + index + ".png").toAbsolutePath().toFile();
-                BufferedImage firstImage;
-                try {
-                    firstImage = ImageIO.read(firstFrameFile);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-                int width = firstImage.getWidth();
-                int height = firstImage.getHeight();
-
                 return Collections.singletonList(new com.github.kokorin.jaffree.ffmpeg.Stream()
                         .setType(com.github.kokorin.jaffree.ffmpeg.Stream.Type.VIDEO)
                         .setTimebase(1000L)
-                        .setWidth(width)
-                        .setHeight(height)
+                        .setWidth(maxWidth)
+                        .setHeight(maxHeight)
                 );
             }
 
             @Override
             public Frame produce() {
-                if (index >= time)
+                if (index >= time + 1)
                     return null;
                 try {
                     File frameFile = framesDir.resolve(PathUtils.getBaseName(structure.path) + index + ".png").toAbsolutePath().toFile();
                     BufferedImage original = ImageIO.read(frameFile);
-                    BufferedImage formatted = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+                    BufferedImage formatted = new BufferedImage(maxWidth, maxHeight, BufferedImage.TYPE_3BYTE_BGR);
                     Graphics2D g = formatted.createGraphics();
-                    g.drawImage(original, 0, 0, null);
+                    g.setColor(Color.BLACK);
+                    g.fillRect(0, 0, maxWidth, maxHeight);
+                    if (original != null) {
+                        int x = (maxWidth - original.getWidth()) / 2;
+                        int y = (maxHeight - original.getHeight()) / 2;
+                        g.drawImage(original, x, y, null);
+                    }
                     g.dispose();
                     return Frame.createVideoFrame(0, (index++ * 1000), formatted);
                 } catch (IOException e) {
@@ -220,11 +237,6 @@ public class Circuit {
                 }
             }
         };
-
-        FFmpeg.atPath()
-            .addInput(FrameInput.withProducer(producer).setFrameRate(1))
-            .addOutput(UrlOutput.toUrl(outputPath.toString()))
-            .execute();
     }
 
     public void saveAsDot() {
