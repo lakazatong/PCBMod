@@ -15,11 +15,15 @@ public class Dust extends Block {
     @Override
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
+            case AIR -> false;
             case SOLID -> this.isFacing(neighbor) || this.isAbove(neighbor);
             case DUST -> true;
             case REPEATER -> !neighbor.locked() && neighbor.isFacingAway(this);
+            case TORCH -> false;
             case COMPARATOR -> !neighbor.isFacing(this);
-            default -> false;
+            case BUTTON -> false;
+            case LEVER -> false;
+            case REDSTONE_BLOCK -> false;
         };
     }
 

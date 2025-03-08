@@ -34,7 +34,7 @@ abstract public class Block {
     }
 
     // stuff that must wait until all Blocks are initialized (within a circuit)
-    // should be called at the end of the override init
+    // should be called at the end of the overridden init
     public void init() {
         this.nextProps = props.dup();
     }
@@ -73,24 +73,22 @@ abstract public class Block {
     }
 
     public boolean isOnWallOf(Block other) {
-        // This checks if the block is on a wall relative to the other block
-        // This can be interpreted as being "on the wall" and facing away from it
-        return this.onWall() && this.isFacingAway(other);
+        return onWall() && isFacingAway(other);
     }
 
     public boolean isFacing(Block other) {
-        return facings().stream().anyMatch(f -> this.coords().add(f).equals(other.coords()));
+        return facings().stream().anyMatch(f -> coords().add(f).equals(other.coords()));
     }
 
     public boolean isFacingAway(Block other) {
-        return facings().stream().anyMatch(f -> this.coords().subtract(f).equals(other.coords()));
+        return facings().stream().anyMatch(f -> coords().subtract(f).equals(other.coords()));
     }
 
     abstract public boolean isInputOf(Block neighbor);
 
     public boolean isSideInputOf(Block neighbor) {
         List<Vec3> neighborFacings = neighbor.facings().stream().toList();
-        return (facings().isEmpty() ? Collections.singleton(neighbor.coords().subtract(coords())) : facings())
+        return isFacing(neighbor) && (facings().isEmpty() ? Collections.singleton(neighbor.coords().subtract(coords())) : facings())
                 .stream().allMatch(f -> neighborFacings.stream().allMatch(f::isPerpendicular));
     }
 

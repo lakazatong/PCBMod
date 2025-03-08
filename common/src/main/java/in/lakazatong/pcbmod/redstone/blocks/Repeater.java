@@ -17,10 +17,14 @@ public class Repeater extends Delayed {
     @Override
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
-            case SOLID, DUST -> this.isFacing(neighbor);
-            case REPEATER -> !neighbor.locked() && this.isFacing(neighbor) && !neighbor.isFacing(this);
-            case COMPARATOR -> this.isFacing(neighbor) && !neighbor.isFacing(this);
-            default -> false;
+            case AIR -> false;
+            case SOLID, DUST -> isFacing(neighbor);
+            case REPEATER -> isSideInputOf(neighbor) || (!neighbor.locked() && isFacing(neighbor) && !neighbor.isFacing(this));
+            case TORCH -> false;
+            case COMPARATOR -> isFacing(neighbor) && !neighbor.isFacing(this);
+            case BUTTON -> false;
+            case LEVER -> false;
+            case REDSTONE_BLOCK -> false;
         };
     }
 

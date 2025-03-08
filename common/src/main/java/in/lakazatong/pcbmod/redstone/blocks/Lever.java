@@ -5,9 +5,9 @@ import in.lakazatong.pcbmod.redstone.BlockType;
 import in.lakazatong.pcbmod.redstone.Props;
 import in.lakazatong.pcbmod.redstone.Structure;
 
-public class Button extends Block {
-    public Button(Structure structure, Props p) {
-        super(BlockType.BUTTON, structure, p);
+public class Lever extends Constant {
+    public Lever(Structure structure, Props p) {
+        super(BlockType.LEVER, structure, p);
     }
 
     @Override
@@ -22,11 +22,5 @@ public class Button extends Block {
             case LEVER -> false;
             case REDSTONE_BLOCK -> false;
         };
-    }
-
-    @Override
-    public void logic(long t) {
-        if (t >= delay())
-            nextProps.signal = 0;
     }
 }

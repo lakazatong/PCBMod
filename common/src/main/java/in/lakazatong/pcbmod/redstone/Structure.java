@@ -142,6 +142,11 @@ public class Structure {
                     b.commonInitialProps.onWall = true;
                     yield b;
                 }
+                case "minecraft:comparator" ->{
+                    BlockBuilder b = new BlockBuilder(Comparator::new);
+                    b.commonInitialProps.delay = 2;
+                    yield b;
+                }
                 case "minecraft:stone_button" -> {
                     BlockBuilder b = new BlockBuilder(Button::new);
                     b.commonInitialProps.onWall = true;
@@ -150,15 +155,11 @@ public class Structure {
                 }
                 case "minecraft:wooden_button" -> {
                     BlockBuilder b = new BlockBuilder(Button::new);
-                    b.commonInitialProps.onWall = true;
                     b.commonInitialProps.delay = 40;
                     yield b;
                 }
-                case "minecraft:comparator" ->{
-                    BlockBuilder b = new BlockBuilder(Comparator::new);
-                    b.commonInitialProps.delay = 2;
-                    yield b;
-                }
+                case "minecraft:lever" -> new BlockBuilder(Lever::new);
+                case "minecraft:redstone_block" -> new BlockBuilder(RedstoneBlock::new);
                 default -> new BlockBuilder(Solid::new);
             };
 
@@ -190,6 +191,9 @@ public class Structure {
                             break;
                         case "mode":
                             builder.commonInitialProps.subtract = value.equals("subtract");
+                            break;
+                        case "face":
+                            builder.commonInitialProps.onWall = value.equals("wall");
                             break;
                     }
 

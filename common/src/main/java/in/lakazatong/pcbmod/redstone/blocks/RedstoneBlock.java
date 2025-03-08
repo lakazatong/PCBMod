@@ -5,39 +5,23 @@ import in.lakazatong.pcbmod.redstone.BlockType;
 import in.lakazatong.pcbmod.redstone.Props;
 import in.lakazatong.pcbmod.redstone.Structure;
 
-public class Torch extends Delayed {
-
-    public Torch(Structure structure, Props p) {
-        super(BlockType.TORCH, structure, p);
+public class RedstoneBlock extends Constant {
+    public RedstoneBlock(Structure structure, Props p) {
+        super(BlockType.REDSTONE_BLOCK, structure, p);
     }
 
     @Override
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
             case AIR -> false;
-            case SOLID -> isBelow(neighbor);
+            case SOLID -> false;
             case DUST -> true;
             case REPEATER -> !neighbor.locked() && neighbor.isFacingAway(this);
-            case TORCH -> false;
             case COMPARATOR -> neighbor.isFacingAway(this);
+            case TORCH -> (neighbor.isAbove(this) && !neighbor.onWall()) || neighbor.isOnWallOf(this);
             case BUTTON -> false;
             case LEVER -> false;
             case REDSTONE_BLOCK -> false;
         };
-    }
-
-    @Override
-    public boolean getShouldPowered() {
-        return inputs().allMatch(input -> input.signal() == 0);
-    }
-
-    @Override
-    protected void setSignal(long t) {
-        nextProps.signal = 15;
-    }
-
-    @Override
-    protected void clearSignal(long t) {
-        nextProps.signal = 0;
     }
 }

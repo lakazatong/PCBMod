@@ -15,6 +15,7 @@ public class Solid extends Block {
     @Override
     public void init() {
         props.signal = 0;
+        outer:
         for (Block input : inputs().collect(Collectors.toSet())) {
             switch (input.type) {
                 case BlockType.REPEATER:
@@ -23,7 +24,7 @@ public class Solid extends Block {
                     if (input.signal() > 0) {
                         props.weakPowered = false;
                         props.signal = 15;
-                        return;
+                        break outer;
                     }
                     break;
                 case BlockType.COMPARATOR:
@@ -46,15 +47,16 @@ public class Solid extends Block {
     @Override
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
+            case AIR -> false;
+            case SOLID -> false;
             case DUST -> true;
             case REPEATER -> !neighbor.locked() && neighbor.isFacingAway(this);
             case COMPARATOR -> neighbor.isFacingAway(this);
             case TORCH -> (neighbor.isAbove(this) && !neighbor.onWall()) || neighbor.isOnWallOf(this);
-            default -> false;
+            case BUTTON -> false;
+            case LEVER -> false;
+            case REDSTONE_BLOCK -> false;
         };
-    }
-
-    public void logicImpl(long t, Props p) {
     }
 
     @Override

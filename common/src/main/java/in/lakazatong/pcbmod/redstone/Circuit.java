@@ -59,7 +59,10 @@ public class Circuit {
     }
 
     private void update() {
-        graph.values().forEach(b -> b.props = b.nextProps.dup());
+        for (Block b : graph.values()) {
+            var x = 0;
+            b.props = b.nextProps.dup();
+        }
         graph.values().stream()
             .filter(Delayed.class::isInstance)
             .map(Delayed.class::cast)
