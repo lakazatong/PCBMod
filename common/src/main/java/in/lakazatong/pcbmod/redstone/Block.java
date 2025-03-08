@@ -2,9 +2,7 @@ package in.lakazatong.pcbmod.redstone;
 
 import in.lakazatong.pcbmod.utils.Vec3;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 abstract public class Block {
@@ -97,7 +95,8 @@ abstract public class Block {
 
     public boolean isSideInputOf(Block neighbor) {
         List<Vec3> neighborFacings = neighbor.facings().stream().toList();
-        return this.facings().stream().allMatch(f -> neighborFacings.stream().allMatch(f::isPerpendicular));
+        return (facings().isEmpty() ? Collections.singleton(neighbor.coords().subtract(coords())) : facings())
+                .stream().allMatch(f -> neighborFacings.stream().allMatch(f::isPerpendicular));
     }
 
     public Props tick(long t) {
