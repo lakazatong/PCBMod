@@ -59,14 +59,15 @@ public class Circuit {
     }
 
     private void update() {
-        for (Block b : graph.values()) {
-            b.props = b.nextProps.dup();
-            if (b instanceof Delayed delayed) {
-                boolean powered = b.signal() > 0;
-                b.dirty = powered != delayed.nextPowered || powered != delayed.getShouldPowered();
+        graph.values().forEach(b -> b.props = b.nextProps.dup());
+        graph.values().stream()
+            .filter(Delayed.class::isInstance)
+            .map(Delayed.class::cast)
+            .forEach(delayed -> {
+                boolean powered = delayed.signal() > 0;
+                delayed.dirty = powered != delayed.nextPowered || powered != delayed.getShouldPowered();
                 var x = 0;
-            }
-        }
+            });
     }
 
     public void tick() {
