@@ -19,7 +19,8 @@ public class Solid extends Block {
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
             case DUST -> true;
-            case REPEATER, COMPARATOR -> neighbor.isFacingAway(this);
+            case REPEATER -> !neighbor.locked() && neighbor.isFacingAway(this);
+            case COMPARATOR -> neighbor.isFacingAway(this);
             case TORCH -> (neighbor.isAbove(this) && !neighbor.onWall()) || neighbor.isOnWallOf(this);
             default -> false;
         };

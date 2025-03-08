@@ -17,7 +17,8 @@ public class Torch extends Delayed {
         return switch (neighbor.type) {
             case SOLID -> neighbor.isAbove(this);
             case DUST -> true;
-            case REPEATER, COMPARATOR -> neighbor.isFacingAway(this);
+            case REPEATER -> !neighbor.locked() && neighbor.isFacingAway(this);
+            case COMPARATOR -> neighbor.isFacingAway(this);
             default -> false;
         };
     }

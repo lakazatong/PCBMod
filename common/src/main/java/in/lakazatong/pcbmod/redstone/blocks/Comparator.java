@@ -20,7 +20,8 @@ public class Comparator extends Delayed {
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
             case SOLID, DUST -> this.isFacing(neighbor);
-            case REPEATER, COMPARATOR -> this.isFacing(neighbor) && !neighbor.isFacing(this);
+            case REPEATER -> isSideInputOf(neighbor) || (!neighbor.locked() && isFacing(neighbor) && neighbor.isFacingAway(this));
+            case COMPARATOR -> this.isFacing(neighbor) && !neighbor.isFacing(this);
             default -> false;
         };
     }
