@@ -16,12 +16,12 @@ public abstract class Delayed extends Block {
 
     public Delayed(BlockType type, Structure structure, Props p) {
         super(type, structure, p);
-        props.delay--;
     }
 
     @Override
     public void init() {
         nextPowered = getShouldPowered();
+        super.init();
     }
 
     @Override

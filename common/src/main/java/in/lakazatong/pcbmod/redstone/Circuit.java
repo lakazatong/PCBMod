@@ -8,6 +8,7 @@ import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.parse.Parser;
 import in.lakazatong.pcbmod.redstone.blocks.Delayed;
+import in.lakazatong.pcbmod.redstone.blocks.Solid;
 import in.lakazatong.pcbmod.utils.SccGraph;
 import org.apache.commons.io.file.PathUtils;
 
@@ -38,7 +39,8 @@ public class Circuit {
         for (Block b : graph.values())
             b.props.neighbors.addAll(structure.getNeighbors(b));
 
-        graph.values().forEach(Block::init);
+        graph.values().stream().filter(b -> b instanceof Solid).forEach(Block::init);
+        graph.values().stream().filter(b -> !(b instanceof Solid)).forEach(Block::init);
 
         Path framesDir = structure.path.resolveSibling("frames");
         try (Stream<Path> paths = Files.walk(framesDir)) {
@@ -62,6 +64,7 @@ public class Circuit {
             if (b instanceof Delayed delayed) {
                 boolean powered = b.signal() > 0;
                 b.dirty = powered != delayed.nextPowered || powered != delayed.getShouldPowered();
+                var x = 0;
             }
         }
     }
@@ -95,8 +98,8 @@ public class Circuit {
         }
     }
 
-    public boolean hasChanged() {
-        return graph.values().stream().anyMatch(b -> b.dirty);
+    public boolean Unchanged() {
+        return graph.values().stream().noneMatch(b -> b.dirty);
     }
 
     public void simulateUntilUnchanged() {
@@ -104,10 +107,13 @@ public class Circuit {
         do {
             update();
             saveAsDot();
+            if (Unchanged() || time >= 200)
+                break;
             tick();
             time++;
-        }  while (hasChanged() && time < 200);
-        animate();
+        }  while (true);
+        if (time > 0)
+            animate();
     }
 
     public String toDot() {

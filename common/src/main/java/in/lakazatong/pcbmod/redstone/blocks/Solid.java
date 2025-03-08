@@ -40,6 +40,7 @@ public class Solid extends Block {
                     break;
             }
         }
+        super.init();
     }
 
     @Override

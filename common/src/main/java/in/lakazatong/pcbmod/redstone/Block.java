@@ -29,13 +29,14 @@ abstract public class Block {
         this.type = type;
         this.structure = structure;
         this.props = initialProps;
-        this.nextProps = props.dup();
 
         this.uuid = UUID.nameUUIDFromBytes(this.props.coords.toString().getBytes());
     }
 
-    // stuff that must wait until all Blocks are initialized (once in a circuit)
+    // stuff that must wait until all Blocks are initialized (within a circuit)
+    // should be called at the end of the override init
     public void init() {
+        this.nextProps = props.dup();
     }
 
     @FunctionalInterface
