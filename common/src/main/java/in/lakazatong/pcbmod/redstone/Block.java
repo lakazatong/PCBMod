@@ -1,5 +1,6 @@
 package in.lakazatong.pcbmod.redstone;
 
+import in.lakazatong.pcbmod.redstone.blocks.Delayed;
 import in.lakazatong.pcbmod.utils.Vec3;
 
 import java.util.Collections;
@@ -92,15 +93,19 @@ abstract public class Block {
     }
 
     public void tick(long t) {
-        Props curProps = delay() == 0 ? nextProps.dup() : props;
+        Props curProps = isInstant() ? nextProps.dup() : props;
         logic(t);
 
         dirty = false;
         if (!nextProps.equals(curProps)) {
-            outputs().filter(output -> output.delay() == 0).forEach(output -> output.dirty = true);
-            if (delay() == 0)
+            outputs().filter(Block::isInstant).forEach(output -> output.dirty = true);
+            if (isInstant())
                 dirty = true;
         }
+    }
+
+    public boolean isInstant() {
+        return delay() == 0 && !(this instanceof Delayed);
     }
 
     public abstract void logic(long t);

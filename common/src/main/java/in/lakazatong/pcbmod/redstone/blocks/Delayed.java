@@ -12,10 +12,11 @@ public abstract class Delayed extends Block {
     protected abstract void clearSignal(long t);
 
     public boolean nextPowered;
-    private int stableTime = 1;
+    private int stableTime = 0;
 
     public Delayed(BlockType type, Structure structure, Props p) {
         super(type, structure, p);
+        props.delay--;
     }
 
     @Override
@@ -30,7 +31,7 @@ public abstract class Delayed extends Block {
         boolean delayOver = stableTime >= delay();
 
         boolean updateSignal = delayOver && (powered != nextPowered);
-        stableTime = updateSignal || (nextPowered != shouldPowered) ? 1 : stableTime + 1;
+        stableTime = updateSignal || (nextPowered != shouldPowered) ? 0 : stableTime + 1;
 
         if (updateSignal) {
             if (nextPowered)
