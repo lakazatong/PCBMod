@@ -24,11 +24,6 @@ public class Torch extends Delayed {
     }
 
     @Override
-    protected boolean getShouldPowered() {
-        return inputs().anyMatch(i -> i.signal() > 0);
-    }
-
-    @Override
     protected void setSignal(long t, Props p) {
         p.signal = 0;
     }
