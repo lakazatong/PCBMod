@@ -100,11 +100,10 @@ public class Circuit {
     public void simulateUntilUnchanged() {
         time = 0;
         do {
-            saveAsDot();
             tick();
+            saveAsDot();
             time++;
         }  while (hasChanged() && time < 200);
-        saveAsDot();
         animate();
     }
 
