@@ -14,7 +14,8 @@ abstract public class Block {
 
     public final BlockType type;
     public final Structure structure;
-    public final UUID uuid;
+//    public final UUID uuid;
+    public final String uuidDebug;
 
     // editable properties
 
@@ -30,7 +31,8 @@ abstract public class Block {
         this.structure = structure;
         this.props = initialProps;
 
-        this.uuid = UUID.nameUUIDFromBytes(this.props.coords.toString().getBytes());
+//        this.uuid = UUID.nameUUIDFromBytes(this.props.coords.toString().getBytes());
+        this.uuidDebug = this.props.coords.toString();
     }
 
     // stuff that must wait until all Blocks are initialized (within a circuit)
@@ -110,11 +112,11 @@ abstract public class Block {
 
     public abstract void logic(long t);
 
-    public int delay() {
+    public long delay() {
         return props.delay;
     }
 
-    public int nextDelay() {
+    public long nextDelay() {
         return nextProps.delay;
     }
 

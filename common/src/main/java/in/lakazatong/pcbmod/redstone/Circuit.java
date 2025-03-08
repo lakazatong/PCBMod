@@ -29,13 +29,15 @@ import java.util.stream.Stream;
 
 public class Circuit {
     public final Structure structure;
-    public final Map<UUID, Block> graph = new HashMap<>();
+//    public final Map<UUID, Block> graph = new HashMap<>();
+    public final Map<String, Block> graph = new HashMap<>();
     private long time = 0; // in game ticks
 
     public Circuit(Structure structure) {
         this.structure = structure;
 
-        structure.blocks().forEach(b -> graph.put(b.uuid, b));
+//        structure.blocks().forEach(b -> graph.put(b.uuid, b));
+        structure.blocks().forEach(b -> graph.put(b.uuidDebug, b));
         for (Block b : graph.values())
             b.props.neighbors.addAll(structure.getNeighbors(b));
 
@@ -127,14 +129,25 @@ public class Circuit {
         for (Block block : graph.values()) {
             int signal = block.props.signal;
             int greenBlue = 255 - (int) ((signal / 15.0) * 255);
-            dotBuilder.append("    \"").append(block.uuid).append("\" ")
+//            dotBuilder.append("    \"").append(block.uuid).append("\" ")
+//                    .append("[label=\"").append(block.type.name().toLowerCase())
+//                    .append("\n").append(signal).append("\", style=filled, fillcolor=\"black\", fontcolor=\"white\", color=\"")
+//                    .append(String.format("#ff%02x%02x", greenBlue, greenBlue))
+//                    .append("\", penwidth=2];\n");
+            dotBuilder.append("    \"").append(block.uuidDebug).append("\" ")
                     .append("[label=\"").append(block.type.name().toLowerCase())
                     .append("\n").append(signal).append("\", style=filled, fillcolor=\"black\", fontcolor=\"white\", color=\"")
                     .append(String.format("#ff%02x%02x", greenBlue, greenBlue))
                     .append("\", penwidth=2];\n");
 
+//            block.inputs().forEach(input -> {
+//                String edge = "\"" + input.uuid + "\" -> \"" + block.uuid + "\"";
+//                if (edges.add(edge)) {
+//                    dotBuilder.append("    ").append(edge).append(" [color=\"white\", penwidth=2];\n");
+//                }
+//            });
             block.inputs().forEach(input -> {
-                String edge = "\"" + input.uuid + "\" -> \"" + block.uuid + "\"";
+                String edge = "\"" + input.uuidDebug + "\" -> \"" + block.uuidDebug + "\"";
                 if (edges.add(edge)) {
                     dotBuilder.append("    ").append(edge).append(" [color=\"white\", penwidth=2];\n");
                 }

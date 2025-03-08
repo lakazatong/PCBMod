@@ -6,13 +6,14 @@ import in.lakazatong.pcbmod.redstone.Props;
 import in.lakazatong.pcbmod.redstone.Structure;
 
 public abstract class Delayed extends Block {
+    protected LogicImpl logicImpl;
 
     public abstract boolean getShouldPowered();
     protected abstract void setSignal(long t);
     protected abstract void clearSignal(long t);
 
     public boolean nextPowered;
-    private int stableTime = 1;
+    private long stableTime = 1;
 
     public Delayed(BlockType type, Structure structure, Props p) {
         super(type, structure, p);
@@ -24,8 +25,7 @@ public abstract class Delayed extends Block {
         super.init();
     }
 
-    @Override
-    public void logic(long t) {
+    protected void unlockedLogic(long t) {
         boolean powered = signal() > 0;
         boolean shouldPowered = getShouldPowered();
         boolean delayOver = stableTime >= delay();
@@ -41,5 +41,26 @@ public abstract class Delayed extends Block {
         }
 
         nextPowered = shouldPowered;
+    }
+
+    protected void lockedLogic(long t) {
+        stableTime = 1;
+        nextPowered = getShouldPowered();
+    }
+
+    protected void unlockableLogic(long t) {
+        unlockedLogic(t);
+    }
+
+    protected void lockableLogic(long t) {
+        if (locked())
+            lockedLogic(t);
+        else
+            unlockedLogic(t);
+    }
+
+    @Override
+    public void logic(long t) {
+        logicImpl.apply(t);
     }
 }

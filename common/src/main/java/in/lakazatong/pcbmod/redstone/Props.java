@@ -9,7 +9,7 @@ import java.util.Set;
 public class Props {
     // static properties
 
-    public int delay; // all
+    public long delay; // all
     public boolean onWall; // button, torch
     public boolean locked; // repeater (might be useless)
     public boolean subtract; // comparator (might be useless)
@@ -23,7 +23,7 @@ public class Props {
     public Vec3 coords;
     public Set<Block> neighbors;
 
-    private Props(int delay, boolean onWall, boolean locked, boolean subtract, Set<Vec3> facings, int signal, boolean weakPowered, Vec3 coords, Set<Block> neighbors) {
+    private Props(long delay, boolean onWall, boolean locked, boolean subtract, Set<Vec3> facings, int signal, boolean weakPowered, Vec3 coords, Set<Block> neighbors) {
         this.delay = delay;
         this.onWall = onWall;
         this.locked = locked;

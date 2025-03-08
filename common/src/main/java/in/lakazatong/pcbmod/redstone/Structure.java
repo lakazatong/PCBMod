@@ -184,7 +184,7 @@ public class Structure {
                             builder.commonInitialProps.facings.add(Vec3.fromCardinal(value));
                             break;
                         case "delay":
-                            builder.commonInitialProps.delay = Integer.parseInt(value) * 2;
+                            builder.commonInitialProps.delay = Integer.parseInt(value) * 2L;
                             break;
                         case "locked":
                             builder.commonInitialProps.locked = Boolean.parseBoolean(value);
