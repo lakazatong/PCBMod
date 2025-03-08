@@ -57,7 +57,6 @@ public class Circuit {
     }
 
     public void tick() {
-        Map<UUID, Props> nextProps = new HashMap<>(graph.size());
         SccGraph sccGraph = new SccGraph(graph);
         Queue<Integer> queue = new LinkedList<>();
 
@@ -73,26 +72,20 @@ public class Circuit {
             int sccId = queue.poll();
             Set<Block> blocks = sccGraph.sccs.get(sccId);
 
+            blocks.forEach(b -> b.nextProps = b.props.dup());
             var x = 0;
 
             do {
                 Set<Block> dirtyBlocks = blocks.stream().filter(b -> b.dirty).collect(Collectors.toSet());
                 if (dirtyBlocks.isEmpty()) break;
-                dirtyBlocks.forEach(b -> {
-                    Props p = b.tick(time);
-                    if (b.delay() == 0)
-                        b.props = p;
-                    else
-                        nextProps.put(b.uuid, p);
-                });
+                dirtyBlocks.forEach(b -> b.tick(time));
             } while (true);
 
             queue.addAll(sccGraph.outputs(sccId));
         }
 
-        for (Map.Entry<UUID, Props> entry : nextProps.entrySet()) {
-            Block b = graph.get(entry.getKey());
-            b.props = entry.getValue();
+        for (Block b : graph.values()) {
+            b.props = b.nextProps.dup();
             if (b instanceof Delayed delayed) {
                 boolean powered = b.signal() > 0;
                 b.dirty = powered != delayed.nextPowered || powered != delayed.getShouldPowered();

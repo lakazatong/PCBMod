@@ -21,11 +21,8 @@ abstract public class Block {
     public boolean dirty = true;
     // holds all states that can changes over time (and some more for convenience)
     public Props props;
-
-    // temporary properties
-
-    // used in Block::hasChanged
-    public Props previousProps = Props.defaults();
+    // here so that 0 tick blocks can "see in the future" and only them
+    public Props nextProps;
 
     protected Block(BlockType type, Structure structure, Props initialProps) {
         this.type = type;
@@ -94,76 +91,129 @@ abstract public class Block {
                 .stream().allMatch(f -> neighborFacings.stream().allMatch(f::isPerpendicular));
     }
 
-    public Props tick(long t) {
-        previousProps = props.dup();
-        Props p = props.dup();
-        logic(t, p);
+    public void tick(long t) {
+        Props curProps = delay() == 0 ? nextProps.dup() : props;
+        logic(t);
 
         dirty = false;
-        if (!p.equals(props)) {
-            outputs().forEach(output -> output.dirty = true);
+        if (!nextProps.equals(curProps)) {
+            outputs().filter(output -> output.delay() == 0).forEach(output -> output.dirty = true);
             if (delay() == 0)
                 dirty = true;
         }
-
-        return p;
     }
 
-    public abstract void logic(long t, Props p);
+    public abstract void logic(long t);
 
     public int delay() {
         return props.delay;
+    }
+
+    public int nextDelay() {
+        return nextProps.delay;
     }
 
     public boolean onWall() {
         return props.onWall;
     }
 
+    public boolean nextOnWall() {
+        return nextProps.onWall;
+    }
+
     public boolean locked() {
         return props.locked;
+    }
+
+    public boolean nextLocked() {
+        return nextProps.locked;
     }
 
     public boolean subtract() {
         return props.subtract;
     }
 
+    public boolean nextSubtract() {
+        return nextProps.subtract;
+    }
+
     public Set<Vec3> facings() {
         return props.facings;
+    }
+
+    public Set<Vec3> nextFacings() {
+        return nextProps.facings;
     }
 
     public int signal() {
         return props.signal;
     }
 
+    public int nextSignal() {
+        return nextProps.signal;
+    }
+
     public boolean weakPowered() {
         return props.weakPowered;
+    }
+
+    public boolean nextWeakPowered() {
+        return nextProps.weakPowered;
     }
 
     public Vec3 coords() {
         return props.coords;
     }
 
+    public Vec3 nextCoords() {
+        return nextProps.coords;
+    }
+
     public Set<Block> neighbors() {
         return props.neighbors;
+    }
+
+    public Set<Block> nextNeighbors() {
+        return nextProps.neighbors;
     }
 
     public Stream<Block> inputs() {
         return neighbors().stream().filter(neighbor -> neighbor.isInputOf(this));
     }
 
+    public Stream<Block> nextInputs() {
+        return nextNeighbors().stream().filter(neighbor -> neighbor.isInputOf(this));
+    }
+
     public Stream<Block> outputs() {
         return neighbors().stream().filter(this::isInputOf);
+    }
+
+    public Stream<Block> nextOutputs() {
+        return nextNeighbors().stream().filter(this::isInputOf);
     }
 
     public Stream<Block> sideInputs() {
         return inputs().filter(input -> input.isSideInputOf(this));
     }
 
+    public Stream<Block> nextSideInputs() {
+        return nextInputs().filter(input -> input.isSideInputOf(this));
+    }
+
     public Stream<Block> frontInputs() {
         return inputs().filter(input -> !input.isSideInputOf(this) && isFacing(input));
     }
 
+    public Stream<Block> nextFrontInputs() {
+        return nextInputs().filter(input -> !input.isSideInputOf(this) && isFacing(input));
+    }
+
     public Stream<Block> rearInputs() {
         return inputs().filter(input -> !input.isSideInputOf(this) && isFacingAway(input));
+    }
+
+    public Stream<Block> nextRearInputs() {
+        return nextInputs().filter(input -> !input.isSideInputOf(this) && isFacingAway(input));
     }
 }

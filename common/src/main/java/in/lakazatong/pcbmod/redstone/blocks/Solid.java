@@ -5,6 +5,8 @@ import in.lakazatong.pcbmod.redstone.BlockType;
 import in.lakazatong.pcbmod.redstone.Props;
 import in.lakazatong.pcbmod.redstone.Structure;
 
+import java.util.stream.Collectors;
+
 public class Solid extends Block {
     public Solid(Structure structure, Props p) {
         super(BlockType.SOLID, structure, p);
@@ -12,7 +14,7 @@ public class Solid extends Block {
 
     @Override
     public void init() {
-        logic(0, props);
+        logic(0);
     }
 
     @Override
@@ -27,32 +29,32 @@ public class Solid extends Block {
     }
 
     @Override
-    public void logic(long t, Props p) {
-        p.signal = 0;
-        inputs().forEach(input -> {
+    public void logic(long t) {
+        nextProps.signal = 0;
+        for (Block input : nextInputs().collect(Collectors.toSet())) {
             switch (input.type) {
                 case BlockType.REPEATER:
                 case BlockType.TORCH:
                 case BlockType.BUTTON:
-                    if (input.signal() > 0) {
-                        p.weakPowered = false;
-                        p.signal = 15;
+                    if (input.nextSignal() > 0) {
+                        nextProps.weakPowered = false;
+                        nextProps.signal = 15;
                         return;
                     }
                     break;
                 case BlockType.COMPARATOR:
-                    if (input.signal() > p.signal) {
-                        p.weakPowered = false;
-                        p.signal = input.signal();
+                    if (input.nextSignal() > nextProps.signal) {
+                        nextProps.weakPowered = false;
+                        nextProps.signal = input.nextSignal();
                     }
                     break;
                 case BlockType.DUST:
-                    if (input.signal() > p.signal) {
-                        p.weakPowered = true;
-                        p.signal = input.signal();
+                    if (input.nextSignal() > nextProps.signal) {
+                        nextProps.weakPowered = true;
+                        nextProps.signal = input.nextSignal();
                     }
                     break;
             }
-        });
+        }
     }
 }

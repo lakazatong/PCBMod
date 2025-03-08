@@ -30,18 +30,18 @@ public class Repeater extends Delayed {
     }
 
     @Override
-    protected void setSignal(long t, Props p) {
-        p.signal = 15;
+    protected void setSignal(long t) {
+        nextProps.signal = 15;
     }
 
     @Override
-    protected void clearSignal(long t, Props p) {
-        p.signal = 0;
+    protected void clearSignal(long t) {
+        nextProps.signal = 0;
     }
 
     @Override
-    public void logic(long t, Props p) {
-        super.logic(t, p);
-        p.locked = sideInputs().anyMatch(i -> i.signal() > 0);
+    public void logic(long t) {
+        super.logic(t);
+        nextProps.locked = sideInputs().anyMatch(i -> i.signal() > 0);
     }
 }

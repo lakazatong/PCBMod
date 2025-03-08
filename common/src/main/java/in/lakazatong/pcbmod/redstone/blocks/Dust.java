@@ -24,38 +24,40 @@ public class Dust extends Block {
     }
 
     @Override
-    public void logic(long t, Props p) {
+    public void logic(long t) {
         boolean decay = true;
-        p.signal = 0;
-        for (Block block : inputs().collect(Collectors.toSet())) {
-            switch (block.type) {
+        nextProps.signal = 0;
+        for (Block input : nextInputs().collect(Collectors.toSet())) {
+            switch (input.type) {
                 case BlockType.REPEATER:
                 case BlockType.TORCH:
                 case BlockType.BUTTON:
-                    if (block.signal() > 0)
-                        p.signal = 15;
+                    if (input.nextSignal() > 0) {
+                        nextProps.signal = 15;
+                       return;
+                    }
                     break;
                 case BlockType.SOLID:
-                    if (block.signal() > p.signal && !block.weakPowered()) {
+                    if (input.nextSignal() > nextProps.signal && !input.nextWeakPowered()) {
                         decay = false;
-                        p.signal = block.signal();
+                        nextProps.signal = input.nextSignal();
                     }
                     break;
                 case BlockType.COMPARATOR:
-                    if (block.signal() > p.signal) {
+                    if (input.nextSignal() > nextProps.signal) {
                         decay = false;
-                        p.signal = block.signal();
+                        nextProps.signal = input.nextSignal();
                     }
                     break;
                 case BlockType.DUST:
-                    if (block.signal() > p.signal) {
+                    if (input.nextSignal() > nextProps.signal) {
                         decay = true;
-                        p.signal = block.signal();
+                        nextProps.signal = input.nextSignal();
                     }
                     break;
             }
         }
-        if (decay && p.signal > 0)
-            p.signal--;
+        if (decay && nextProps.signal > 0)
+            nextProps.signal--;
     }
 }

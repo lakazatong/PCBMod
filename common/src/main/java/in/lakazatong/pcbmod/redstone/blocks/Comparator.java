@@ -30,11 +30,11 @@ public class Comparator extends Delayed {
         return inputs().anyMatch(i -> i.signal() > 0);
     }
 
-    protected void setSignalSubtract(long t, Props p) {
+    protected void setSignalSubtract(long t) {
         List<Block> rearInputs = rearInputs().toList();
         assert rearInputs.size() <= 1;
         if (rearInputs.isEmpty()) {
-            p.signal = 0;
+            nextProps.signal = 0;
             return;
         }
         List<Block> sideInputs = sideInputs().toList();
@@ -44,32 +44,32 @@ public class Comparator extends Delayed {
                 .mapToInt(Block::signal)
                 .max()
                 .orElse(0);
-        p.signal = Math.max(0, rearSignal - maxSideSignal);
+        nextProps.signal = Math.max(0, rearSignal - maxSideSignal);
     }
 
-    protected void setSignalNormal(long t, Props p) {
+    protected void setSignalNormal(long t) {
         List<Block> rearInputs = rearInputs().toList();
         assert rearInputs.size() <= 1;
         if (rearInputs.isEmpty()) {
-            p.signal = 0;
+            nextProps.signal = 0;
             return;
         }
         List<Block> sideInputs = sideInputs().toList();
         assert sideInputs.size() <= 2;
         int rearSignal = rearInputs.getFirst().signal();
-        p.signal = sideInputs.stream().anyMatch(i -> i.signal() > rearSignal) ? 0 : rearSignal;
+        nextProps.signal = sideInputs.stream().anyMatch(i -> i.signal() > rearSignal) ? 0 : rearSignal;
     }
 
     @Override
-    protected void setSignal(long t, Props p) {
+    protected void setSignal(long t) {
         if (subtract())
-            setSignalSubtract(t, p);
+            setSignalSubtract(t);
         else
-            setSignalNormal(t, p);
+            setSignalNormal(t);
     }
 
     @Override
-    protected void clearSignal(long t, Props p) {
-        p.signal = 0;
+    protected void clearSignal(long t) {
+        nextProps.signal = 0;
     }
 }
