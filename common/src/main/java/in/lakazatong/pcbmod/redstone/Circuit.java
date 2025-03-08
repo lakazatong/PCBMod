@@ -56,6 +56,16 @@ public class Circuit {
         }
     }
 
+    private void update() {
+        for (Block b : graph.values()) {
+            b.props = b.nextProps.dup();
+            if (b instanceof Delayed delayed) {
+                boolean powered = b.signal() > 0;
+                b.dirty = powered != delayed.nextPowered || powered != delayed.getShouldPowered();
+            }
+        }
+    }
+
     public void tick() {
         SccGraph sccGraph = new SccGraph(graph);
         Queue<Integer> queue = new LinkedList<>();
@@ -68,11 +78,11 @@ public class Circuit {
         if (queue.isEmpty() && !sccGraph.sccs.isEmpty())
             queue.add(0);
 
+
         while (!queue.isEmpty()) {
             int sccId = queue.poll();
             Set<Block> blocks = sccGraph.sccs.get(sccId);
 
-            blocks.forEach(b -> b.nextProps = b.props.dup());
             var x = 0;
 
             do {
@@ -83,14 +93,6 @@ public class Circuit {
 
             queue.addAll(sccGraph.outputs(sccId));
         }
-
-        for (Block b : graph.values()) {
-            b.props = b.nextProps.dup();
-            if (b instanceof Delayed delayed) {
-                boolean powered = b.signal() > 0;
-                b.dirty = powered != delayed.nextPowered || powered != delayed.getShouldPowered();
-            }
-        }
     }
 
     public boolean hasChanged() {
@@ -100,8 +102,9 @@ public class Circuit {
     public void simulateUntilUnchanged() {
         time = 0;
         do {
-            tick();
+            update();
             saveAsDot();
+            tick();
             time++;
         }  while (hasChanged() && time < 200);
         animate();

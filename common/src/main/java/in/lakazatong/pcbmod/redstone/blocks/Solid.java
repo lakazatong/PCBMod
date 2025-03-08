@@ -14,7 +14,32 @@ public class Solid extends Block {
 
     @Override
     public void init() {
-        logic(0);
+        props.signal = 0;
+        for (Block input : inputs().collect(Collectors.toSet())) {
+            switch (input.type) {
+                case BlockType.REPEATER:
+                case BlockType.TORCH:
+                case BlockType.BUTTON:
+                    if (input.signal() > 0) {
+                        props.weakPowered = false;
+                        props.signal = 15;
+                        return;
+                    }
+                    break;
+                case BlockType.COMPARATOR:
+                    if (input.signal() > props.signal) {
+                        props.weakPowered = false;
+                        props.signal = input.signal();
+                    }
+                    break;
+                case BlockType.DUST:
+                    if (input.signal() > props.signal) {
+                        props.weakPowered = true;
+                        props.signal = input.signal();
+                    }
+                    break;
+            }
+        }
     }
 
     @Override
@@ -26,6 +51,9 @@ public class Solid extends Block {
             case TORCH -> (neighbor.isAbove(this) && !neighbor.onWall()) || neighbor.isOnWallOf(this);
             default -> false;
         };
+    }
+
+    public void logicImpl(long t, Props p) {
     }
 
     @Override

@@ -27,7 +27,7 @@ public class Comparator extends Delayed {
 
     @Override
     public boolean getShouldPowered() {
-        return inputs().anyMatch(i -> i.signal() > 0);
+        return rearInputs().anyMatch(i -> i.signal() > 0);
     }
 
     protected void setSignalSubtract(long t) {

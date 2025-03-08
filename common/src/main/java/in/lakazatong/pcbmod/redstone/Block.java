@@ -19,7 +19,7 @@ abstract public class Block {
     // editable properties
 
     // makes more sense to be here as it's managed within the same tick
-    public boolean dirty = true;
+    public boolean dirty = false;
     // holds all states that can changes over time (and some more for convenience)
     public Props props;
     // here so that 0 tick blocks can "see in the future" and only them
@@ -29,6 +29,7 @@ abstract public class Block {
         this.type = type;
         this.structure = structure;
         this.props = initialProps;
+        this.nextProps = props.dup();
 
         this.uuid = UUID.nameUUIDFromBytes(this.props.coords.toString().getBytes());
     }
@@ -39,7 +40,7 @@ abstract public class Block {
 
     @FunctionalInterface
     public interface LogicImpl {
-        void apply(long t, Props p);
+        void apply(long t);
     }
 
     public static class BlockBuilder {
