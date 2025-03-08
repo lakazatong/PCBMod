@@ -78,10 +78,6 @@ public class Circuit {
                 queue.add(sccId);
         }
 
-        if (queue.isEmpty() && !sccGraph.sccs.isEmpty())
-            queue.add(0);
-
-
         while (!queue.isEmpty()) {
             int sccId = queue.poll();
             Set<Block> blocks = sccGraph.sccs.get(sccId);
