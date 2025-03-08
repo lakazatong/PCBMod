@@ -61,24 +61,41 @@ public class Circuit {
         }
     }
 
-    private void update() {
-        for (Block b : graph.values()) {
-            var x = 0;
-            b.props = b.nextProps.dup();
-        }
-        for (Block b : graph.values()) {
-            if (b instanceof Delayed delayed) {
-                delayed.dirty = true;
-                var x = 0;
-            } else if (b instanceof Button button) {
-                button.dirty = true;
-            }
-        }
+//    private void update() {
+//        for (Block b : graph.values()) {
+//            var x = 0;
+//            b.props = b.nextProps.dup();
+//        }
+//        for (Block b : graph.values()) {
+//            if (b instanceof Delayed delayed) {
+//                delayed.dirty = true;
+//                var x = 0;
+//            } else if (b instanceof Button button) {
+//                button.dirty = true;
+//            }
+//        }
 //        graph.values().stream()
 //            .filter(Delayed.class::isInstance)
 //            .map(Delayed.class::cast)
 //            .forEach(delayed -> {
 //            });
+//    }
+
+    private boolean update() {
+        boolean changing = false;
+        for (Block b : graph.values()) {
+            if (!b.props.equals(b.nextProps) || b instanceof Delayed delayed && delayed.stableTime() > 0)
+                changing = true;
+            b.props = b.nextProps.dup();
+        }
+        for (Block b : graph.values()) {
+            if (b instanceof Delayed delayed) {
+                delayed.dirty = true;
+            } else if (b instanceof Button button) {
+                button.dirty = true;
+            }
+        }
+        return changing;
     }
 
     public void tick() {
@@ -106,22 +123,17 @@ public class Circuit {
         }
     }
 
-    public boolean Unchanged() {
-        return graph.values().stream().noneMatch(b -> b.dirty);
-    }
-
     public void simulateUntilUnchanged() {
         time = 0;
         do {
-            update();
+            boolean changing = update();
             saveAsDot();
-            if (Unchanged() || time >= 200)
+            if ((time > 0 && !changing) || time >= 200)
                 break;
             tick();
             time++;
-        }  while (true);
-        if (time > 0)
-            animate();
+        } while (true);
+        animate();
     }
 
     public String toDot() {

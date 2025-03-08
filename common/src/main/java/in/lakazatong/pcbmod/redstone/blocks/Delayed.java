@@ -65,4 +65,8 @@ public abstract class Delayed extends Block {
     public void logic(long t) {
         logicImpl.apply(t);
     }
+
+    public long stableTime() {
+        return stableTime;
+    }
 }
