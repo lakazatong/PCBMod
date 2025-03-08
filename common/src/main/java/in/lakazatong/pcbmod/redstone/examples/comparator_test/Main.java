@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public class Main {
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException {
         Path nbtPath = Path.of("common/src/main/java/in/lakazatong/pcbmod/redstone/examples/comparator_test/comparator_test.nbt");
         Structure structure = Structure.fromNBT(nbtPath);
         System.out.println(structure);

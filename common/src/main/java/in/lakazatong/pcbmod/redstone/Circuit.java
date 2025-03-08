@@ -36,12 +36,19 @@ public class Circuit {
         for (Block b : graph.values())
             b.props.neighbors.addAll(structure.getNeighbors(b));
 
+        graph.values().forEach(Block::init);
+
         Path framesDir = structure.path.resolveSibling("frames");
         try (Stream<Path> paths = Files.walk(framesDir)) {
             paths.sorted(Comparator.reverseOrder())
                     .map(Path::toFile)
                     .forEach(File::delete);
-            structure.path.resolveSibling(PathUtils.getBaseName(structure.path) + ".mp4").toFile().delete();
+        } catch (IOException ignored) {
+        }
+
+        structure.path.resolveSibling(PathUtils.getBaseName(structure.path) + ".mp4").toFile().delete();
+
+        try {
             Files.createDirectory(framesDir);
         } catch (IOException ignored) {
         }
@@ -56,6 +63,9 @@ public class Circuit {
             if (sccGraph.inputs(sccId).isEmpty())
                 queue.add(sccId);
         }
+
+        if (queue.isEmpty() && !sccGraph.sccs.isEmpty())
+            queue.add(0);
 
         while (!queue.isEmpty()) {
             int sccId = queue.poll();
@@ -92,7 +102,8 @@ public class Circuit {
             saveAsDot();
             tick();
             time++;
-        }  while (hasChanged());
+        }  while (hasChanged() && time < 200);
+        saveAsDot();
         animate();
     }
 

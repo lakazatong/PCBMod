@@ -32,10 +32,8 @@ public class Dust extends Block {
                 case BlockType.REPEATER:
                 case BlockType.TORCH:
                 case BlockType.BUTTON:
-                    if (block.signal() > 0) {
+                    if (block.signal() > 0)
                         p.signal = 15;
-                        return;
-                    }
                     break;
                 case BlockType.SOLID:
                     if (block.signal() > p.signal && !block.weakPowered()) {

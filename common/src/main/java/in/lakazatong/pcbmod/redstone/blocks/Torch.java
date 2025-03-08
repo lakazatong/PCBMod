@@ -10,7 +10,6 @@ public class Torch extends Delayed {
     public Torch(Structure structure, Props p) {
         super(BlockType.TORCH, structure, p);
         props.delay = 2;
-        logicImpl = super::unlockableLogic;
     }
 
     @Override
@@ -24,7 +23,17 @@ public class Torch extends Delayed {
     }
 
     @Override
+    protected boolean getShouldPowered() {
+        return inputs().anyMatch(i -> i.signal() > 0);
+    }
+
+    @Override
     protected void setSignal(long t, Props p) {
-        p.signal = powered ? 0 : 15;
+        p.signal = 0;
+    }
+
+    @Override
+    protected void clearSignal(long t, Props p) {
+        p.signal = 15;
     }
 }

@@ -10,13 +10,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Comparator extends Delayed {
-    private final LogicImpl setSignalImpl;
-
     public Comparator(Structure structure, Props p) {
         super(BlockType.COMPARATOR, structure, p);
         props.delay = 2;
-        setSignalImpl = subtract() ? this::setSignalSubtract : this::setSignalNormal;
-        logicImpl = super::unlockableLogic;
         props.facings = facings().stream().map(Vec3::opposite).collect(Collectors.toSet());
     }
 
@@ -30,10 +26,6 @@ public class Comparator extends Delayed {
     }
 
     protected void setSignalSubtract(long t, Props p) {
-        if (!powered) {
-            p.signal = 0;
-            return;
-        }
         List<Block> rearInputs = rearInputs().toList();
         assert rearInputs.size() <= 1;
         if (rearInputs.isEmpty()) {
@@ -51,10 +43,6 @@ public class Comparator extends Delayed {
     }
 
     protected void setSignalNormal(long t, Props p) {
-        if (!powered) {
-            p.signal = 0;
-            return;
-        }
         List<Block> rearInputs = rearInputs().toList();
         assert rearInputs.size() <= 1;
         if (rearInputs.isEmpty()) {
@@ -68,7 +56,20 @@ public class Comparator extends Delayed {
     }
 
     @Override
+    protected boolean getShouldPowered() {
+        return rearInputs().anyMatch(i -> i.signal() > 0);
+    }
+
+    @Override
     protected void setSignal(long t, Props p) {
-        setSignalImpl.apply(t, p);
+        if (subtract())
+            setSignalSubtract(t, p);
+        else
+            setSignalNormal(t, p);
+    }
+
+    @Override
+    protected void clearSignal(long t, Props p) {
+        p.signal = 0;
     }
 }

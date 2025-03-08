@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 public class Repeater extends Delayed {
     public Repeater(Structure structure, Props p) {
         super(BlockType.REPEATER, structure, p);
-        logicImpl = super::lockableLogic;
         props.facings = facings().stream().map(Vec3::opposite).collect(Collectors.toSet());
     }
 
@@ -19,13 +18,24 @@ public class Repeater extends Delayed {
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
             case SOLID, DUST -> this.isFacing(neighbor);
-            case REPEATER, COMPARATOR -> this.isFacing(neighbor) && !neighbor.isFacing(this);
+            case REPEATER -> !neighbor.locked() && this.isFacing(neighbor) && !neighbor.isFacing(this);
+            case COMPARATOR -> this.isFacing(neighbor) && !neighbor.isFacing(this);
             default -> false;
         };
     }
 
     @Override
+    protected boolean getShouldPowered() {
+        return rearInputs().anyMatch(i -> i.signal() > 0);
+    }
+
+    @Override
     protected void setSignal(long t, Props p) {
-        p.signal = powered ? 15 : 0;
+        p.signal = 15;
+    }
+
+    @Override
+    protected void clearSignal(long t, Props p) {
+        p.signal = 0;
     }
 }

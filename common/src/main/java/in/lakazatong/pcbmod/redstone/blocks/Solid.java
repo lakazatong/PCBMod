@@ -11,6 +11,11 @@ public class Solid extends Block {
     }
 
     @Override
+    public void init() {
+        logic(0, props);
+    }
+
+    @Override
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
             case DUST -> true;

@@ -34,6 +34,9 @@ abstract public class Block {
         this.uuid = UUID.nameUUIDFromBytes(this.props.coords.toString().getBytes());
     }
 
+    public void init() {
+    }
+
     @FunctionalInterface
     public interface LogicImpl {
         void apply(long t, Props p);
@@ -101,9 +104,14 @@ abstract public class Block {
         previousProps = props.dup();
         Props p = props.dup();
         logic(t, p);
-        if (!p.equals(props))
-            outputs().forEach(output -> output.dirty = true);
+
         dirty = false;
+        if (!p.equals(props)) {
+            outputs().forEach(output -> output.dirty = true);
+            if (delay() == 0)
+                dirty = true;
+        }
+
         return p;
     }
 
