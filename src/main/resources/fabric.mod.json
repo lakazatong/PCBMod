@@ -3,32 +3,22 @@
 	"id": "pcbmod",
 	"version": "${version}",
 	"name": "PCBMod",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": ":)",
 	"authors": [
-		"Me!"
+		"lakazatong"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
-	"license": "CC0-1.0",
+	"license": "LGPL-3.0-or-later",
 	"icon": "assets/pcbmod/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
 			"net.lakazatong.pcbmod.PCBMod"
-		],
-		"client": [
-			"net.lakazatong.pcbmod.PCBModClient"
 		]
 	},
-	"mixins": [
-		"pcbmod.mixins.json",
-		{
-			"config": "pcbmod.client.mixins.json",
-			"environment": "client"
-		}
-	],
 	"depends": {
 		"fabricloader": ">=0.16.10",
 		"minecraft": "~1.21.4",
