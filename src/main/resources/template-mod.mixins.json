@@ -1,0 +1,11 @@
+{
+	"required": true,
+	"package": "net.lakazatong.pcbmod.mixins",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"StructureTemplateManagerMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
