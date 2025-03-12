@@ -17,6 +17,9 @@
 	"entrypoints": {
 		"main": [
 			"net.lakazatong.pcbmod.PCBMod"
+		],
+		"client": [
+			"net.lakazatong.pcbmod.PCBModClient"
 		]
 	},
 	"depends": {
