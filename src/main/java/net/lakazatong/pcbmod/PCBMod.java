@@ -3,6 +3,7 @@ package net.lakazatong.pcbmod;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.lakazatong.pcbmod.block.ModBlockEntities;
 import net.lakazatong.pcbmod.block.ModBlocks;
 import net.lakazatong.pcbmod.item.ModItems;
 import net.lakazatong.pcbmod.payloads.OpenPortScreenPayload;
@@ -25,6 +26,7 @@ public class PCBMod implements ModInitializer {
 
         ModItems.initialize();
         ModBlocks.initialize();
+        ModBlockEntities.initialize();
     }
 
     private void onServerStart(MinecraftServer server) {
