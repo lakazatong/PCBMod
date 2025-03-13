@@ -1,6 +1,16 @@
 {
-  "tab.pcbmod": "PCB Mod",
+  "word.pcbmod.none": "none",
+  "word.pcbmod.input": "input",
+  "word.pcbmod.output": "output",
+
+  "word.pcbmod.done": "done",
+  "word.pcbmod.cancel": "cancel",
+
+  "tab.pcbmod.title": "PCB Mod",
 
   "item.pcbmod.suspicious_substance": "Suspicious Substance",
-  "item.pcbmod.port": "Port Block"
+  "item.pcbmod.port": "Port Block",
+
+  "screen.pcbmod.port.port_number":  "Port Number",
+  "screen.pcbmod.port.title": "Port Screen"
 }

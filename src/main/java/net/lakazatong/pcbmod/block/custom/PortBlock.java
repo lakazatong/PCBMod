@@ -13,7 +13,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
-import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.hit.BlockHitResult;
@@ -22,6 +21,7 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.List;
 
 public class PortBlock extends BlockWithEntity {
 
@@ -55,12 +55,11 @@ public class PortBlock extends BlockWithEntity {
             ServerPlayerEntity playerEntity = server.getPlayerManager().getPlayer(player.getUuid());
             server.execute(() -> {
                 assert playerEntity != null;
-                ServerPlayNetworking.send(playerEntity, new OpenPortScreenPayload(false));
+                ServerPlayNetworking.send(playerEntity, new OpenPortScreenPayload(pos));
             });
         }
 
-        portBlockEntity.incrementClicks();
-        player.sendMessage(Text.literal("You've clicked the block for the " + portBlockEntity.getClicks() + "th time."), true);
+//        player.sendMessage(Text.literal("Current port number: " + portBlockEntity.getPortNumber()), true);
 
 //        if (player.isSneaking()) {
 //            world.setBlockState(pos, state.with(SIDE, state.get(SIDE).next()));
@@ -87,6 +86,7 @@ public class PortBlock extends BlockWithEntity {
     public enum PortType implements StringIdentifiable {
         CLOSE, INPUT, OUTPUT;
 
+        public static final List<PortType> values = Arrays.stream(PortType.values()).toList();
         public static final int count = PortType.values().length;
 
         @Override
@@ -95,7 +95,12 @@ public class PortBlock extends BlockWithEntity {
         }
 
         public PortType next() {
-            return Arrays.stream(PortType.values()).toList().get((this.ordinal() + 1) % count);
+            return values.get((this.ordinal() + 1) % count);
+        }
+
+        public static PortType of(int type) {
+            assert type >= 0 && type < count;
+            return values.get(type);
         }
     }
 
