@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "pcbmod:block/condensed_dirt"
+    "model": "pcbmod:item/port"
   }
 }

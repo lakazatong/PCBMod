@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "type=close": { "model": "pcbmod:block/port/close" },
+    "type=input": { "model": "pcbmod:block/port/input" },
+    "type=output": { "model": "pcbmod:block/port/output" }
+  }
+}
