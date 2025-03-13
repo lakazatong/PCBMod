@@ -1,10 +1,12 @@
 package net.lakazatong.pcbmod.block.custom;
 
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.lakazatong.pcbmod.payloads.OpenPortScreenPayload;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.ActionResult;
@@ -78,19 +80,31 @@ public class PortBlock extends Block {
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!player.getAbilities().allowModifyWorld) {
+        if (!player.getAbilities().allowModifyWorld)
             return ActionResult.PASS;
-        } else {
-            if (player.isSneaking()) {
-                world.setBlockState(pos, state.with(SIDE, state.get(SIDE).next()));
-            } else {
-                world.setBlockState(pos, state.with(TYPE, state.get(TYPE).next()));
-            }
 
-            world.playSound(player, pos, SoundEvents.BLOCK_COMPARATOR_CLICK, SoundCategory.BLOCKS, 1.0F, 1.0F);
+//        Circuits circuits = Circuits.getServerState(server);
+//        circuits.totalDirtBlocksBroken += 1;
 
-            return ActionResult.SUCCESS;
-        }
+        MinecraftServer server = world.getServer();
+        if (server == null)
+            return ActionResult.PASS;
+
+        ServerPlayerEntity playerEntity = server.getPlayerManager().getPlayer(player.getUuid());
+        server.execute(() -> {
+            assert playerEntity != null;
+            ServerPlayNetworking.send(playerEntity, new OpenPortScreenPayload(false));
+        });
+
+//        if (player.isSneaking()) {
+//            world.setBlockState(pos, state.with(SIDE, state.get(SIDE).next()));
+//        } else {
+//            world.setBlockState(pos, state.with(TYPE, state.get(TYPE).next()));
+//        }
+//
+//        world.playSound(player, pos, SoundEvents.BLOCK_COMPARATOR_CLICK, SoundCategory.BLOCKS, 1.0F, 1.0F);
+
+        return ActionResult.CONSUME;
     }
 
 }

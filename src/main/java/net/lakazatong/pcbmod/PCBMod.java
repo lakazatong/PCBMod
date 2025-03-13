@@ -5,7 +5,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.lakazatong.pcbmod.block.ModBlocks;
 import net.lakazatong.pcbmod.item.ModItems;
-import net.lakazatong.pcbmod.payloads.NewCircuitPayload;
+import net.lakazatong.pcbmod.payloads.OpenPortScreenPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
 
@@ -18,8 +18,10 @@ public class PCBMod implements ModInitializer {
     public static Path structuresPath;
 
     public void onInitialize() {
-        PayloadTypeRegistry.playS2C().register(NewCircuitPayload.ID, NewCircuitPayload.CODEC);
         ServerLifecycleEvents.SERVER_STARTED.register(this::onServerStart);
+
+        // Payloads
+        PayloadTypeRegistry.playS2C().register(OpenPortScreenPayload.ID, OpenPortScreenPayload.CODEC);
 
         ModItems.initialize();
         ModBlocks.initialize();

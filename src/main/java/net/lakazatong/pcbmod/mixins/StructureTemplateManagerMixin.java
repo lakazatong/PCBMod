@@ -33,14 +33,5 @@ public abstract class StructureTemplateManagerMixin {
         if (!cir.getReturnValue() || nbtPath == null) return;
 
         System.out.println("NEW STRUCTURE AT " + nbtPath);
-
-//        Circuits circuits = Circuits.getServerState(server);
-//        circuits.totalDirtBlocksBroken += 1;
-//
-//        ServerPlayerEntity playerEntity = server.getPlayerManager().getPlayer(player.getUuid());
-//        server.execute(() -> {
-//            assert playerEntity != null;
-//            ServerPlayNetworking.send(playerEntity, new NewCircuitPayload(nbtPath.toAbsolutePath().toString()));
-//        });
     }
 }
