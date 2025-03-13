@@ -8,8 +8,7 @@
 		"lakazatong"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/lakazatong/PCBMod"
 	},
 	"license": "LGPL-3.0-or-later",
 	"icon": "assets/pcbmod/icon.png",

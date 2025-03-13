@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "pcbmod:block/condensed_dirt"
+    }
+  }
+}
