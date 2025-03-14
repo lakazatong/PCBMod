@@ -19,7 +19,7 @@ for combo in itertools.product('012', repeat=6):
 	
 	data = {
 		"parent": "block/cube",
-		"textures": {face: f"pcbmod:block/{states[state]}" for face, state in zip(faces, combo)},
+		"textures": {**{face: f"pcbmod:block/{states[state]}" for face, state in zip(faces, combo)}, "particle": "pcbmod:block/close"},
 		"elements": [
 			{
 				"from": [0, 0, 0],

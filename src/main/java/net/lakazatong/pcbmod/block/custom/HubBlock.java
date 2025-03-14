@@ -62,7 +62,7 @@ public class HubBlock extends HorizontalFacingBlock implements BlockEntityProvid
         BlockState state = super.getPlacementState(ctx);
         if (state == null)
             state = getDefaultState();
-        return state.with(FACING, ctx.getPlayerLookDirection());
+        return state.with(FACING, ctx.getHorizontalPlayerFacing());
     }
 
     @Override

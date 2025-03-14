@@ -2,7 +2,7 @@ package net.lakazatong.pcbmod.screen;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.lakazatong.pcbmod.Utils;
-import net.lakazatong.pcbmod.block.custom.HubBlock;
+import net.lakazatong.pcbmod.block.custom.HubBlock.Side;
 import net.lakazatong.pcbmod.block.entity.HubBlockEntity;
 import net.lakazatong.pcbmod.payloads.UpdateHubPayload;
 import net.minecraft.client.gui.DrawContext;
@@ -11,8 +11,6 @@ import net.minecraft.client.gui.widget.EditBoxWidget;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
-
-import net.lakazatong.pcbmod.block.custom.HubBlock.Side;
 
 public class HubScreen extends CommonScreen<HubBlockEntity> {
 

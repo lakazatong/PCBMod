@@ -15,16 +15,17 @@ blockstate_data = {"variants": {}}
 for combo in itertools.product('012', repeat=6):
     state_str = ''.join(combo)
     props = (
-        f"front_type={states[combo[0]]},"
         f"back_type={states[combo[1]]},"
+        f"down_type={states[combo[5]]},"
+        f"facing={{facing}},"
+        f"front_type={states[combo[0]]},"
         f"left_type={states[combo[2]]},"
         f"right_type={states[combo[3]]},"
-        f"up_type={states[combo[4]]},"
-        f"down_type={states[combo[5]]}"
+        f"up_type={states[combo[4]]}"
     )
 
     for facing in directions:
-        key = f"facing={facing},{props}"
+        key = props.format(facing=facing)
         blockstate_data["variants"][key] = {
             "model": f"pcbmod:block/hub/{state_str}",
             "y": rotations[facing]
