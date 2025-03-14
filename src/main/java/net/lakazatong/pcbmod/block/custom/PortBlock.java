@@ -26,16 +26,16 @@ import java.util.List;
 public class PortBlock extends BlockWithEntity {
 
     public static final EnumProperty<PortType> TYPE = EnumProperty.of("type", PortType.class);
-    public static final EnumProperty<Side> SIDE = EnumProperty.of("side", Side.class);
+//    public static final EnumProperty<Side> SIDE = EnumProperty.of("side", Side.class);
 
     public PortBlock(Settings settings) {
         super(settings);
-        setDefaultState(getDefaultState().with(TYPE, PortType.CLOSE).with(SIDE, Side.NONE));
+        setDefaultState(getDefaultState().with(TYPE, PortType.CLOSE));
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(TYPE).add(SIDE);
+        builder.add(TYPE);
     }
 
     @Override
@@ -101,35 +101,6 @@ public class PortBlock extends BlockWithEntity {
         public static PortType of(int type) {
             assert type >= 0 && type < count;
             return values.get(type);
-        }
-    }
-
-    public enum Side implements StringIdentifiable {
-        NONE(0xFFFFFF),      // White
-        FRONT(0xFF0000),     // Red
-        BACK(0x00FF00),      // Green
-        LEFT(0x0000FF),      // Blue
-        RIGHT(0xFFFF00),     // Yellow
-        UP(0xFF00FF),        // Magenta
-        DOWN(0x00FFFF);      // Cyan
-
-        private final int color;
-
-        Side(int color) {
-            this.color = color;
-        }
-
-        public int getColor() {
-            return color;
-        }
-
-        @Override
-        public String asString() {
-            return name().toLowerCase();
-        }
-
-        public Side next() {
-            return Arrays.stream(Side.values()).toList().get((this.ordinal() + 1) % values().length);
         }
     }
 }

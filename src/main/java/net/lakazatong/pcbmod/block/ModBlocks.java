@@ -2,6 +2,7 @@ package net.lakazatong.pcbmod.block;
 
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.lakazatong.pcbmod.PCBMod;
+import net.lakazatong.pcbmod.block.custom.HubBlock;
 import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -22,6 +23,7 @@ public class ModBlocks {
     public static void initialize() {
         ItemGroupEvents.modifyEntriesEvent(MOD_TAB_KEY).register(itemGroup -> {
             itemGroup.add(ModBlocks.PORT);
+            itemGroup.add(ModBlocks.HUB);
         });
     }
 
@@ -48,6 +50,12 @@ public class ModBlocks {
     public static final Block PORT = register(
             "port",
             PortBlock::new,
+            AbstractBlock.Settings.create().sounds(BlockSoundGroup.METAL)
+    );
+
+    public static final Block HUB = register(
+            "hub",
+            HubBlock::new,
             AbstractBlock.Settings.create().sounds(BlockSoundGroup.METAL)
     );
 }

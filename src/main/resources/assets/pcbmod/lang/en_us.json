@@ -6,11 +6,22 @@
   "word.pcbmod.done": "done",
   "word.pcbmod.cancel": "cancel",
 
+  "word.pcbmod.front": "front",
+  "word.pcbmod.back": "back",
+  "word.pcbmod.left": "left",
+  "word.pcbmod.right": "right",
+  "word.pcbmod.up": "up",
+  "word.pcbmod.down": "down",
+
   "tab.pcbmod.title": "PCB Mod",
 
   "item.pcbmod.suspicious_substance": "Suspicious Substance",
   "item.pcbmod.port": "Port Block",
+  "item.pcbmod.hub": "Hub Block",
 
   "screen.pcbmod.port.port_number":  "Port Number",
-  "screen.pcbmod.port.title": "Port Screen"
+  "screen.pcbmod.port.title": "Port Screen",
+
+  "screen.pcbmod.hub.structure_name":  "Structure Name",
+  "screen.pcbmod.hub.title": "Hub Screen"
 }

@@ -2,6 +2,7 @@ package net.lakazatong.pcbmod.block;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.lakazatong.pcbmod.PCBMod;
+import net.lakazatong.pcbmod.block.entity.HubBlockEntity;
 import net.lakazatong.pcbmod.block.entity.PortBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
@@ -25,4 +26,7 @@ public class ModBlockEntities {
 
     public static final BlockEntityType<PortBlockEntity> PORT =
             register("port", PortBlockEntity::new, ModBlocks.PORT);
+
+    public static final BlockEntityType<HubBlockEntity> HUB =
+            register("hub", HubBlockEntity::new, ModBlocks.HUB);
 }
