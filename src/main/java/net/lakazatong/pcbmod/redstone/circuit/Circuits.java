@@ -58,9 +58,9 @@ public final class Circuits extends PersistentState implements Map<String, Circu
     public static Circuits init(MinecraftServer server) {
         ServerWorld serverWorld = server.getWorld(World.OVERWORLD);
         assert serverWorld != null;
-        Circuits circuits = serverWorld.getPersistentStateManager().getOrCreate(type, PCBMod.MOD_ID);
-        circuits.markDirty();
-        return circuits;
+        Circuits r = serverWorld.getPersistentStateManager().getOrCreate(type, PCBMod.MOD_ID);
+        r.markDirty();
+        return r;
     }
 
     @Override

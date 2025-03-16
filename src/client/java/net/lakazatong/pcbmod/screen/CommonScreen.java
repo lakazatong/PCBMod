@@ -65,4 +65,9 @@ public abstract class CommonScreen<E extends BlockEntity> extends Screen {
     protected int getFieldLength(int width) {
         return width / refWidth - 3;
     }
+
+    @Override
+    public boolean shouldPause() {
+        return false;
+    }
 }
