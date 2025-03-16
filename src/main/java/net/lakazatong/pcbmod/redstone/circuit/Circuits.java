@@ -1,7 +1,8 @@
 package net.lakazatong.pcbmod.redstone.circuit;
 
-import net.lakazatong.pcbmod.PCBMod;
+import net.lakazatong.pcbmod.Utils;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
@@ -11,33 +12,41 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.*;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
+import static net.lakazatong.pcbmod.PCBMod.MOD_ID;
 import static net.lakazatong.pcbmod.PCBMod.STRUCTURES_PATH;
 
 public final class Circuits extends PersistentState implements Map<String, Circuit> {
 
-    private final Map<String, Circuit> circuits = new HashMap<>();
+    private static final PersistentState.Type<Circuits> TYPE = new Type<>(Circuits::new, Circuits::createFromNbt, null);
+    private static final String KEY = MOD_ID + ".circuits";
 
     private Circuits() {
     }
 
+    private final Map<String, Circuit> circuits = new HashMap<>();
+
     @Override
     public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
-        NbtCompound tag = new NbtCompound();
-
-        this.forEach((key, value) -> tag.put(key, value.save()));
-
-        nbt.put("circuits", tag);
-
+        this.forEach((key, value) -> nbt.put(key, value.save()));
         return nbt;
     }
 
     private static Circuits createFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
         Circuits r = new Circuits();
-        for (String structureName : ((NbtCompound) Objects.requireNonNull(tag.get("circuits"))).getKeys()) {
+        for (String circuitName : tag.getKeys()) {
             try {
-                r.put(structureName, Circuit.load(tag.get(structureName), new Structure(STRUCTURES_PATH.resolve(structureName + ".nbt"))));
+                NbtElement circuitData = tag.get(circuitName);
+                String structureName = Utils.structureNameFrom(circuitName);
+                Path structurePath = STRUCTURES_PATH.resolve(structureName + ".nbt");
+                Structure structure = new Structure(structurePath);
+                Circuit circuit = Circuit.load(circuitData, structure);
+                r.put(circuitName, circuit);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -45,22 +54,10 @@ public final class Circuits extends PersistentState implements Map<String, Circu
         return r;
     }
 
-    private static Circuits createNew() {
-        return new Circuits();
-    }
-
-    private static final Type<Circuits> type = new Type<>(
-            Circuits::createNew,
-            Circuits::createFromNbt,
-            null
-    );
-
     public static Circuits init(MinecraftServer server) {
         ServerWorld serverWorld = server.getWorld(World.OVERWORLD);
         assert serverWorld != null;
-        Circuits r = serverWorld.getPersistentStateManager().getOrCreate(type, PCBMod.MOD_ID);
-        r.markDirty();
-        return r;
+        return serverWorld.getPersistentStateManager().getOrCreate(TYPE, KEY);
     }
 
     @Override
@@ -90,21 +87,25 @@ public final class Circuits extends PersistentState implements Map<String, Circu
 
     @Override
     public @Nullable Circuit put(String key, Circuit value) {
+        markDirty();
         return circuits.put(key, value);
     }
 
     @Override
     public Circuit remove(Object key) {
+        markDirty();
         return circuits.remove(key);
     }
 
     @Override
     public void putAll(@NotNull Map<? extends String, ? extends Circuit> m) {
+        markDirty();
         circuits.putAll(m);
     }
 
     @Override
     public void clear() {
+        markDirty();
         circuits.clear();
     }
 

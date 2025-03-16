@@ -7,6 +7,7 @@ import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.parse.Parser;
+import net.lakazatong.pcbmod.PCBMod;
 import net.lakazatong.pcbmod.redstone.blocks.Button;
 import net.lakazatong.pcbmod.redstone.blocks.Delayed;
 import net.lakazatong.pcbmod.redstone.blocks.Solid;
@@ -52,19 +53,21 @@ public class Circuit {
         graph.values().stream().filter(b -> b instanceof Solid).forEach(Block::init);
         graph.values().stream().filter(b -> !(b instanceof Solid)).forEach(Block::init);
 
-        Path framesDir = structure.path.resolveSibling("frames");
-        try (Stream<Path> paths = Files.walk(framesDir)) {
-            paths.sorted(Comparator.reverseOrder())
-                    .map(Path::toFile)
-                    .forEach(File::delete);
-        } catch (IOException ignored) {
-        }
+        if (PCBMod.DEBUG) {
+            Path framesDir = structure.path.resolveSibling("frames");
+            try (Stream<Path> paths = Files.walk(framesDir)) {
+                paths.sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(File::delete);
+            } catch (IOException ignored) {
+            }
 
-        structure.path.resolveSibling(PathUtils.getBaseName(structure.path) + ".mp4").toFile().delete();
+            structure.path.resolveSibling(PathUtils.getBaseName(structure.path) + ".mp4").toFile().delete();
 
-        try {
-            Files.createDirectory(framesDir);
-        } catch (IOException ignored) {
+            try {
+                Files.createDirectory(framesDir);
+            } catch (IOException ignored) {
+            }
         }
     }
 
@@ -156,6 +159,7 @@ public class Circuit {
     }
 
     public void animate() {
+        if (!PCBMod.DEBUG) return;
         Path framesDir = structure.path.resolveSibling("frames");
         Path outputPath = structure.path.resolveSibling(PathUtils.getBaseName(structure.path) + ".mp4").toAbsolutePath();
 
@@ -220,6 +224,7 @@ public class Circuit {
     }
 
     public void saveAsDot() {
+        if (!PCBMod.DEBUG) return;
         String dotPath = structure.path.resolveSibling("frames/" + PathUtils.getBaseName(structure.path) + time + ".dot").toAbsolutePath().toString();
         String pngPath = structure.path.resolveSibling("frames/" + PathUtils.getBaseName(structure.path) + time + ".png").toAbsolutePath().toString();
 

@@ -101,7 +101,7 @@ public class Props {
 
         props.facings = new HashSet<>();
         for (int facing : t.getIntArray("facings"))
-            props.neighbors.add(structure.getBlock(Vec3.fromHash(facing)));
+            props.facings.add(Vec3.fromHash(facing));
 
         props.signal = t.getInt("signal");
         props.weakPowered = t.getBoolean("weakPowered");

@@ -9,14 +9,12 @@ import net.lakazatong.pcbmod.redstone.circuit.Circuit;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.EditBoxWidget;
-import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 import static net.lakazatong.pcbmod.PCBMod.CIRCUITS;
@@ -133,15 +131,15 @@ public class HubScreen extends CommonScreen<HubBlockEntity> {
         int instanceId = be.getInstanceId();
 
         if (circuitName.matches("^[a-zA-Z0-9_.-]+\\d+$")) {
-            String tmp = circuitName.replaceFirst("\\d+$", "");
+            String tmp = Utils.structureNameFrom(circuitName);
             Path structurePath = STRUCTURES_PATH.resolve(tmp + ".nbt");
-            System.out.println("Chosen structure path: " + structurePath.toAbsolutePath());
             if (structurePath.toFile().exists()) {
                 structureName = tmp;
-                instanceId = Integer.parseInt(circuitName.replaceFirst(".+?(\\d+)$", "$1"));
+                instanceId = Utils.instanceIdFrom(circuitName);
                 try {
                     if (!CIRCUITS.containsKey(circuitName)) {
                         CIRCUITS.put(circuitName, new Circuit(structurePath));
+                        System.out.println("New circuit with structure at: " + structurePath.toAbsolutePath() + " (structureName: " + structureName + ", instanceId: " + instanceId + ")");
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
