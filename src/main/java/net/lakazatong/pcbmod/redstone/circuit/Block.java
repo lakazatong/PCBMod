@@ -13,19 +13,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 abstract public class Block {
-    // fixed properties
-
     public final BlockType type;
     public final Structure structure;
     public int uuid;
 
-    // editable properties
-
-    // makes more sense to be here as it's managed within the same tick
+    // here as it's managed within the same tick
     public boolean dirty = false;
-    // holds all states that can changes over time (and some more for convenience)
+    // every property packed as one for convenience
     public Props props;
-    // here so that 0 tick blocks can "see in the future" and only them
     public Props nextProps;
 
     protected Block(BlockType type, Structure structure, Props initialProps) {
