@@ -5,19 +5,20 @@ import net.lakazatong.pcbmod.redstone.circuit.BlockType;
 import net.lakazatong.pcbmod.redstone.circuit.Props;
 import net.lakazatong.pcbmod.redstone.circuit.Structure;
 
-public class Button extends Block {
-    public Button(Structure structure, Props p) {
-        super(BlockType.BUTTON, structure, p);
+public class Port extends Block {
+    public Port(Structure structure, Props initialProps) {
+        super(BlockType.PORT, structure, initialProps);
     }
 
     @Override
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
             case AIR -> false;
-            case SOLID -> isFacingAway(neighbor);
+            case SOLID -> false;
             case DUST -> true;
-            case TORCH -> false;
-            case REPEATER, COMPARATOR -> neighbor.isFacingAway(this);
+            case REPEATER -> !neighbor.locked() && neighbor.isFacingAway(this);
+            case COMPARATOR -> neighbor.isFacingAway(this);
+            case TORCH -> (neighbor.isAbove(this) && !neighbor.onWall()) || neighbor.isOnWallOf(this);
             case BUTTON -> false;
             case LEVER -> false;
             case REDSTONE_BLOCK -> false;
@@ -27,7 +28,7 @@ public class Button extends Block {
 
     @Override
     public void logic(long t) {
-        if (t + 1 >= delay() )
-            nextProps.signal = 0;
+        // TODO
+        // nextProps.signal = ?;
     }
 }

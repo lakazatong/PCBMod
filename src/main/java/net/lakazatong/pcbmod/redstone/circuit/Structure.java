@@ -4,6 +4,7 @@ import dev.dewy.nbt.Nbt;
 import dev.dewy.nbt.tags.collection.CompoundTag;
 import dev.dewy.nbt.tags.collection.ListTag;
 import dev.dewy.nbt.tags.primitive.IntTag;
+import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.blocks.*;
 import net.lakazatong.pcbmod.redstone.circuit.Block.BlockBuilder;
 import net.lakazatong.pcbmod.redstone.utils.Vec3;
@@ -185,6 +186,7 @@ public class Structure {
                     b.commonInitialProps.signal = 15;
                     yield b;
                 }
+                case "pcbmod:port" -> new BlockBuilder(Port::new);
                 default -> new BlockBuilder(Solid::new);
             };
 
@@ -221,6 +223,11 @@ public class Structure {
                             break;
                         case "mode":
                             builder.commonInitialProps.subtract = value.equals("subtract");
+                            break;
+                        case "type":
+                            builder.commonInitialProps.portType = PortBlock.PortType.valueOf(value);
+                            // TODO
+                            // builder.commonInitialProps.portNumber =
                             break;
                     }
 

@@ -57,6 +57,7 @@ public class Solid extends Block {
             case BUTTON -> false;
             case LEVER -> false;
             case REDSTONE_BLOCK -> false;
+            case PORT -> false;
         };
     }
 

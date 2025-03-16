@@ -1,5 +1,6 @@
 package net.lakazatong.pcbmod.redstone.circuit;
 
+import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.utils.Vec3;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -19,8 +20,10 @@ public class Props {
     public boolean weakPowered; // solid
     public Vec3 coords;
     public Set<Block> neighbors;
+    public PortBlock.PortType portType; // port
+    public int portNumber; // port
 
-    private Props(long delay, boolean onWall, boolean locked, boolean subtract, Set<Vec3> facings, int signal, boolean weakPowered, Vec3 coords, Set<Block> neighbors) {
+    private Props(long delay, boolean onWall, boolean locked, boolean subtract, Set<Vec3> facings, int signal, boolean weakPowered, Vec3 coords, Set<Block> neighbors, PortBlock.PortType portType, int portNumber) {
         this.delay = delay;
         this.onWall = onWall;
         this.locked = locked;
@@ -30,16 +33,19 @@ public class Props {
         this.weakPowered = weakPowered;
         this.coords = coords;
         this.neighbors = neighbors;
+        this.portType = portType;
+        this.portNumber = portNumber;
     }
 
     public static Props defaults() {
-        return new Props(0, false, false, false, new HashSet<>(), 0, false, new Vec3(0, 0, 0), new HashSet<>());
+        return new Props(0, false, false, false, new HashSet<>(), 0, false, new Vec3(0, 0, 0), new HashSet<>(), PortBlock.PortType.CLOSE, 0);
     }
 
     public Props dup() {
         return new Props(
             delay, onWall, locked, subtract,
-            new HashSet<>(facings), signal, weakPowered, coords.dup(), new HashSet<>(neighbors)
+            new HashSet<>(facings), signal, weakPowered, coords.dup(), new HashSet<>(neighbors),
+            portType, portNumber
         );
     }
 
@@ -55,7 +61,9 @@ public class Props {
                     weakPowered == other.weakPowered &&
                     Objects.equals(facings, other.facings) &&
                     Objects.equals(coords, other.coords) &&
-                    Objects.equals(neighbors, other.neighbors);
+                    Objects.equals(neighbors, other.neighbors) &&
+                    portType.equals(other.portType) &&
+                    portNumber == other.portNumber;
         }
         return false;
     }
@@ -75,6 +83,9 @@ public class Props {
         tag.putInt("coords", coords.hashCode());
 
         tag.put("neighbors", new NbtIntArray(neighbors.stream().map(neighbor -> neighbor.uuid).toList()));
+
+        tag.putInt("portType", portType.ordinal());
+        tag.putInt("portNumber", portNumber);
 
         return tag;
     }
@@ -99,6 +110,9 @@ public class Props {
         props.neighbors = new HashSet<>();
         for (int neighbor : t.getIntArray("neighbors"))
             props.neighbors.add(structure.getBlock(Vec3.fromHash(neighbor)));
+
+        props.portType = PortBlock.PortType.of(t.getInt("portType"));
+        props.portNumber = t.getInt("portNumber");
 
         return props;
     }

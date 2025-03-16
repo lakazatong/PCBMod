@@ -9,7 +9,8 @@ public enum BlockType {
     COMPARATOR(5),
     BUTTON(6),
     LEVER(7),
-    REDSTONE_BLOCK(8);
+    REDSTONE_BLOCK(8),
+    PORT(8);
 
     public final int value;
 
