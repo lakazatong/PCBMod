@@ -4,6 +4,7 @@ import net.lakazatong.pcbmod.redstone.circuit.Block;
 import net.lakazatong.pcbmod.redstone.circuit.BlockType;
 import net.lakazatong.pcbmod.redstone.circuit.Props;
 import net.lakazatong.pcbmod.redstone.circuit.Structure;
+import net.lakazatong.pcbmod.redstone.utils.Vec3;
 
 import java.util.stream.Collectors;
 
@@ -81,7 +82,13 @@ public class Solid extends Block {
                     break;
                 case BlockType.DUST:
                     if (input.nextSignal() > nextProps.signal) {
-                        nextProps.weakPowered = true;
+                        Vec3 horizontalFacing = input.nextFacings().stream()
+                                .filter(f -> input.coords().add(new Vec3(f.x(), 0, f.z())).equals(coords()))
+                                .findFirst()
+                                .orElse(null);
+
+                        nextProps.weakPowered = horizontalFacing != null && horizontalFacing.y() == 0;
+
                         nextProps.signal = input.nextSignal();
                     }
                     break;

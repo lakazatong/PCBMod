@@ -19,10 +19,10 @@ public class Comparator extends Delayed {
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
             case AIR -> false;
-            case SOLID, DUST -> this.isFacing(neighbor);
+            case SOLID, DUST -> isFacing(neighbor);
             case REPEATER -> isSideInputOf(neighbor) || (!neighbor.locked() && isFacing(neighbor) && neighbor.isFacingAway(this));
             case TORCH -> false;
-            case COMPARATOR -> this.isFacing(neighbor) && !neighbor.isFacing(this);
+            case COMPARATOR -> isFacing(neighbor) && !neighbor.isFacing(this);
             case BUTTON -> false;
             case LEVER -> false;
             case REDSTONE_BLOCK -> false;

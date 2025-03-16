@@ -37,11 +37,6 @@ abstract public class Block {
         this.nextProps = props.dup();
     }
 
-    @FunctionalInterface
-    public interface LogicImpl {
-        void apply(long t);
-    }
-
     public static class BlockBuilder {
         @FunctionalInterface
         public interface BlockConstructor {
@@ -98,6 +93,26 @@ abstract public class Block {
 
     public boolean isFacingAway(Block other) {
         return facings().stream().anyMatch(f -> coords().subtract(f).equals(other.coords()));
+    }
+
+    public boolean isFacingHorizontally(Block other) {
+        return facings().stream().anyMatch(f -> {
+            Vec3 adjusted = adjustHorizontalOnly(f);
+            return coords().add(adjusted).equals(other.coords());
+        });
+    }
+
+    public boolean isFacingAwayHorizontally(Block other) {
+        return facings().stream().anyMatch(f -> {
+            Vec3 adjusted = adjustHorizontalOnly(f);
+            return coords().subtract(adjusted).equals(other.coords());
+        });
+    }
+
+    private Vec3 adjustHorizontalOnly(Vec3 f) {
+        return (f.x() != 0 || f.z() != 0) && f.y() != 0
+                ? new Vec3(f.x(), 0, f.z())
+                : f;
     }
 
     abstract public boolean isInputOf(Block neighbor);

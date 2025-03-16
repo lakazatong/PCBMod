@@ -16,7 +16,7 @@ public class Dust extends Block {
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
             case AIR -> false;
-            case SOLID -> this.isFacing(neighbor) || this.isAbove(neighbor);
+            case SOLID -> isFacingHorizontally(neighbor) || isAbove(neighbor);
             case DUST -> true;
             case REPEATER -> !neighbor.locked() && neighbor.isFacingAway(this);
             case TORCH -> false;

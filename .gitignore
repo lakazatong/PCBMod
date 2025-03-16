@@ -43,6 +43,7 @@ replay_*.log
 *.class
 
 # Log file
+logs
 *.log
 
 # BlueJ files
@@ -67,3 +68,6 @@ replay_pid*
 # Generated Mod files
 src/main/resources/assets/pcbmod/blockstates/hub.json
 src/main/resources/assets/pcbmod/models/block/hub/
+src/main/java/net/lakazatong/pcbmod/redstone/examples/**/*.png
+src/main/java/net/lakazatong/pcbmod/redstone/examples/**/*.dot
+src/main/java/net/lakazatong/pcbmod/redstone/examples/**/*.mp4

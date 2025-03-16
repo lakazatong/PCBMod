@@ -180,7 +180,11 @@ public class Structure {
                     yield b;
                 }
                 case "minecraft:lever" -> new BlockBuilder(Lever::new);
-                case "minecraft:redstone_block" -> new BlockBuilder(RedstoneBlock::new);
+                case "minecraft:redstone_block" -> {
+                    BlockBuilder b = new BlockBuilder(RedstoneBlock::new);
+                    b.commonInitialProps.signal = 15;
+                    yield b;
+                }
                 default -> new BlockBuilder(Solid::new);
             };
 
@@ -191,6 +195,14 @@ public class Structure {
 
             if (t.contains("Properties")) {
                 CompoundTag properties = t.getCompound("Properties");
+                boolean hasFacing = properties.contains("facing");
+                boolean hasFace = properties.contains("face");
+
+                assert !hasFace || hasFacing; // checks that hasFace implies hasFacing
+
+                String facingValue = hasFacing ? properties.getString("facing").getValue() : null;
+                String faceValue = hasFace ? properties.getString("face").getValue() : null;
+
                 for (String key : properties.keySet()) {
                     String value = properties.getString(key).getValue();
 
@@ -201,9 +213,6 @@ public class Structure {
                         case "power":
                             builder.commonInitialProps.signal = Integer.parseInt(value);
                             break;
-                        case "facing":
-                            builder.commonInitialProps.facings.add(Vec3.fromCardinal(value));
-                            break;
                         case "delay":
                             builder.commonInitialProps.delay = Integer.parseInt(value) * 2L;
                             break;
@@ -213,13 +222,30 @@ public class Structure {
                         case "mode":
                             builder.commonInitialProps.subtract = value.equals("subtract");
                             break;
-                        case "face":
-                            builder.commonInitialProps.onWall = value.equals("wall");
-                            break;
                     }
 
-                    if (Vec3.fromCardinal(key) != null && value.equals("side"))
-                        builder.commonInitialProps.facings.add(Vec3.fromCardinal(key));
+                    // dust
+                    Vec3 tmp = Vec3.fromCardinal(key);
+                    if (tmp != null) {
+                        if (value.equals("side"))
+                            builder.commonInitialProps.facings.add(tmp);
+                        else if (value.equals("up"))
+                            builder.commonInitialProps.facings.add(tmp.add(new Vec3(0, 1, 0)));
+                    }
+                }
+
+                // button, lever
+                if (hasFace) {
+                    if (faceValue.equals("wall")) {
+                        builder.commonInitialProps.onWall = true;
+                        builder.commonInitialProps.facings.add(Vec3.fromCardinal(facingValue));
+                    } else if (faceValue.equals("floor")) {
+                        builder.commonInitialProps.facings.add(Vec3.fromCardinal("up"));
+                    } else if (faceValue.equals("ceiling")) {
+                        builder.commonInitialProps.facings.add(Vec3.fromCardinal("down"));
+                    }
+                } else if (hasFacing) {
+                    builder.commonInitialProps.facings.add(Vec3.fromCardinal(facingValue));
                 }
             }
 
