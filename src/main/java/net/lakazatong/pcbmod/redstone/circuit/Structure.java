@@ -72,28 +72,28 @@ public class Structure {
     public List<Block> getNeighbors(Block block) {
         return block.coords().neighbors().stream()
                 .filter(this::withinBounds)
-                .map(coords -> xyzGrid.get((int) coords.x()).get((int) coords.y()).get((int) coords.z()))
+                .map(coords -> xyzGrid.get(coords.x()).get(coords.y()).get(coords.z()))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
     public Block getBlock(Vec3 coords) {
-        return xyzGrid.get((int) coords.x())
-                .get((int) coords.y())
-                .get((int) coords.z());
+        return xyzGrid.get(coords.x())
+                .get(coords.y())
+                .get(coords.z());
     }
 
     public void setBlock(Block block) {
         ensureCapacity(block.coords());
-        xyzGrid.get((int) block.coords().x())
-                .get((int) block.coords().y())
-                .set((int) block.coords().z(), block);
+        xyzGrid.get(block.coords().x())
+                .get(block.coords().y())
+                .set(block.coords().z(), block);
     }
 
     private void ensureCapacity(Vec3 coords) {
-        expandList(xyzGrid, (int) coords.x(), ArrayList::new);
-        expandList(xyzGrid.get((int) coords.x()), (int) coords.y(), ArrayList::new);
-        expandList(xyzGrid.get((int) coords.x()).get((int) coords.y()), (int) coords.z(), () -> null);
+        expandList(xyzGrid, coords.x(), ArrayList::new);
+        expandList(xyzGrid.get(coords.x()), coords.y(), ArrayList::new);
+        expandList(xyzGrid.get(coords.x()).get(coords.y()), coords.z(), () -> null);
     }
 
     private static <T> void expandList(List<T> list, int index, Supplier<T> supplier) {

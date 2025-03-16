@@ -12,7 +12,6 @@ public class Repeater extends Delayed {
     public Repeater(Structure structure, Props p) {
         super(BlockType.REPEATER, structure, p);
         props.facings = facings().stream().map(Vec3::opposite).collect(Collectors.toSet());
-        logicImpl = super::lockableLogic;
     }
 
     @Override
@@ -37,7 +36,6 @@ public class Repeater extends Delayed {
                 return true;
         }
         return false;
-//        return rearInputs().anyMatch(i -> i.signal() > 0);
     }
 
     @Override
@@ -52,7 +50,16 @@ public class Repeater extends Delayed {
 
     @Override
     public void logic(long t) {
-        super.logic(t);
+        if (locked())
+            lockedLogic(t);
+        else
+            super.logic(t);
+
         nextProps.locked = nextSideInputs().anyMatch(i -> i.nextSignal() > 0);
+    }
+
+    protected void lockedLogic(long t) {
+        stableTime = 0;
+        prevShouldPowered = getShouldPowered();
     }
 }

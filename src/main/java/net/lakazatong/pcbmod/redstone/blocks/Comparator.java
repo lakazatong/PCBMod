@@ -13,7 +13,6 @@ public class Comparator extends Delayed {
     public Comparator(Structure structure, Props p) {
         super(BlockType.COMPARATOR, structure, p);
         props.facings = facings().stream().map(Vec3::opposite).collect(Collectors.toSet());
-        logicImpl = super::unlockableLogic;
     }
 
     @Override

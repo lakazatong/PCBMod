@@ -1,8 +1,8 @@
 package net.lakazatong.pcbmod.redstone.circuit;
 
 
-import com.github.kokorin.jaffree.ffmpeg.Frame;
 import com.github.kokorin.jaffree.ffmpeg.*;
+import com.github.kokorin.jaffree.ffmpeg.Frame;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
@@ -25,9 +25,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.*;
 import java.util.List;
 import java.util.Queue;
-import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -75,7 +75,7 @@ public class Circuit {
     private boolean update() {
         boolean changing = false;
         for (Block b : graph.values()) {
-            if (!b.props.equals(b.nextProps) || b instanceof Delayed delayed && delayed.stableTime() > 0)
+            if (!b.props.equals(b.nextProps) || b instanceof Delayed delayed && delayed.stableTime > 0)
                 changing = true;
             b.props = b.nextProps.dup();
         }

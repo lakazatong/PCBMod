@@ -14,8 +14,8 @@ public class Props {
 
     public long delay; // all
     public boolean onWall; // button, torch
-    public boolean locked; // repeater (might be useless)
-    public boolean subtract; // comparator (might be useless)
+    public boolean locked; // repeater
+    public boolean subtract; // comparator
 
     // dynamic properties
 

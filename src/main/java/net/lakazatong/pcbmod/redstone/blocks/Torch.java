@@ -9,7 +9,6 @@ public class Torch extends Delayed {
 
     public Torch(Structure structure, Props p) {
         super(BlockType.TORCH, structure, p);
-        logicImpl = super::unlockableLogic;
     }
 
     @Override

@@ -253,6 +253,11 @@ abstract public class Block {
         tag.put("props", props.save());
         tag.put("nextProps", nextProps.save());
 
+        if (this instanceof Delayed delayed) {
+            tag.putBoolean("prevShouldPowered", delayed.prevShouldPowered);
+            tag.putLong("stableTime", delayed.stableTime);
+        }
+
         return tag;
     }
 
@@ -270,6 +275,11 @@ abstract public class Block {
         b.uuid = uuid;
         b.dirty = dirty;
         b.nextProps = Props.load(nextProps, structure);
+
+        if (b instanceof Delayed delayed) {
+            delayed.prevShouldPowered = t.getBoolean("prevShouldPowered");
+            delayed.stableTime = t.getLong("stableTime");
+        }
 
         return b;
     }
