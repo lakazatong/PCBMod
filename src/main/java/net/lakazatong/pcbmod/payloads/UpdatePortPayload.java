@@ -13,8 +13,8 @@ public record UpdatePortPayload(BlockPos pos, Integer portNumber, Integer portTy
     public static final CustomPayload.Id<UpdatePortPayload> ID = new CustomPayload.Id<>(Identifier.of(MOD_ID, "update_port"));
     public static final PacketCodec<PacketByteBuf, UpdatePortPayload> CODEC = PacketCodec.tuple(
             BlockPos.PACKET_CODEC, UpdatePortPayload::pos,
-            PacketCodecs.INTEGER, UpdatePortPayload::portNumber,
-            PacketCodecs.INTEGER, UpdatePortPayload::portType,
+            PacketCodecs.VAR_INT, UpdatePortPayload::portNumber,
+            PacketCodecs.VAR_INT, UpdatePortPayload::portType,
             UpdatePortPayload::new);
 
     @Override

@@ -43,8 +43,11 @@ public class PortBlockEntity extends BlockEntity {
         return signal;
     }
 
-    public void setSignal(int signal) {
-        this.signal = signal;
+    public void setSignal(int newSignal) {
+        if (newSignal != signal) {
+            signal = newSignal;
+            markDirty();
+        }
     }
 
 //    public PortBlock.Side getSide() {

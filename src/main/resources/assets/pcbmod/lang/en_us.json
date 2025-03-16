@@ -22,6 +22,6 @@
   "screen.pcbmod.port.port_number":  "Port Number",
   "screen.pcbmod.port.title": "Port Screen",
 
-  "screen.pcbmod.hub.structure_name":  "Structure Name",
+  "screen.pcbmod.hub.circuit_name":  "Circuit Name",
   "screen.pcbmod.hub.title": "Hub Screen"
 }

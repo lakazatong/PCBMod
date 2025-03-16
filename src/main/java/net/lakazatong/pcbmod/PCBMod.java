@@ -15,6 +15,7 @@ import net.lakazatong.pcbmod.payloads.OpenHubScreenPayload;
 import net.lakazatong.pcbmod.payloads.OpenPortScreenPayload;
 import net.lakazatong.pcbmod.payloads.UpdateHubPayload;
 import net.lakazatong.pcbmod.payloads.UpdatePortPayload;
+import net.lakazatong.pcbmod.redstone.circuit.Circuits;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
 
@@ -24,7 +25,9 @@ public class PCBMod implements ModInitializer {
 
     public static final String MOD_ID = "pcbmod";
 
-    public static Path structuresPath;
+    public static Path STRUCTURES_PATH;
+
+    public static Circuits CIRCUITS;
 
     private static void handleUpdatePortPayload(UpdatePortPayload payload, ServerPlayNetworking.Context context) {
         if (context.player().getServerWorld().getBlockEntity(payload.pos()) instanceof PortBlockEntity be) {
@@ -35,12 +38,9 @@ public class PCBMod implements ModInitializer {
 
     private static void handleUpdateHubPayload(UpdateHubPayload payload, ServerPlayNetworking.Context context) {
         if (context.player().getServerWorld().getBlockEntity(payload.pos()) instanceof HubBlockEntity be) {
-            be.setPortNumberAt(HubBlock.Side.FRONT.ordinal(), payload.frontPortNumber());
-            be.setPortNumberAt(HubBlock.Side.BACK.ordinal(), payload.backPortNumber());
-            be.setPortNumberAt(HubBlock.Side.LEFT.ordinal(), payload.leftPortNumber());
-            be.setPortNumberAt(HubBlock.Side.RIGHT.ordinal(), payload.rightPortNumber());
-            be.setPortNumberAt(HubBlock.Side.UP.ordinal(), payload.upPortNumber());
-            be.setPortNumberAt(HubBlock.Side.DOWN.ordinal(), payload.downPortNumber());
+            be.setStructureName(payload.structureName());
+            be.setInstanceId(payload.instanceId());
+            be.setPortNumbers(payload.portNumbers().stream().mapToInt(Integer::intValue).toArray());
         }
     }
 
@@ -64,7 +64,10 @@ public class PCBMod implements ModInitializer {
     }
 
     private void onServerStart(MinecraftServer server) {
-        structuresPath = server.getSavePath(WorldSavePath.GENERATED).resolve("minecraft/structures");
-        System.out.println("Structures path: " + structuresPath);
+        STRUCTURES_PATH = server.getSavePath(WorldSavePath.GENERATED).resolve("minecraft/structures");
+        System.out.println("Structures path: " + STRUCTURES_PATH);
+        CIRCUITS = Circuits.init(server);
+
+        System.out.println("CIRCUITS size: " + CIRCUITS.size());
     }
 }

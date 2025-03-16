@@ -11,18 +11,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-public class Circuits extends PersistentState implements Map<String, Circuit> {
+import static net.lakazatong.pcbmod.PCBMod.STRUCTURES_PATH;
 
-    public final Map<String, Circuit> circuits;
+public final class Circuits extends PersistentState implements Map<String, Circuit> {
 
-    public Circuits() {
-        circuits = new HashMap<>();
+    private final Map<String, Circuit> circuits = new HashMap<>();
+
+    private Circuits() {
     }
 
     @Override
@@ -36,19 +33,19 @@ public class Circuits extends PersistentState implements Map<String, Circuit> {
         return nbt;
     }
 
-    public static Circuits createFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        Circuits circuits = new Circuits();
-        for (String structureName : tag.getKeys()) {
+    private static Circuits createFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+        Circuits r = new Circuits();
+        for (String structureName : ((NbtCompound) Objects.requireNonNull(tag.get("circuits"))).getKeys()) {
             try {
-                circuits.put(structureName, Circuit.load(tag.get(structureName), new Structure(Path.of(structureName))));
+                r.put(structureName, Circuit.load(tag.get(structureName), new Structure(STRUCTURES_PATH.resolve(structureName + ".nbt"))));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        return circuits;
+        return r;
     }
 
-    public static Circuits createNew() {
+    private static Circuits createNew() {
         return new Circuits();
     }
 
@@ -58,7 +55,7 @@ public class Circuits extends PersistentState implements Map<String, Circuit> {
             null
     );
 
-    public static Circuits getServerState(MinecraftServer server) {
+    public static Circuits init(MinecraftServer server) {
         ServerWorld serverWorld = server.getWorld(World.OVERWORLD);
         assert serverWorld != null;
         Circuits circuits = serverWorld.getPersistentStateManager().getOrCreate(type, PCBMod.MOD_ID);

@@ -11,6 +11,7 @@ import net.minecraft.util.math.BlockPos;
 
 public class HubBlockEntity extends BlockEntity {
     private String structureName = "";
+    private int instanceId = 0;
     private int[] portNumbers = new int[6];
     private int[] signals = new int[6];
 
@@ -40,8 +41,27 @@ public class HubBlockEntity extends BlockEntity {
         }
     }
 
+    public int getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(int newInstanceId) {
+        if (newInstanceId != instanceId) {
+            instanceId = newInstanceId;
+            markDirty();
+        }
+    }
+
+    public String getCircuitName() {
+        return structureName.isEmpty() ? "" : structureName + instanceId;
+    }
+
     public int getPortNumberAt(int side) {
         return portNumbers[side];
+    }
+
+    public int[] getPortNumbers() {
+        return portNumbers;
     }
 
     public void setPortNumberAt(int side, int newPortNumber) {
@@ -49,6 +69,10 @@ public class HubBlockEntity extends BlockEntity {
             portNumbers[side] = newPortNumber;
             markDirty();
         }
+    }
+
+    public void setPortNumbers(int[] portNumbers) {
+        this.portNumbers = portNumbers;
     }
 
     public int getSignalAt(int side) {
@@ -65,6 +89,7 @@ public class HubBlockEntity extends BlockEntity {
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
         nbt.putString("structureName", structureName);
+        nbt.putInt("instanceId", instanceId);
         nbt.putIntArray("portNumbers", portNumbers);
         nbt.putIntArray("signals", signals);
 
@@ -76,6 +101,7 @@ public class HubBlockEntity extends BlockEntity {
         super.readNbt(nbt, registries);
 
         structureName = nbt.getString("structureName");
+        instanceId = nbt.getInt("instanceId");
         portNumbers = nbt.getIntArray("portNumbers");
         signals = nbt.getIntArray("signals");
     }

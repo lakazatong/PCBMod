@@ -61,6 +61,7 @@ abstract public class Block {
                 case BUTTON -> Button::new;
                 case LEVER -> Lever::new;
                 case REDSTONE_BLOCK -> RedstoneBlock::new;
+                case PORT -> Port::new;
             };
         }
 

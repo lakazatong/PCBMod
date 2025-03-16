@@ -5,16 +5,26 @@ import net.lakazatong.pcbmod.Utils;
 import net.lakazatong.pcbmod.block.custom.HubBlock.Side;
 import net.lakazatong.pcbmod.block.entity.HubBlockEntity;
 import net.lakazatong.pcbmod.payloads.UpdateHubPayload;
+import net.lakazatong.pcbmod.redstone.circuit.Circuit;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.EditBoxWidget;
+import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+
+import static net.lakazatong.pcbmod.PCBMod.CIRCUITS;
+import static net.lakazatong.pcbmod.PCBMod.STRUCTURES_PATH;
+
 public class HubScreen extends CommonScreen<HubBlockEntity> {
 
-    private EditBoxWidget structureNameField;
+    private EditBoxWidget circuitNameField;
 
     private final EditBoxWidget[] portNumberFields = new EditBoxWidget[6];
 
@@ -40,10 +50,10 @@ public class HubScreen extends CommonScreen<HubBlockEntity> {
         titleLabelX = centerX - textRenderer.getWidth(title) / 2;
         titleLabelY = centerY - 3 * verticalTotalSpacingWidth;
 
-        structureNameField = new EditBoxWidget(textRenderer, centerX - maxWidth / 2, centerY - 2 * verticalTotalSpacingWidth, maxWidth, fieldHeight, Text.empty(), Text.empty());
-        structureNameField.setMaxLength(maxLength);
-        structureNameField.setText(be.getStructureName());
-        addDrawableChild(structureNameField);
+        circuitNameField = new EditBoxWidget(textRenderer, centerX - maxWidth / 2, centerY - 2 * verticalTotalSpacingWidth, maxWidth, fieldHeight, Text.empty(), Text.empty());
+        circuitNameField.setMaxLength(maxLength);
+        circuitNameField.setText(be.getCircuitName());
+        addDrawableChild(circuitNameField);
 
         int nbCols = 3;
         int nbRows = 2;
@@ -87,7 +97,7 @@ public class HubScreen extends CommonScreen<HubBlockEntity> {
         super.render(context, mouseX, mouseY, delta);
 
         context.drawText(textRenderer, title, titleLabelX, titleLabelY, 0xFFFFFF, true);
-        context.drawText(textRenderer, Utils.translate("screen", "hub", "structure_name"), structureNameField.getX(), structureNameField.getY() - 10, 0xA0A0A0, true);
+        context.drawText(textRenderer, Utils.translate("screen", "hub", "circuit_name"), circuitNameField.getX(), circuitNameField.getY() - 10, 0xA0A0A0, true);
 
         MutableText[] sides = {
                 Utils.translate("word", "front"),
@@ -101,7 +111,7 @@ public class HubScreen extends CommonScreen<HubBlockEntity> {
             context.drawText(textRenderer, sides[i], portNumberFields[i].getX(), portNumberFields[i].getY() - 10, Side.colorAt(i), true);
         }
 
-        structureNameField.render(context, mouseX, mouseY, delta);
+        circuitNameField.render(context, mouseX, mouseY, delta);
         for (int i = 0; i < 6; i++) {
             portNumberFields[i].render(context, mouseX, mouseY, delta);
         }
@@ -118,27 +128,38 @@ public class HubScreen extends CommonScreen<HubBlockEntity> {
 
     @Override
     protected void onDone() {
-        String structureName = structureNameField.getText();
-        int frontPortNumber = getPortNumberAt(Side.FRONT.ordinal());
-        int backPortNumber = getPortNumberAt(Side.BACK.ordinal());
-        int leftPortNumber = getPortNumberAt(Side.LEFT.ordinal());
-        int rightPortNumber = getPortNumberAt(Side.RIGHT.ordinal());
-        int upPortNumber = getPortNumberAt(Side.UP.ordinal());
-        int downPortNumber = getPortNumberAt(Side.DOWN.ordinal());
+        String circuitName = circuitNameField.getText();
+        String structureName = be.getStructureName();
+        int instanceId = be.getInstanceId();
 
-        ClientPlayNetworking.send(new UpdateHubPayload(pos, structureName,
-                frontPortNumber, backPortNumber,
-                leftPortNumber, rightPortNumber,
-                upPortNumber, downPortNumber));
+        if (circuitName.matches("^[a-zA-Z0-9_.-]+\\d+$")) {
+            String tmp = circuitName.replaceFirst("\\d+$", "");
+            Path structurePath = STRUCTURES_PATH.resolve(tmp + ".nbt");
+            System.out.println("Chosen structure path: " + structurePath.toAbsolutePath());
+            if (structurePath.toFile().exists()) {
+                structureName = tmp;
+                instanceId = Integer.parseInt(circuitName.replaceFirst(".+?(\\d+)$", "$1"));
+                try {
+                    if (!CIRCUITS.containsKey(circuitName)) {
+                        CIRCUITS.put(circuitName, new Circuit(structurePath));
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        List<Integer> portNumbers = List.of(
+                getPortNumberAt(Side.FRONT.ordinal()), getPortNumberAt(Side.BACK.ordinal()),
+                getPortNumberAt(Side.LEFT.ordinal()), getPortNumberAt(Side.RIGHT.ordinal()),
+                getPortNumberAt(Side.UP.ordinal()), getPortNumberAt(Side.DOWN.ordinal())
+        );
+
+        ClientPlayNetworking.send(new UpdateHubPayload(pos, structureName, instanceId, portNumbers));
 
         be.setStructureName(structureName);
-
-        be.setPortNumberAt(Side.FRONT.ordinal(), frontPortNumber);
-        be.setPortNumberAt(Side.BACK.ordinal(), backPortNumber);
-        be.setPortNumberAt(Side.LEFT.ordinal(), leftPortNumber);
-        be.setPortNumberAt(Side.RIGHT.ordinal(), rightPortNumber);
-        be.setPortNumberAt(Side.UP.ordinal(), upPortNumber);
-        be.setPortNumberAt(Side.DOWN.ordinal(), downPortNumber);
+        be.setInstanceId(instanceId);
+        be.setPortNumbers(portNumbers.stream().mapToInt(Integer::intValue).toArray());
 
         close();
     }
