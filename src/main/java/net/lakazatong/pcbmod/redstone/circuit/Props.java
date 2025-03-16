@@ -10,19 +10,13 @@ import java.util.Objects;
 import java.util.Set;
 
 public class Props {
-    // static properties
-
-    public long delay; // all
+    public long delay;
     public boolean onWall; // button, torch
     public boolean locked; // repeater
     public boolean subtract; // comparator
-
-    // dynamic properties
-
     public Set<Vec3> facings; // button, delayed, dust
-    public int signal; // all
+    public int signal;
     public boolean weakPowered; // solid
-    // the following two could be changed with pistons
     public Vec3 coords;
     public Set<Block> neighbors;
 
