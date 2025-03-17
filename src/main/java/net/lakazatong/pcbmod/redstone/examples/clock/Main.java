@@ -9,6 +9,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         Path nbtPath = Path.of("src/main/java/net/lakazatong/pcbmod/redstone/examples/clock/clock.nbt");
         Circuit circuit = new Circuit(nbtPath);
-        circuit.simulateUntilUnchanged();
+        circuit.stabilize();
+        circuit.animate();
     }
 }

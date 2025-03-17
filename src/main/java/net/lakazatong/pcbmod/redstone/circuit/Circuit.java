@@ -117,17 +117,33 @@ public class Circuit {
         }
     }
 
-    public void simulateUntilUnchanged() {
-        time = 0;
-        do {
-            boolean changing = update();
+    // return if the circuit is stable
+    public boolean step(long timeout) {
+        boolean changing = update();
+        if (PCBMod.DEBUG)
             saveAsDot();
-            if ((time > 0 && !changing) || time >= 200)
+        // time + 1 > timeout instead of time >= timeout allows for no timeout if timeout is Long.MAX_VALUE
+        if ((time > 0 && !changing) || time + 1 > timeout)
+            return true;
+        tick();
+        time++;
+        return false;
+    }
+
+    public boolean step() {
+        return step(Long.MAX_VALUE);
+    }
+
+    public void stabilize(long timeout) {
+        do {
+            if (step(timeout))
                 break;
-            tick();
-            time++;
         } while (true);
-        animate();
+    }
+
+    public void stabilize() {
+        // default timeout of 10s
+        stabilize(time + 200);
     }
 
     public String toDot() {
@@ -159,7 +175,6 @@ public class Circuit {
     }
 
     public void animate() {
-        if (!PCBMod.DEBUG) return;
         Path framesDir = structure.path.resolveSibling("frames");
         Path outputPath = structure.path.resolveSibling(PathUtils.getBaseName(structure.path) + ".mp4").toAbsolutePath();
 
@@ -224,7 +239,6 @@ public class Circuit {
     }
 
     public void saveAsDot() {
-        if (!PCBMod.DEBUG) return;
         String dotPath = structure.path.resolveSibling("frames/" + PathUtils.getBaseName(structure.path) + time + ".dot").toAbsolutePath().toString();
         String pngPath = structure.path.resolveSibling("frames/" + PathUtils.getBaseName(structure.path) + time + ".png").toAbsolutePath().toString();
 
