@@ -103,4 +103,9 @@ public class PortBlock extends BlockWithEntity {
             return values.get(type);
         }
     }
+
+    @Override
+    protected boolean emitsRedstonePower(BlockState state) {
+        return state.get(TYPE) == PortType.INPUT;
+    }
 }
