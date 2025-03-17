@@ -131,6 +131,7 @@ public class Circuit {
     }
 
     public boolean step() {
+        // no timeout by default
         return step(Long.MAX_VALUE);
     }
 
