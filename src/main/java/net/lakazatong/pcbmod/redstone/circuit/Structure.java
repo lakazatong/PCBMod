@@ -225,7 +225,7 @@ public class Structure {
                             builder.commonInitialProps.subtract = value.equals("subtract");
                             break;
                         case "type":
-                            builder.commonInitialProps.portType = PortBlock.PortType.valueOf(value);
+                            builder.commonInitialProps.portType = PortBlock.PortType.of(value);
                             // TODO
                             // builder.commonInitialProps.portNumber =
                             break;

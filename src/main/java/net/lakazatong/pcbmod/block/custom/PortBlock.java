@@ -102,6 +102,15 @@ public class PortBlock extends BlockWithEntity {
             assert type >= 0 && type < count;
             return values.get(type);
         }
+
+        public static PortType of(String name) {
+            for (PortType type : PortType.values()) {
+                if (type.asString().equals(name.toLowerCase()))
+                    return type;
+            }
+            throw new IllegalArgumentException("No enum constant for string: " + name);
+        }
+
     }
 
     @Override

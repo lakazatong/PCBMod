@@ -2,6 +2,9 @@ package net.lakazatong.pcbmod;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
+import net.lakazatong.pcbmod.block.ModBlocks;
+import net.lakazatong.pcbmod.block.custom.HubBlock;
 import net.lakazatong.pcbmod.payloads.OpenHubScreenPayload;
 import net.lakazatong.pcbmod.payloads.OpenPortScreenPayload;
 import net.lakazatong.pcbmod.screen.HubScreen;
@@ -19,10 +22,9 @@ public class PCBModClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-//        ColorProviderRegistry.BLOCK.register(
-//                (state, view, pos, tintIndex) ->
-//                        state.get(PortBlock.SIDE).getColor()
-//                , ModBlocks.PORT);
+        ColorProviderRegistry.BLOCK.register(
+                (state, view, pos, tintIndex) -> HubBlock.Side.colorAt(tintIndex)
+                , ModBlocks.HUB);
 
         // Payload handlers
         ClientPlayNetworking.registerGlobalReceiver(OpenPortScreenPayload.ID, PCBModClient::handleOpenPortScreenPayload);
