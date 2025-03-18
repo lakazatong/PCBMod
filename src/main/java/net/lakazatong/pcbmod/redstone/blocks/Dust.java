@@ -29,6 +29,10 @@ public class Dust extends Block {
         nextProps.signal = 0;
         for (Block input : nextInputs().collect(Collectors.toSet())) {
             switch (input.type) {
+                case BlockType.AIR:
+                    break;
+                case BlockType.LEVER:
+                case BlockType.REDSTONE_BLOCK:
                 case BlockType.REPEATER:
                 case BlockType.TORCH:
                 case BlockType.BUTTON:
@@ -44,6 +48,7 @@ public class Dust extends Block {
                     }
                     break;
                 case BlockType.COMPARATOR:
+                case BlockType.PORT:
                     if (input.nextSignal() > nextProps.signal) {
                         decay = false;
                         nextProps.signal = input.nextSignal();

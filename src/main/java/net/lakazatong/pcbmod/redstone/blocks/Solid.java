@@ -61,9 +61,15 @@ public class Solid extends Block {
         nextProps.signal = 0;
         for (Block input : nextInputs().collect(Collectors.toSet())) {
             switch (input.type) {
+                case BlockType.AIR:
+                case BlockType.SOLID:
+                case BlockType.REDSTONE_BLOCK:
+                case BlockType.PORT:
+                    break;
                 case BlockType.REPEATER:
                 case BlockType.TORCH:
                 case BlockType.BUTTON:
+                case BlockType.LEVER:
                     if (input.nextSignal() > 0) {
                         nextProps.weakPowered = false;
                         nextProps.signal = 15;
