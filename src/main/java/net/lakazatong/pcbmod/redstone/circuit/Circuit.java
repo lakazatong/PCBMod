@@ -213,19 +213,22 @@ public class Circuit {
             }
         }
 
-        FrameProducer producer = getFrameProducer(maxWidth, maxHeight, framesDir);
+        File[] frameFiles = Objects.requireNonNull(framesDir.toFile().listFiles((dir, name) -> name.endsWith(".png")));
+        int frameCount = frameFiles.length;
+
+        FrameProducer producer = getFrameProducer(maxWidth, maxHeight, framesDir, frameCount);
 
         FFmpeg.atPath()
-            .addInput(FrameInput.withProducer(producer).setFrameRate(1))
-                .addOutput(UrlOutput.toUrl(outputPath.toString()).setDuration(2000))
-            .execute();
+                .addInput(FrameInput.withProducer(producer).setFrameRate(1))
+                .addOutput(UrlOutput.toUrl(outputPath.toString()))
+                .execute();
     }
 
-    private FrameProducer getFrameProducer(int maxWidth, int maxHeight, Path framesDir) {
+    private FrameProducer getFrameProducer(int maxWidth, int maxHeight, Path framesDir, int frameCount) {
         return new FrameProducer() {
             private long index = 0;
+            private BufferedImage cachedLastFrame = null;
 
-            @Override
             public List<com.github.kokorin.jaffree.ffmpeg.Stream> produceStreams() {
                 return Collections.singletonList(new com.github.kokorin.jaffree.ffmpeg.Stream()
                         .setType(com.github.kokorin.jaffree.ffmpeg.Stream.Type.VIDEO)
@@ -235,24 +238,29 @@ public class Circuit {
                 );
             }
 
-            @Override
             public Frame produce() {
-                if (index >= time + 1)
+                if (index >= frameCount * 2L)
                     return null;
                 try {
-                    File frameFile = framesDir.resolve(PathUtils.getBaseName(structure.path) + index + ".png").toAbsolutePath().toFile();
-                    BufferedImage original = ImageIO.read(frameFile);
-                    BufferedImage formatted = new BufferedImage(maxWidth, maxHeight, BufferedImage.TYPE_3BYTE_BGR);
-                    Graphics2D g = formatted.createGraphics();
-                    g.setColor(Color.BLACK);
-                    g.fillRect(0, 0, maxWidth, maxHeight);
-                    if (original != null) {
-                        int x = (maxWidth - original.getWidth()) / 2;
-                        int y = (maxHeight - original.getHeight()) / 2;
-                        g.drawImage(original, x, y, null);
+                    BufferedImage formatted;
+                    if (index < frameCount) {
+                        File frameFile = framesDir.resolve(PathUtils.getBaseName(structure.path) + index + ".png").toAbsolutePath().toFile();
+                        BufferedImage original = ImageIO.read(frameFile);
+                        formatted = new BufferedImage(maxWidth, maxHeight, BufferedImage.TYPE_3BYTE_BGR);
+                        Graphics2D g = formatted.createGraphics();
+                        g.setColor(Color.BLACK);
+                        g.fillRect(0, 0, maxWidth, maxHeight);
+                        if (original != null) {
+                            int x = (maxWidth - original.getWidth()) / 2;
+                            int y = (maxHeight - original.getHeight()) / 2;
+                            g.drawImage(original, x, y, null);
+                        }
+                        g.dispose();
+                        cachedLastFrame = formatted;
+                    } else {
+                        formatted = cachedLastFrame;
                     }
-                    g.dispose();
-                    return Frame.createVideoFrame(0, (index++ * 1000), formatted);
+                    return Frame.createVideoFrame(0, ++index * 1000, formatted);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

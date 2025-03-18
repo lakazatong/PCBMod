@@ -1,5 +1,6 @@
 package net.lakazatong.pcbmod.redstone.blocks;
 
+import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.circuit.Block;
 import net.lakazatong.pcbmod.redstone.circuit.BlockType;
 import net.lakazatong.pcbmod.redstone.circuit.Props;
@@ -16,7 +17,8 @@ public class Dust extends Block {
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
             case AIR, TORCH, BUTTON, LEVER, REDSTONE_BLOCK -> false;
-            case SOLID, PORT -> isFacingHorizontally(neighbor) || isAbove(neighbor);
+            case SOLID -> isFacingHorizontally(neighbor) || isAbove(neighbor);
+            case PORT -> neighbor.portType().equals(PortBlock.PortType.OUTPUT) && (isFacingHorizontally(neighbor) || isAbove(neighbor));
             case DUST -> true;
             case REPEATER -> !neighbor.locked() && neighbor.isFacingAwayHorizontally(this);
             case COMPARATOR -> !neighbor.isFacing(this);
@@ -31,11 +33,7 @@ public class Dust extends Block {
             switch (input.type) {
                 case BlockType.AIR:
                     break;
-                case BlockType.LEVER:
-                case BlockType.REDSTONE_BLOCK:
-                case BlockType.REPEATER:
-                case BlockType.TORCH:
-                case BlockType.BUTTON:
+                case BlockType.LEVER, BlockType.REDSTONE_BLOCK, BlockType.REPEATER, BlockType.TORCH, BlockType.BUTTON:
                     if (input.nextSignal() > 0) {
                         nextProps.signal = 15;
                        return;
@@ -47,8 +45,7 @@ public class Dust extends Block {
                         nextProps.signal = input.nextSignal();
                     }
                     break;
-                case BlockType.COMPARATOR:
-                case BlockType.PORT:
+                case BlockType.PORT, BlockType.COMPARATOR:
                     if (input.nextSignal() > nextProps.signal) {
                         decay = false;
                         nextProps.signal = input.nextSignal();

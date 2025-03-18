@@ -1,5 +1,6 @@
 package net.lakazatong.pcbmod.redstone.blocks;
 
+import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.circuit.Block;
 import net.lakazatong.pcbmod.redstone.circuit.BlockType;
 import net.lakazatong.pcbmod.redstone.circuit.Props;
@@ -18,7 +19,8 @@ public class Repeater extends Delayed {
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
             case AIR, TORCH, BUTTON, LEVER, REDSTONE_BLOCK -> false;
-            case SOLID, DUST, PORT -> !locked() && isFacing(neighbor);
+            case SOLID, DUST -> !locked() && isFacing(neighbor);
+            case PORT -> neighbor.portType().equals(PortBlock.PortType.OUTPUT) && (!locked() && isFacing(neighbor));
             case REPEATER -> isSideInputOf(neighbor) || (!neighbor.locked() && isFacing(neighbor) && !neighbor.isFacing(this));
             case COMPARATOR -> !locked() && isFacing(neighbor) && !neighbor.isFacing(this);
         };

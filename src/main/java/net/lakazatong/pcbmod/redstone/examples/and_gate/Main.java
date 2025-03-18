@@ -13,6 +13,9 @@ public class Main {
         circuit.setSignalOfPortNumber(1, 15);
         circuit.setSignalOfPortNumber(2, 15);
         circuit.stabilize();
+        circuit.setSignalOfPortNumber(1, 0);
+        circuit.setSignalOfPortNumber(2, 0);
+        circuit.stabilize();
         circuit.animate();
     }
 }

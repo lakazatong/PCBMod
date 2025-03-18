@@ -18,9 +18,9 @@ public class Solid extends SolidLike {
         outer:
         for (Block input : inputs().collect(Collectors.toSet())) {
             switch (input.type) {
-                case BlockType.REPEATER:
-                case BlockType.TORCH:
-                case BlockType.BUTTON:
+                case BlockType.AIR, BlockType.SOLID, BlockType.REDSTONE_BLOCK, BlockType.PORT:
+                    break;
+                case BlockType.LEVER, BlockType.REPEATER, BlockType.TORCH, BlockType.BUTTON:
                     if (input.signal() > 0) {
                         props.weakPowered = false;
                         props.signal = 15;
