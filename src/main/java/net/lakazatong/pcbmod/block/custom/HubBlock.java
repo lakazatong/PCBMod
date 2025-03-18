@@ -59,10 +59,10 @@ public class HubBlock extends HorizontalFacingBlock implements BlockEntityProvid
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING)
-            .add(FRONT_TYPE).add(BACK_TYPE)
-            .add(LEFT_TYPE).add(RIGHT_TYPE)
-            .add(UP_TYPE).add(DOWN_TYPE);
+        builder.add(FACING,
+                    FRONT_TYPE, BACK_TYPE,
+                    LEFT_TYPE, RIGHT_TYPE,
+                    UP_TYPE, DOWN_TYPE);
     }
 
     @Override
@@ -123,17 +123,6 @@ public class HubBlock extends HorizontalFacingBlock implements BlockEntityProvid
         }
         return super.onBreak(world, pos, state, player);
     }
-
-    //    @Override
-//    public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, @org.jetbrains.annotations.Nullable BlockEntity blockEntity, ItemStack tool) {
-//
-//        super.afterBreak(world, player, pos, state, blockEntity, tool);
-//    }
-
-//    @Override
-//    protected void onBlockBreakStart(BlockState state, World world, BlockPos pos, PlayerEntity player) {
-//
-//    }
 
     @Override
     protected int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
