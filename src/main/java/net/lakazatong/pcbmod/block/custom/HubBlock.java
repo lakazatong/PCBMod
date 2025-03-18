@@ -113,8 +113,11 @@ public class HubBlock extends HorizontalFacingBlock implements BlockEntityProvid
             Circuit circuit = PCBMod.CIRCUITS.get(be.getCircuitName());
             if (circuit == null) return 0;
             int portNumber = be.getPortNumberAt(Side.fromDirection(Vec3.fromMinecraft(direction).toRelative(Vec3.fromMinecraft(state.get(FACING)))).ordinal());
-             world.getBlockState(pos).getStrongRedstonePower(world, pos, direction)
-            return circuit.signalOfPortNumber(portNumber);
+            int r = circuit.getSignalOfPortNumber(portNumber);
+            for (Direction dir : Direction.values()) {
+                circuit.setSignalOfPortNumber(portNumber, world.getBlockState(pos).getStrongRedstonePower(world, pos, dir));
+            }
+            return r;
         }
         return 0;
     }

@@ -8,6 +8,7 @@ import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.parse.Parser;
 import net.lakazatong.pcbmod.PCBMod;
+import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.blocks.Button;
 import net.lakazatong.pcbmod.redstone.blocks.Delayed;
 import net.lakazatong.pcbmod.redstone.blocks.Solid;
@@ -290,7 +291,14 @@ public class Circuit {
         return circuit;
     }
 
-    public int signalOfPortNumber(int portNumber) {
+    public int getSignalOfPortNumber(int portNumber) {
         return portNumbers.containsKey(portNumber) ? portNumbers.get(portNumber).signal() : 0;
+    }
+
+    public void setSignalOfPortNumber(int portNumber, int signal) {
+        Block p = portNumbers.get(portNumber);
+        if (p != null && p.portType() == PortBlock.PortType.INPUT) {
+            p.props.signal = signal;
+        }
     }
 }

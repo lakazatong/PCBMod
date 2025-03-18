@@ -8,8 +8,6 @@ import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.blocks.*;
 import net.lakazatong.pcbmod.redstone.circuit.Block.BlockBuilder;
 import net.lakazatong.pcbmod.redstone.utils.Vec3;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import org.apache.commons.io.file.PathUtils;
 
 import java.io.IOException;
