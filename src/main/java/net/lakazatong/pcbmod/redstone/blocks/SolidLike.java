@@ -14,6 +14,38 @@ public class SolidLike extends Block {
     }
 
     @Override
+    public void init() {
+        props.signal = 0;
+        outer:
+        for (Block input : inputs().collect(Collectors.toSet())) {
+            switch (input.type) {
+                case BlockType.AIR, BlockType.SOLID, BlockType.REDSTONE_BLOCK, BlockType.PORT:
+                    break;
+                case BlockType.LEVER, BlockType.REPEATER, BlockType.TORCH, BlockType.BUTTON:
+                    if (input.signal() > 0) {
+                        props.weakPowered = false;
+                        props.signal = 15;
+                        break outer;
+                    }
+                    break;
+                case BlockType.COMPARATOR:
+                    if (input.signal() > props.signal) {
+                        props.weakPowered = false;
+                        props.signal = input.signal();
+                    }
+                    break;
+                case BlockType.DUST:
+                    if (input.signal() > props.signal) {
+                        props.weakPowered = true;
+                        props.signal = input.signal();
+                    }
+                    break;
+            }
+        }
+        super.init();
+    }
+
+    @Override
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
             case AIR, SOLID, PORT, BUTTON, LEVER, REDSTONE_BLOCK -> false;

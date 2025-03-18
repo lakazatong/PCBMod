@@ -12,7 +12,7 @@ import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.blocks.Button;
 import net.lakazatong.pcbmod.redstone.blocks.Delayed;
 import net.lakazatong.pcbmod.redstone.blocks.Port;
-import net.lakazatong.pcbmod.redstone.blocks.Solid;
+import net.lakazatong.pcbmod.redstone.blocks.SolidLike;
 import net.lakazatong.pcbmod.redstone.utils.SccGraph;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -46,30 +46,17 @@ public class Circuit {
 
     public final Map<Integer, Integer> portUpdates = new HashMap<>();
 
-    private void init() {
-        for (Block b : graph.values()) {
-            if (b.type.equals(BlockType.PORT))
-                portNumbers.put(b.props.portNumber, b);
-            b.circuit = this;
-        }
-    }
-
-    public Circuit(Structure structure, Map<Integer, Block> graph) {
+    private Circuit(Structure structure, Map<Integer, Block> graph) {
         this.structure = structure;
         this.graph = graph;
-        init();
-    }
 
-    public Circuit(Structure structure) {
-        this.structure = structure;
-
-        graph = new HashMap<>();
-        structure.blocks().forEach(b -> graph.put(b.uuid, b));
-        for (Block b : graph.values())
-            b.props.neighbors.addAll(structure.getNeighbors(b));
-
-        graph.values().stream().filter(b -> b instanceof Solid).forEach(Block::init);
-        graph.values().stream().filter(b -> !(b instanceof Solid)).forEach(Block::init);
+        if (graph.isEmpty()) {
+            structure.blocks().forEach(b -> graph.put(b.uuid, b));
+            for (Block b : graph.values())
+                b.props.neighbors.addAll(structure.getNeighbors(b));
+            graph.values().stream().filter(b -> b instanceof SolidLike).forEach(Block::init);
+            graph.values().stream().filter(b -> !(b instanceof SolidLike)).forEach(Block::init);
+        }
 
         if (PCBMod.DEBUG) {
             Path framesDir = structure.path.resolveSibling("frames");
@@ -88,7 +75,15 @@ public class Circuit {
             }
         }
 
-        init();
+        for (Block b : graph.values()) {
+            if (b.type.equals(BlockType.PORT))
+                portNumbers.put(b.props.portNumber, b);
+            b.circuit = this;
+        }
+    }
+
+    public Circuit(Structure structure) {
+        this(structure, new HashMap<>());
     }
 
     public Circuit(Path nbtPath) throws IOException {
