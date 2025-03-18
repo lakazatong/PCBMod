@@ -10,6 +10,9 @@ public class Main {
         Path nbtPath = Path.of("src/main/java/net/lakazatong/pcbmod/redstone/examples/and_gate/and_gate.nbt");
         Circuit circuit = new Circuit(nbtPath);
         circuit.stabilize();
+        circuit.setSignalOfPortNumber(1, 15);
+        circuit.setSignalOfPortNumber(2, 15);
+        circuit.stabilize();
         circuit.animate();
     }
 }
