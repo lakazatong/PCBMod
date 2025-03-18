@@ -119,4 +119,9 @@ public class PortScreen extends CommonScreen<PortBlockEntity> {
 
         close();
     }
+
+    @Override
+    protected void setInitialFocus() {
+        portNumberField.setFocused(true);
+    }
 }

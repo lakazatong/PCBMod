@@ -166,4 +166,9 @@ public class HubScreen extends CommonScreen<HubBlockEntity> {
     protected void onCancel() {
         close();
     }
+
+    @Override
+    protected void setInitialFocus() {
+        circuitNameField.setFocused(true);
+    }
 }

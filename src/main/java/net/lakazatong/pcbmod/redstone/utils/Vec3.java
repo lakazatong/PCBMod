@@ -1,5 +1,6 @@
 package net.lakazatong.pcbmod.redstone.utils;
 
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 import java.util.HashSet;
@@ -150,5 +151,16 @@ public record Vec3(int x, int y, int z) {
             case UP -> UP.dup();
             case DOWN -> DOWN.dup();
         };
+    }
+
+    public double norm() {
+        return Math.sqrt(x * x + y * y + z * z);
+    }
+
+    public static Vec3 fromBlockDiff(BlockPos from, BlockPos to) {
+        int dx = to.getX() - from.getX();
+        int dy = to.getY() - from.getY();
+        int dz = to.getZ() - from.getZ();
+        return new Vec3(dx, dy, dz);
     }
 }

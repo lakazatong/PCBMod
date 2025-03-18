@@ -26,8 +26,13 @@ import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
+import net.minecraft.world.block.WireOrientation;
+import net.minecraft.world.tick.ScheduledTickView;
 
 import javax.annotation.Nullable;
 
@@ -119,7 +124,7 @@ public class HubBlock extends HorizontalFacingBlock implements BlockEntityProvid
     }
 
     @Override
-    public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, @org.jetbrains.annotations.Nullable BlockEntity blockEntity, ItemStack tool) {
+    public void onBroken(WorldAccess world, BlockPos pos, BlockState state) {
         if (world.getBlockEntity(pos) instanceof HubBlockEntity be) {
             String circuitName = be.getCircuitName();
             Circuit circuit = PCBMod.CIRCUITS.get(circuitName);
@@ -134,13 +139,25 @@ public class HubBlock extends HorizontalFacingBlock implements BlockEntityProvid
             Circuit circuit = PCBMod.CIRCUITS.get(be.getCircuitName());
             if (circuit == null) return 0;
             int portNumber = be.getPortNumberAt(Side.fromDirection(Vec3.fromMinecraft(direction).toRelative(Vec3.fromMinecraft(state.get(FACING)))).ordinal());
-            int r = circuit.getSignalOfPortNumber(portNumber);
-            for (Direction dir : Direction.values()) {
-                circuit.setSignalOfPortNumber(portNumber, world.getBlockState(pos).getStrongRedstonePower(world, pos, dir));
-            }
-            return r;
+            return circuit.getSignalOfPortNumber(portNumber);
         }
         return 0;
+    }
+
+    @Override
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        if (world.getBlockEntity(pos) instanceof HubBlockEntity be) {
+            Circuit circuit = PCBMod.CIRCUITS.get(be.getCircuitName());
+            if (circuit == null) return state;
+            Vec3 facing = Vec3.fromMinecraft(state.get(FACING)); // 1, 0, 0
+            Vec3 aligned = Vec3.fromMinecraft(direction).toRelative(facing); // -1, 0, 0
+            int side = Side.fromDirection(aligned).ordinal(); // 2
+            int portNumber = be.getPortNumberAt(side); // 1
+            BlockPos offset = pos.offset(direction); // -10 56 13
+            int signal = world.getBlockState(offset).getStrongRedstonePower(world, offset, direction.getOpposite()); // 15
+            circuit.setSignalOfPortNumber(portNumber, signal);
+        }
+        return state;
     }
 
     public enum Side implements StringIdentifiable {
