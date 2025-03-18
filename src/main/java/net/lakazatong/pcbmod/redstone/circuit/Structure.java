@@ -60,12 +60,12 @@ public class Structure {
             Vec3 pos = new Vec3(tmp.get(0).intValue(), tmp.get(1).intValue(), tmp.get(2).intValue());
             BlockBuilder builder = palette.get(bTag.getInt("state").getValue());
             if (builder == null) continue;
-            if (builder.commonInitialProps.portType != null) {
-                CompoundTag bNbt = bTag.get("nbt");
-                builder.commonInitialProps.signal = bNbt.getInt("signal").intValue();
-                builder.commonInitialProps.portNumber = bNbt.getInt("portNumber").intValue();
-            }
             Block block = builder.apply(this, pos);
+            if (block instanceof Port port) {
+                CompoundTag bNbt = bTag.get("nbt");
+                port.props.signal = bNbt.getInt("signal").intValue();
+                port.props.portNumber = bNbt.getInt("portNumber").intValue();
+            }
             setBlock(block);
         }
     }

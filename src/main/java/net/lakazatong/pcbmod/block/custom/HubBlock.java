@@ -13,8 +13,10 @@ import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
@@ -105,6 +107,25 @@ public class HubBlock extends HorizontalFacingBlock implements BlockEntityProvid
     @Override
     protected boolean emitsRedstonePower(BlockState state) {
         return true;
+    }
+
+    @Override
+    public void onPlaced(World world, BlockPos pos, BlockState state, @org.jetbrains.annotations.Nullable LivingEntity placer, ItemStack itemStack) {
+        if (world.getBlockEntity(pos) instanceof HubBlockEntity be) {
+            Circuit circuit = PCBMod.CIRCUITS.get(be.getCircuitName());
+            if (circuit == null) return;
+            circuit.hubCount++;
+        }
+    }
+
+    @Override
+    public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, @org.jetbrains.annotations.Nullable BlockEntity blockEntity, ItemStack tool) {
+        if (world.getBlockEntity(pos) instanceof HubBlockEntity be) {
+            String circuitName = be.getCircuitName();
+            Circuit circuit = PCBMod.CIRCUITS.get(circuitName);
+            if (circuit != null && (circuit.hubCount == 0 || --circuit.hubCount == 0))
+                PCBMod.CIRCUITS.remove(circuitName);
+        }
     }
 
     @Override

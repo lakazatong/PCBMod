@@ -18,7 +18,6 @@ import net.lakazatong.pcbmod.redstone.circuit.Circuits;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
 
-import java.lang.management.ManagementFactory;
 import java.nio.file.Path;
 
 public class PCBMod implements ModInitializer {
@@ -29,7 +28,7 @@ public class PCBMod implements ModInitializer {
 
     public static Circuits CIRCUITS;
 
-    public static boolean DEBUG;
+    public static boolean DEBUG = true;
 
     private static void handleUpdatePortPayload(UpdatePortPayload payload, ServerPlayNetworking.Context context) {
         if (context.player().getServerWorld().getBlockEntity(payload.pos()) instanceof PortBlockEntity be) {
@@ -47,8 +46,7 @@ public class PCBMod implements ModInitializer {
     }
 
     public void onInitialize() {
-        String inputArguments = ManagementFactory.getRuntimeMXBean().getInputArguments().toString();
-        DEBUG = inputArguments.contains("jdwp");
+        DEBUG = false;
 
         ServerLifecycleEvents.SERVER_STARTED.register(this::onServerStart);
 

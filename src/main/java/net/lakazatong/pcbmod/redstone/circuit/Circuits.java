@@ -82,6 +82,7 @@ public final class Circuits extends PersistentState implements Map<String, Circu
 
     @Override
     public Circuit get(Object key) {
+        markDirty();
         return circuits.get(key);
     }
 
@@ -116,11 +117,13 @@ public final class Circuits extends PersistentState implements Map<String, Circu
 
     @Override
     public @NotNull Collection<Circuit> values() {
+        markDirty();
         return circuits.values();
     }
 
     @Override
     public @NotNull Set<Entry<String, Circuit>> entrySet() {
+        markDirty();
         return circuits.entrySet();
     }
 }

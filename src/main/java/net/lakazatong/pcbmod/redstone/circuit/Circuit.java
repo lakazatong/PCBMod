@@ -37,6 +37,7 @@ public class Circuit {
     public final Structure structure;
     public final Map<Integer, Block> graph;
     private long time = 0; // in game ticks
+    public long hubCount = 0;
 
     private final Map<Integer, Block> portNumbers = new HashMap<>();
 
@@ -273,6 +274,7 @@ public class Circuit {
         graph.forEach((uuid, block) -> savedGraph.add(block.save()));
         tag.put("graph", savedGraph);
         tag.putLong("time", time);
+        tag.putLong("hubCount", hubCount);
 
         return tag;
     }
@@ -287,6 +289,7 @@ public class Circuit {
         });
         Circuit circuit = new Circuit(structure, graph);
         circuit.time = t.getLong("time");
+        circuit.hubCount = t.getLong("hubCount");
 
         return circuit;
     }

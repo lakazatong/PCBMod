@@ -38,7 +38,7 @@ public class Props {
     }
 
     public static Props defaults() {
-        return new Props(0, false, false, false, new HashSet<>(), 0, false, new Vec3(0, 0, 0), new HashSet<>(), null, 0);
+        return new Props(0, false, false, false, new HashSet<>(), 0, false, new Vec3(0, 0, 0), new HashSet<>(), PortBlock.PortType.CLOSE, 0);
     }
 
     public Props dup() {
