@@ -37,9 +37,16 @@ public class Circuit {
     public final Map<Integer, Block> graph;
     private long time = 0; // in game ticks
 
+    private final Map<Integer, Block> portNumbers = new HashMap<>();
+
+    private void initPortNumbers() {
+        graph.values().stream().filter(b -> b.type == BlockType.PORT).forEach(p -> portNumbers.put(p.props.portNumber, p));
+    }
+
     public Circuit(Structure structure, Map<Integer, Block> graph) {
         this.structure = structure;
         this.graph = graph;
+        initPortNumbers();
     }
 
     public Circuit(Structure structure) {
@@ -69,6 +76,8 @@ public class Circuit {
             } catch (IOException ignored) {
             }
         }
+
+        initPortNumbers();
     }
 
     public Circuit(Path nbtPath) throws IOException {
@@ -279,5 +288,9 @@ public class Circuit {
         circuit.time = t.getLong("time");
 
         return circuit;
+    }
+
+    public int signalOfPortNumber(int portNumber) {
+        return portNumbers.containsKey(portNumber) ? portNumbers.get(portNumber).signal() : 0;
     }
 }

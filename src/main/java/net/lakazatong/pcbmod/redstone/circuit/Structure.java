@@ -8,6 +8,8 @@ import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.blocks.*;
 import net.lakazatong.pcbmod.redstone.circuit.Block.BlockBuilder;
 import net.lakazatong.pcbmod.redstone.utils.Vec3;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import org.apache.commons.io.file.PathUtils;
 
 import java.io.IOException;
@@ -56,11 +58,17 @@ public class Structure {
         }
 
         for (CompoundTag bTag : blocks) {
-            ListTag<IntTag> pos = bTag.getList("pos");
+            ListTag<IntTag> tmp = bTag.getList("pos");
+            Vec3 pos = new Vec3(tmp.get(0).intValue(), tmp.get(1).intValue(), tmp.get(2).intValue());
             BlockBuilder builder = palette.get(bTag.getInt("state").getValue());
             if (builder == null) continue;
-            Block block = builder.apply(this, new Vec3(pos.get(0).intValue(), pos.get(1).intValue(), pos.get(2).intValue()));
-            this.setBlock(block);
+            if (builder.commonInitialProps.portType != null) {
+                CompoundTag bNbt = bTag.get("nbt");
+                builder.commonInitialProps.signal = bNbt.getInt("signal").intValue();
+                builder.commonInitialProps.portNumber = bNbt.getInt("portNumber").intValue();
+            }
+            Block block = builder.apply(this, pos);
+            setBlock(block);
         }
     }
 
@@ -226,8 +234,6 @@ public class Structure {
                             break;
                         case "type":
                             builder.commonInitialProps.portType = PortBlock.PortType.of(value);
-                            // TODO
-                            // builder.commonInitialProps.portNumber =
                             break;
                     }
 

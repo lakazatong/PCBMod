@@ -111,8 +111,9 @@ public class HubBlock extends HorizontalFacingBlock implements BlockEntityProvid
     protected int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
         if (world.getBlockEntity(pos) instanceof HubBlockEntity be) {
             Circuit circuit = PCBMod.CIRCUITS.get(be.getCircuitName());
+            if (circuit == null) return 0;
             int portNumber = be.getPortNumberAt(Side.fromDirection(Vec3.fromMinecraft(direction).toRelative(Vec3.fromMinecraft(state.get(FACING)))).ordinal());
-            circuit.signalOfPortNumber(portNumber);
+            return circuit.signalOfPortNumber(portNumber);
         }
         return 0;
     }
