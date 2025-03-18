@@ -1,6 +1,5 @@
 package net.lakazatong.pcbmod.redstone.blocks;
 
-import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.circuit.Block;
 import net.lakazatong.pcbmod.redstone.circuit.BlockType;
 import net.lakazatong.pcbmod.redstone.circuit.Props;
@@ -15,16 +14,11 @@ public class Torch extends Delayed {
     @Override
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
-            case AIR -> false;
-            case SOLID -> isBelow(neighbor);
+            case AIR, TORCH, BUTTON, LEVER, REDSTONE_BLOCK -> false;
+            case SOLID, PORT -> isBelow(neighbor);
             case DUST -> true;
             case REPEATER -> !neighbor.locked() && neighbor.isFacingAway(this);
-            case TORCH -> false;
             case COMPARATOR -> neighbor.isFacingAway(this);
-            case BUTTON -> false;
-            case LEVER -> false;
-            case REDSTONE_BLOCK -> false;
-            case PORT -> neighbor.portType() == PortBlock.PortType.OUTPUT && isBelow(neighbor);
         };
     }
 

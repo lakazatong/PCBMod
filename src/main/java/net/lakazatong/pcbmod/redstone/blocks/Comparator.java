@@ -1,6 +1,5 @@
 package net.lakazatong.pcbmod.redstone.blocks;
 
-import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.circuit.Block;
 import net.lakazatong.pcbmod.redstone.circuit.BlockType;
 import net.lakazatong.pcbmod.redstone.circuit.Props;
@@ -19,15 +18,10 @@ public class Comparator extends Delayed {
     @Override
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
-            case AIR -> false;
-            case SOLID, DUST -> isFacing(neighbor);
+            case AIR, TORCH, BUTTON, LEVER, REDSTONE_BLOCK -> false;
+            case SOLID, DUST, PORT -> isFacing(neighbor);
             case REPEATER -> isSideInputOf(neighbor) || (!neighbor.locked() && isFacing(neighbor) && neighbor.isFacingAway(this));
-            case TORCH -> false;
             case COMPARATOR -> isFacing(neighbor) && !neighbor.isFacing(this);
-            case BUTTON -> false;
-            case LEVER -> false;
-            case REDSTONE_BLOCK -> false;
-            case PORT -> neighbor.portType() == PortBlock.PortType.OUTPUT && isFacing(neighbor);
         };
     }
 

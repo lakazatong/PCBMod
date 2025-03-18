@@ -1,6 +1,5 @@
 package net.lakazatong.pcbmod.redstone.blocks;
 
-import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.circuit.Block;
 import net.lakazatong.pcbmod.redstone.circuit.BlockType;
 import net.lakazatong.pcbmod.redstone.circuit.Props;
@@ -13,18 +12,12 @@ public class Port extends Constant {
 
     @Override
     public boolean isInputOf(Block neighbor) {
-        if (props.portType != PortBlock.PortType.INPUT) return false;
         return switch (neighbor.type) {
-            case AIR -> false;
-            case SOLID -> false;
+            case AIR, SOLID, PORT, BUTTON, LEVER, REDSTONE_BLOCK -> false;
             case DUST -> true;
             case REPEATER -> !neighbor.locked() && neighbor.isFacingAway(this);
             case COMPARATOR -> neighbor.isFacingAway(this);
             case TORCH -> (neighbor.isAbove(this) && !neighbor.onWall()) || neighbor.isOnWallOf(this);
-            case BUTTON -> false;
-            case LEVER -> false;
-            case REDSTONE_BLOCK -> false;
-            case PORT -> false;
         };
     }
 

@@ -48,16 +48,11 @@ public class Solid extends Block {
     @Override
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
-            case AIR -> false;
-            case SOLID -> false;
+            case AIR, SOLID, PORT, BUTTON, LEVER, REDSTONE_BLOCK -> false;
             case DUST -> true;
             case REPEATER -> !neighbor.locked() && neighbor.isFacingAway(this);
             case COMPARATOR -> neighbor.isFacingAway(this);
             case TORCH -> (neighbor.isAbove(this) && !neighbor.onWall()) || neighbor.isOnWallOf(this);
-            case BUTTON -> false;
-            case LEVER -> false;
-            case REDSTONE_BLOCK -> false;
-            case PORT -> false;
         };
     }
 
