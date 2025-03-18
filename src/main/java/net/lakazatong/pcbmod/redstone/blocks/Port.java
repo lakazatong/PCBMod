@@ -1,17 +1,19 @@
 package net.lakazatong.pcbmod.redstone.blocks;
 
+import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.circuit.Block;
 import net.lakazatong.pcbmod.redstone.circuit.BlockType;
 import net.lakazatong.pcbmod.redstone.circuit.Props;
 import net.lakazatong.pcbmod.redstone.circuit.Structure;
 
-public class Port extends Block {
+public class Port extends Constant {
     public Port(Structure structure, Props initialProps) {
         super(BlockType.PORT, structure, initialProps);
     }
 
     @Override
     public boolean isInputOf(Block neighbor) {
+        if (props.portType != PortBlock.PortType.INPUT) return false;
         return switch (neighbor.type) {
             case AIR -> false;
             case SOLID -> false;
@@ -24,11 +26,5 @@ public class Port extends Block {
             case REDSTONE_BLOCK -> false;
             case PORT -> false;
         };
-    }
-
-    @Override
-    public void logic(long t) {
-        // TODO
-        // nextProps.signal = ?;
     }
 }

@@ -26,7 +26,7 @@ package net.lakazatong.pcbmod.mixins;
 //import java.nio.file.Path;
 //
 //@Mixin(StructureBlockBlockEntity.class)
-public abstract class StructureBlockBlockEntityMixin {
+public abstract class StructureBlockEntityMixin {
 //
 //    @Shadow private @Nullable Identifier templateName;
 //    @Shadow private Vec3i size;

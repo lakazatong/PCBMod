@@ -1,5 +1,6 @@
 package net.lakazatong.pcbmod.redstone.circuit;
 
+import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.blocks.*;
 import net.lakazatong.pcbmod.redstone.utils.Vec3;
 import net.minecraft.nbt.NbtCompound;
@@ -237,6 +238,12 @@ abstract public class Block {
     public Stream<Block> nextSideInputs() {
         return nextInputs().filter(input -> input.isSideInputOf(this));
     }
+
+    public PortBlock.PortType portType() { return props.portType; }
+    public PortBlock.PortType nextPortType() { return nextProps.portType; }
+
+    public int portNumber() { return props.portNumber; }
+    public int nextPortNumber() { return nextProps.portNumber; }
 
     public Stream<Block> frontInputs() {
         return inputs().filter(input -> !input.isSideInputOf(this) && isFacing(input));

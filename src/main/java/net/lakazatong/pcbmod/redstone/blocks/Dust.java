@@ -1,5 +1,6 @@
 package net.lakazatong.pcbmod.redstone.blocks;
 
+import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.circuit.Block;
 import net.lakazatong.pcbmod.redstone.circuit.BlockType;
 import net.lakazatong.pcbmod.redstone.circuit.Props;
@@ -18,13 +19,13 @@ public class Dust extends Block {
             case AIR -> false;
             case SOLID -> isFacingHorizontally(neighbor) || isAbove(neighbor);
             case DUST -> true;
-            case REPEATER -> !neighbor.locked() && neighbor.isFacingAway(this);
+            case REPEATER -> !neighbor.locked() && neighbor.isFacingAwayHorizontally(this);
             case TORCH -> false;
             case COMPARATOR -> !neighbor.isFacing(this);
             case BUTTON -> false;
             case LEVER -> false;
             case REDSTONE_BLOCK -> false;
-            case PORT -> false;
+            case PORT -> neighbor.portType() == PortBlock.PortType.OUTPUT && isFacingHorizontally(neighbor);
         };
     }
 
