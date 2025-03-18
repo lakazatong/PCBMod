@@ -18,6 +18,7 @@
   "item.pcbmod.suspicious_substance": "Suspicious Substance",
   "item.pcbmod.port": "Port Block",
   "item.pcbmod.hub": "Hub Block",
+  "item.pcbmod.test": "Test Block",
 
   "screen.pcbmod.port.port_number":  "Port Number",
   "screen.pcbmod.port.title": "Port Screen",

@@ -3,7 +3,7 @@
 	"package": "net.lakazatong.pcbmod.mixins",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"StructureTemplateManagerMixin"
+		"StructureBlockBlockEntityMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

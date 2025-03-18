@@ -2,9 +2,12 @@ package net.lakazatong.pcbmod.block.custom;
 
 import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.lakazatong.pcbmod.PCBMod;
 import net.lakazatong.pcbmod.block.custom.PortBlock.PortType;
 import net.lakazatong.pcbmod.block.entity.HubBlockEntity;
 import net.lakazatong.pcbmod.payloads.OpenHubScreenPayload;
+import net.lakazatong.pcbmod.redstone.circuit.Circuit;
+import net.lakazatong.pcbmod.redstone.utils.Vec3;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -106,12 +109,12 @@ public class HubBlock extends HorizontalFacingBlock implements BlockEntityProvid
 
     @Override
     protected int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
-        return super.getWeakRedstonePower(state, world, pos, direction);
-    }
-
-    @Override
-    protected int getStrongRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
-        return super.getStrongRedstonePower(state, world, pos, direction);
+        if (world.getBlockEntity(pos) instanceof HubBlockEntity be) {
+            Circuit circuit = PCBMod.CIRCUITS.get(be.getCircuitName());
+            int portNumber = be.getPortNumberAt(Side.fromDirection(Vec3.fromMinecraft(direction).toRelative(Vec3.fromMinecraft(state.get(FACING)))).ordinal());
+            circuit.signalOfPortNumber(portNumber);
+        }
+        return 0;
     }
 
     public enum Side implements StringIdentifiable {
@@ -149,6 +152,16 @@ public class HubBlock extends HorizontalFacingBlock implements BlockEntityProvid
 
         public Side next() {
             return values()[(this.ordinal() + 1) % values().length];
+        }
+
+        public static Side fromDirection(Vec3 dir) {
+            if (dir.equals(Vec3.NORTH)) return Side.FRONT;
+            if (dir.equals(Vec3.SOUTH)) return Side.BACK;
+            if (dir.equals(Vec3.WEST)) return Side.LEFT;
+            if (dir.equals(Vec3.EAST)) return Side.RIGHT;
+            if (dir.equals(Vec3.UP)) return Side.UP;
+            if (dir.equals(Vec3.DOWN)) return Side.DOWN;
+            throw new IllegalArgumentException();
         }
     }
 }
