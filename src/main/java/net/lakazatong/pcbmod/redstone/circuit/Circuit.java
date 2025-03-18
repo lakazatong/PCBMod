@@ -11,11 +11,14 @@ import net.lakazatong.pcbmod.PCBMod;
 import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.blocks.Button;
 import net.lakazatong.pcbmod.redstone.blocks.Delayed;
+import net.lakazatong.pcbmod.redstone.blocks.Port;
 import net.lakazatong.pcbmod.redstone.blocks.Solid;
 import net.lakazatong.pcbmod.redstone.utils.SccGraph;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtIntArray;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.util.math.BlockPos;
 import org.apache.commons.io.file.PathUtils;
 
 import javax.imageio.ImageIO;
@@ -36,19 +39,25 @@ import java.util.stream.Stream;
 public class Circuit {
     public final Structure structure;
     public final Map<Integer, Block> graph;
-    private long time = 0; // in game ticks
-    public long hubCount = 0;
+    public long time = 0; // in game ticks
+    public Set<BlockPos> hubs = new HashSet<>();
 
     private final Map<Integer, Block> portNumbers = new HashMap<>();
 
-    private void initPortNumbers() {
-        graph.values().stream().filter(b -> b.type == BlockType.PORT).forEach(p -> portNumbers.put(p.props.portNumber, p));
+    public final Map<Integer, Integer> portUpdates = new HashMap<>();
+
+    private void init() {
+        for (Block b : graph.values()) {
+            if (b.type.equals(BlockType.PORT))
+                portNumbers.put(b.props.portNumber, b);
+            b.circuit = this;
+        }
     }
 
     public Circuit(Structure structure, Map<Integer, Block> graph) {
         this.structure = structure;
         this.graph = graph;
-        initPortNumbers();
+        init();
     }
 
     public Circuit(Structure structure) {
@@ -79,7 +88,7 @@ public class Circuit {
             }
         }
 
-        initPortNumbers();
+        init();
     }
 
     public Circuit(Path nbtPath) throws IOException {
@@ -89,16 +98,17 @@ public class Circuit {
     private boolean update() {
         boolean changing = false;
         for (Block b : graph.values()) {
-            if (!b.props.equals(b.nextProps) || b instanceof Delayed delayed && delayed.stableTime > 0)
+
+            if (!b.props.equals(b.nextProps) || (b instanceof Delayed delayed && delayed.stableTime > 0))
                 changing = true;
-            b.props = b.nextProps.dup();
-        }
-        for (Block b : graph.values()) {
-            if (b instanceof Delayed delayed) {
-                delayed.dirty = true;
-            } else if (b instanceof Button button) {
-                button.dirty = true;
-            }
+
+            if (b instanceof Delayed
+                || b instanceof Button
+                || b instanceof Port
+            )
+                b.dirty = true;
+
+           b.props = b.nextProps.dup();
         }
         return changing;
     }
@@ -121,7 +131,7 @@ public class Circuit {
             do {
                 Set<Block> dirtyBlocks = blocks.stream().filter(b -> b.dirty).collect(Collectors.toSet());
                 if (dirtyBlocks.isEmpty()) break;
-                dirtyBlocks.forEach(b -> b.tick(time));
+                dirtyBlocks.forEach(Block::tick);
             } while (true);
 
             queue.addAll(sccGraph.outputs(sccId));
@@ -134,7 +144,7 @@ public class Circuit {
         if (PCBMod.DEBUG)
             saveAsDot();
         // time + 1 > timeout instead of time >= timeout allows for no timeout if timeout is Long.MAX_VALUE
-        if ((time > 0 && !changing) || time + 1 > timeout)
+        if ((time > 0 && !changing && portUpdates.isEmpty()) || time + 1 > timeout)
             return true;
         tick();
         time++;
@@ -274,7 +284,9 @@ public class Circuit {
         graph.forEach((uuid, block) -> savedGraph.add(block.save()));
         tag.put("graph", savedGraph);
         tag.putLong("time", time);
-        tag.putLong("hubCount", hubCount);
+        NbtList hubsTag = new NbtList();
+        hubs.forEach(pos -> hubsTag.add(new NbtIntArray(List.of(pos.getX(), pos.getY(), pos.getZ()))));
+        tag.put("hubs", hubsTag);
 
         return tag;
     }
@@ -289,7 +301,10 @@ public class Circuit {
         });
         Circuit circuit = new Circuit(structure, graph);
         circuit.time = t.getLong("time");
-        circuit.hubCount = t.getLong("hubCount");
+        t.getList("hubs", NbtElement.INT_ARRAY_TYPE).forEach(e -> {
+            NbtIntArray pos = (NbtIntArray) e;
+            circuit.hubs.add(new BlockPos(pos.get(0).intValue(), pos.get(1).intValue(), pos.get(2).intValue()));
+        });
 
         return circuit;
     }
@@ -302,7 +317,7 @@ public class Circuit {
     public void setSignalOfPortNumber(int portNumber, int signal) {
         Block p = portNumbers.get(portNumber);
         if (p != null && p.portType() == PortBlock.PortType.INPUT) {
-            p.nextProps.signal = signal;
+            portUpdates.put(p.uuid, signal);
         }
     }
 }

@@ -36,7 +36,7 @@ public class Comparator extends Delayed {
         return rearInputs().anyMatch(i -> i.signal() > 0);
     }
 
-    protected void setSignalSubtract(long t) {
+    protected void setSignalSubtract() {
         List<Block> rearInputs = rearInputs().toList();
         assert rearInputs.size() <= 1;
         if (rearInputs.isEmpty()) {
@@ -53,7 +53,7 @@ public class Comparator extends Delayed {
         nextProps.signal = Math.max(0, rearSignal - maxSideSignal);
     }
 
-    protected void setSignalNormal(long t) {
+    protected void setSignalNormal() {
         List<Block> rearInputs = rearInputs().toList();
         assert rearInputs.size() <= 1;
         if (rearInputs.isEmpty()) {
@@ -67,15 +67,15 @@ public class Comparator extends Delayed {
     }
 
     @Override
-    protected void setSignal(long t) {
+    protected void setSignal() {
         if (subtract())
-            setSignalSubtract(t);
+            setSignalSubtract();
         else
-            setSignalNormal(t);
+            setSignalNormal();
     }
 
     @Override
-    protected void clearSignal(long t) {
+    protected void clearSignal() {
         nextProps.signal = 0;
     }
 }

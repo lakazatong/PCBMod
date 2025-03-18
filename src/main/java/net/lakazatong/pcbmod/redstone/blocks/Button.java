@@ -27,8 +27,8 @@ public class Button extends Block {
     }
 
     @Override
-    public void logic(long t) {
-        if (t + 1 >= delay() )
+    public void logic() {
+        if (circuit.time + 1 >= delay() )
             nextProps.signal = 0;
     }
 }

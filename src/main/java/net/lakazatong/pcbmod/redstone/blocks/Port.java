@@ -27,4 +27,11 @@ public class Port extends Constant {
             case PORT -> false;
         };
     }
+
+    @Override
+    public void logic() {
+        Integer newSignal = circuit.portUpdates.remove(uuid);
+        if (newSignal != null)
+            nextProps.signal = newSignal;
+    }
 }

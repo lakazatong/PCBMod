@@ -6,6 +6,7 @@ import net.lakazatong.pcbmod.block.custom.HubBlock.Side;
 import net.lakazatong.pcbmod.block.entity.HubBlockEntity;
 import net.lakazatong.pcbmod.payloads.UpdateHubPayload;
 import net.lakazatong.pcbmod.redstone.circuit.Circuit;
+import net.lakazatong.pcbmod.redstone.circuit.Circuits;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.EditBoxWidget;
@@ -130,22 +131,19 @@ public class HubScreen extends CommonScreen<HubBlockEntity> {
         String structureName = be.getStructureName();
         int instanceId = be.getInstanceId();
 
-        if (circuitName.matches("^[a-zA-Z0-9_.-]+\\d+$")) {
+        if (Circuits.isValidCircuitName(circuitName)) {
             String tmp = Utils.structureNameFrom(circuitName);
             Path structurePath = STRUCTURES_PATH.resolve(tmp + ".nbt");
             if (structurePath.toFile().exists()) {
                 structureName = tmp;
                 instanceId = Utils.instanceIdFrom(circuitName);
-                try {
-                    Circuit circuit = CIRCUITS.get(circuitName);
-                    if (circuit == null) {
-                        circuit = new Circuit(structurePath);
+                if (!CIRCUITS.containsKey(circuitName)) {
+                    try {
+                        CIRCUITS.put(circuitName, new Circuit(structurePath));
                         System.out.println("New circuit with structure at: " + structurePath.toAbsolutePath() + " (structureName: " + structureName + ", instanceId: " + instanceId + ")");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
-                    circuit.hubCount++;
-                    CIRCUITS.put(circuitName, circuit);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
                 }
             }
         }

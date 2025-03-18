@@ -41,26 +41,26 @@ public class Repeater extends Delayed {
     }
 
     @Override
-    protected void setSignal(long t) {
+    protected void setSignal() {
         nextProps.signal = 15;
     }
 
     @Override
-    protected void clearSignal(long t) {
+    protected void clearSignal() {
         nextProps.signal = 0;
     }
 
     @Override
-    public void logic(long t) {
+    public void logic() {
         if (locked())
-            lockedLogic(t);
+            lockedLogic();
         else
-            super.logic(t);
+            super.logic();
 
         nextProps.locked = nextSideInputs().anyMatch(i -> i.nextSignal() > 0);
     }
 
-    protected void lockedLogic(long t) {
+    protected void lockedLogic() {
         stableTime = 0;
         prevShouldPowered = getShouldPowered();
     }

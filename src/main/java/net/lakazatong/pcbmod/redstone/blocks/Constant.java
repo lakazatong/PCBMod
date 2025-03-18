@@ -11,6 +11,6 @@ public abstract class Constant extends Block {
     }
 
     @Override
-    public void logic(long t) {
+    public void logic() {
     }
 }

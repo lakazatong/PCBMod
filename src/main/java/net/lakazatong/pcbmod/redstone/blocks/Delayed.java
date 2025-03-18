@@ -7,8 +7,8 @@ import net.lakazatong.pcbmod.redstone.circuit.Structure;
 
 public abstract class Delayed extends Block {
     public abstract boolean getShouldPowered();
-    protected abstract void setSignal(long t);
-    protected abstract void clearSignal(long t);
+    protected abstract void setSignal();
+    protected abstract void clearSignal();
 
     public boolean prevShouldPowered;
     public long stableTime = 0;
@@ -24,7 +24,7 @@ public abstract class Delayed extends Block {
     }
 
     @Override
-    public void logic(long t) {
+    public void logic() {
         boolean powered = signal() > 0;
         boolean shouldPowered = getShouldPowered();
         boolean delayOver = stableTime + 1 >= delay();
@@ -33,9 +33,9 @@ public abstract class Delayed extends Block {
             if (powered != prevShouldPowered) {
                 stableTime = 0;
                 if (prevShouldPowered)
-                    setSignal(t);
+                    setSignal();
                 else
-                    clearSignal(t);
+                    clearSignal();
             }
         } else if (powered != shouldPowered) {
             stableTime++;

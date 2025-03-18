@@ -116,10 +116,9 @@ public class HubBlock extends HorizontalFacingBlock implements BlockEntityProvid
             String circuitName = be.getCircuitName();
             Circuit circuit = PCBMod.CIRCUITS.get(circuitName);
             if (circuit != null) {
-                if (circuit.hubCount == 0 || --circuit.hubCount == 0)
+                circuit.hubs.remove(pos);
+                if (circuit.hubs.isEmpty())
                     PCBMod.CIRCUITS.remove(circuitName);
-                else
-                    PCBMod.CIRCUITS.put(circuitName, circuit);
             }
         }
         return super.onBreak(world, pos, state, player);

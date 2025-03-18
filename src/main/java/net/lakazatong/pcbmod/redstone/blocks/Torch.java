@@ -34,12 +34,12 @@ public class Torch extends Delayed {
     }
 
     @Override
-    protected void setSignal(long t) {
+    protected void setSignal() {
         nextProps.signal = 15;
     }
 
     @Override
-    protected void clearSignal(long t) {
+    protected void clearSignal() {
         nextProps.signal = 0;
     }
 }

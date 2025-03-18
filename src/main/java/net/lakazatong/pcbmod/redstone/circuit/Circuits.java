@@ -31,6 +31,10 @@ public final class Circuits extends PersistentState implements Map<String, Circu
 
     private final Map<String, Circuit> circuits = new HashMap<>();
 
+    public static boolean isValidCircuitName(String circuitName) {
+        return circuitName.matches("^[a-zA-Z0-9_.-]+\\d+$");
+    }
+
     @Override
     public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
         forEach((key, value) -> nbt.put(key, value.save()));

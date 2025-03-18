@@ -62,7 +62,7 @@ public class Solid extends Block {
     }
 
     @Override
-    public void logic(long t) {
+    public void logic() {
         nextProps.signal = 0;
         for (Block input : nextInputs().collect(Collectors.toSet())) {
             switch (input.type) {

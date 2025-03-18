@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 abstract public class Block {
+    public Circuit circuit = null;
+
     public final BlockType type;
     public final Structure structure;
     public int uuid;
@@ -125,9 +127,9 @@ abstract public class Block {
                 .stream().allMatch(f -> neighborFacings.stream().allMatch(f::isPerpendicular));
     }
 
-    public void tick(long t) {
+    public void tick() {
         Props curProps = isInstant() ? nextProps.dup() : props;
-        logic(t);
+        logic();
 
         dirty = false;
         if (!nextProps.equals(curProps)) {
@@ -141,7 +143,7 @@ abstract public class Block {
         return delay() == 0 && !(this instanceof Delayed);
     }
 
-    public abstract void logic(long t);
+    public abstract void logic();
 
     public long delay() {
         return props.delay;

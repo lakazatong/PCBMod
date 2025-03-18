@@ -17,6 +17,7 @@ import net.lakazatong.pcbmod.payloads.UpdatePortPayload;
 import net.lakazatong.pcbmod.redstone.circuit.Circuits;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
+import net.minecraft.util.math.BlockPos;
 
 import java.nio.file.Path;
 
@@ -38,10 +39,15 @@ public class PCBMod implements ModInitializer {
     }
 
     private static void handleUpdateHubPayload(UpdateHubPayload payload, ServerPlayNetworking.Context context) {
-        if (context.player().getServerWorld().getBlockEntity(payload.pos()) instanceof HubBlockEntity be) {
+        BlockPos pos = payload.pos();
+        if (context.player().getServerWorld().getBlockEntity(pos) instanceof HubBlockEntity be) {
             be.setStructureName(payload.structureName());
             be.setInstanceId(payload.instanceId());
             be.setPortNumbers(payload.portNumbers().stream().mapToInt(Integer::intValue).toArray());
+
+            String circuitName = be.getCircuitName();
+            if (Circuits.isValidCircuitName(circuitName))
+                CIRCUITS.get(circuitName).hubs.add(pos);
         }
     }
 

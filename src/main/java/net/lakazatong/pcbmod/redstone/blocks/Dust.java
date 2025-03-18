@@ -30,7 +30,7 @@ public class Dust extends Block {
     }
 
     @Override
-    public void logic(long t) {
+    public void logic() {
         boolean decay = true;
         nextProps.signal = 0;
         for (Block input : nextInputs().collect(Collectors.toSet())) {
