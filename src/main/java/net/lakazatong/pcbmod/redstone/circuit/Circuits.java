@@ -33,7 +33,7 @@ public final class Circuits extends PersistentState implements Map<String, Circu
 
     @Override
     public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
-        this.forEach((key, value) -> nbt.put(key, value.save()));
+        forEach((key, value) -> nbt.put(key, value.save()));
         return nbt;
     }
 

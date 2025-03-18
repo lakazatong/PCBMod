@@ -115,31 +115,39 @@ public class HubBlock extends HorizontalFacingBlock implements BlockEntityProvid
     }
 
     @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @org.jetbrains.annotations.Nullable LivingEntity placer, ItemStack itemStack) {
-        if (world.getBlockEntity(pos) instanceof HubBlockEntity be) {
-            Circuit circuit = PCBMod.CIRCUITS.get(be.getCircuitName());
-            if (circuit == null) return;
-            circuit.hubCount++;
-        }
-    }
-
-    @Override
-    public void onBroken(WorldAccess world, BlockPos pos, BlockState state) {
-        if (world.getBlockEntity(pos) instanceof HubBlockEntity be) {
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        if (!world.isClient() && world.getBlockEntity(pos) instanceof HubBlockEntity be) {
             String circuitName = be.getCircuitName();
             Circuit circuit = PCBMod.CIRCUITS.get(circuitName);
-            if (circuit != null && (circuit.hubCount == 0 || --circuit.hubCount == 0))
-                PCBMod.CIRCUITS.remove(circuitName);
+            if (circuit != null) {
+                if (circuit.hubCount == 0 || --circuit.hubCount == 0)
+                    PCBMod.CIRCUITS.remove(circuitName);
+                else
+                    PCBMod.CIRCUITS.put(circuitName, circuit);
+            }
         }
+        return super.onBreak(world, pos, state, player);
     }
+
+    //    @Override
+//    public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, @org.jetbrains.annotations.Nullable BlockEntity blockEntity, ItemStack tool) {
+//
+//        super.afterBreak(world, player, pos, state, blockEntity, tool);
+//    }
+
+//    @Override
+//    protected void onBlockBreakStart(BlockState state, World world, BlockPos pos, PlayerEntity player) {
+//
+//    }
 
     @Override
     protected int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
         if (world.getBlockEntity(pos) instanceof HubBlockEntity be) {
             Circuit circuit = PCBMod.CIRCUITS.get(be.getCircuitName());
             if (circuit == null) return 0;
-            int portNumber = be.getPortNumberAt(Side.fromDirection(Vec3.fromMinecraft(direction).toRelative(Vec3.fromMinecraft(state.get(FACING)))).ordinal());
-            return circuit.getSignalOfPortNumber(portNumber);
+            int portNumber = be.getPortNumberAt(Side.fromDirection(Vec3.fromMinecraft(direction.getOpposite()).toRelative(Vec3.fromMinecraft(state.get(FACING)))).ordinal());
+            int signal = circuit.getSignalOfPortNumber(portNumber);
+            return signal;
         }
         return 0;
     }
@@ -157,7 +165,7 @@ public class HubBlock extends HorizontalFacingBlock implements BlockEntityProvid
             int signal = world.getBlockState(offset).getStrongRedstonePower(world, offset, direction.getOpposite()); // 15
             circuit.setSignalOfPortNumber(portNumber, signal);
         }
-        return state;
+        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     public enum Side implements StringIdentifiable {

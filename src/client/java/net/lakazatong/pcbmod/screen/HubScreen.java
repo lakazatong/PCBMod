@@ -137,10 +137,13 @@ public class HubScreen extends CommonScreen<HubBlockEntity> {
                 structureName = tmp;
                 instanceId = Utils.instanceIdFrom(circuitName);
                 try {
-                    if (!CIRCUITS.containsKey(circuitName)) {
-                        CIRCUITS.put(circuitName, new Circuit(structurePath));
+                    Circuit circuit = CIRCUITS.get(circuitName);
+                    if (circuit == null) {
+                        circuit = new Circuit(structurePath);
                         System.out.println("New circuit with structure at: " + structurePath.toAbsolutePath() + " (structureName: " + structureName + ", instanceId: " + instanceId + ")");
                     }
+                    circuit.hubCount++;
+                    CIRCUITS.put(circuitName, circuit);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

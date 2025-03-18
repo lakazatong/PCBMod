@@ -295,13 +295,14 @@ public class Circuit {
     }
 
     public int getSignalOfPortNumber(int portNumber) {
-        return portNumbers.containsKey(portNumber) ? portNumbers.get(portNumber).signal() : 0;
+        Block p = portNumbers.get(portNumber);
+        return p != null && p.portType() == PortBlock.PortType.OUTPUT ? p.signal() : 0;
     }
 
     public void setSignalOfPortNumber(int portNumber, int signal) {
         Block p = portNumbers.get(portNumber);
         if (p != null && p.portType() == PortBlock.PortType.INPUT) {
-            p.props.signal = signal;
+            p.nextProps.signal = signal;
         }
     }
 }

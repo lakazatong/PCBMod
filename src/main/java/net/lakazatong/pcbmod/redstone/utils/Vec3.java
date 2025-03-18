@@ -134,11 +134,11 @@ public record Vec3(int x, int y, int z) {
     // align the direction given that I face this way
     public Vec3 toRelative(Vec3 facing) {
         assert pure() && facing.pure();
-        if (this == UP || this == DOWN) return this;
-        if (facing == NORTH) return this;
-        if (facing == SOUTH) return opposite();
-        if (facing == WEST) return clockwise();
-        if (facing == EAST) return counterClockwise();
+        if (equals(UP) || equals(DOWN)) return this;
+        if (facing.equals(NORTH)) return this;
+        if (facing.equals(SOUTH)) return opposite();
+        if (facing.equals(WEST)) return counterClockwise();
+        if (facing.equals(EAST)) return clockwise();
         return this;
     }
 
