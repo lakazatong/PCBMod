@@ -306,10 +306,11 @@ public class Circuit {
 
         Map<Integer, Block> graph = new HashMap<>();
         t.getList("graph", NbtElement.COMPOUND_TYPE).forEach(blockTag -> {
-            Block b = Block.load(blockTag, graph);
+            Block b = Block.load(blockTag);
             graph.put(b.uuid, b);
         });
         Circuit circuit = new Circuit(graph);
+        graph.values().forEach(Block::restoreNeighbors);
         circuit.time = t.getLong("time");
         t.getList("hubs", NbtElement.INT_ARRAY_TYPE).forEach(e -> {
             NbtIntArray pos = (NbtIntArray) e;

@@ -6,10 +6,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtIntArray;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Consumer;
 
 public class Props {
     public long delay;
@@ -91,7 +89,9 @@ public class Props {
         return tag;
     }
 
-    public static Props load(NbtElement tag, Map<Integer, Block> graph) {
+    public Stack<Consumer<Map<Integer, Block>>> scheduledNeighborsRestore = new Stack<>();
+
+    public static Props load(NbtElement tag) {
         NbtCompound t = ((NbtCompound) tag);
         Props props =  Props.defaults();
 
@@ -109,8 +109,10 @@ public class Props {
         props.coords = Vec3.fromHash(t.getInt("coords"));
 
         props.neighbors = new HashSet<>();
-        for (int neighbor : t.getIntArray("neighbors"))
-            props.neighbors.add(graph.get(neighbor));
+        props.scheduledNeighborsRestore.add(graph -> {
+            for (int neighbor : t.getIntArray("neighbors"))
+                props.neighbors.add(graph.get(neighbor));
+        });
 
         props.portType = PortBlock.PortType.of(t.getInt("portType"));
         props.portNumber = t.getInt("portNumber");

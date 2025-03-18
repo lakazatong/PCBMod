@@ -2,12 +2,14 @@ package net.lakazatong.pcbmod.redstone.circuit;
 
 import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.blocks.*;
-import net.lakazatong.pcbmod.redstone.blocks.Comparator;
 import net.lakazatong.pcbmod.redstone.utils.Vec3;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -278,7 +280,7 @@ abstract public class Block {
         return tag;
     }
 
-    public static Block load(NbtElement tag, Map<Integer, Block> graph) {
+    public static Block load(NbtElement tag) {
         NbtCompound t = ((NbtCompound) tag);
 
         int type = t.getInt("type");
@@ -288,10 +290,10 @@ abstract public class Block {
         NbtElement nextProps = t.get("nextProps");
 
         BlockBuilder builder = new BlockBuilder(Arrays.stream(BlockType.values()).toList().get(type));
-        Block b = builder.apply(Props.load(props, graph));
+        Block b = builder.apply(Props.load(props));
         b.uuid = uuid;
         b.dirty = dirty;
-        b.nextProps = Props.load(nextProps, graph);
+        b.nextProps = Props.load(nextProps);
 
         if (b instanceof Delayed delayed) {
             delayed.prevShouldPowered = t.getBoolean("prevShouldPowered");
@@ -299,5 +301,10 @@ abstract public class Block {
         }
 
         return b;
+    }
+
+    public void restoreNeighbors() {
+        while (!props.scheduledNeighborsRestore.isEmpty()) props.scheduledNeighborsRestore.pop().accept(circuit.graph);
+        while (!nextProps.scheduledNeighborsRestore.isEmpty()) nextProps.scheduledNeighborsRestore.pop().accept(circuit.graph);
     }
 }
