@@ -4,13 +4,12 @@ import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.circuit.Block;
 import net.lakazatong.pcbmod.redstone.circuit.BlockType;
 import net.lakazatong.pcbmod.redstone.circuit.Props;
-import net.lakazatong.pcbmod.redstone.circuit.Structure;
 
 import java.util.stream.Collectors;
 
 public class Dust extends Block {
-    public Dust(Structure structure, Props p) {
-        super(BlockType.DUST, structure, p);
+    public Dust(Props p) {
+        super(BlockType.DUST, p);
     }
 
     @Override

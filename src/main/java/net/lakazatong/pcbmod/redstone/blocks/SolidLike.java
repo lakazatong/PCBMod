@@ -3,14 +3,13 @@ package net.lakazatong.pcbmod.redstone.blocks;
 import net.lakazatong.pcbmod.redstone.circuit.Block;
 import net.lakazatong.pcbmod.redstone.circuit.BlockType;
 import net.lakazatong.pcbmod.redstone.circuit.Props;
-import net.lakazatong.pcbmod.redstone.circuit.Structure;
 import net.lakazatong.pcbmod.redstone.utils.Vec3;
 
 import java.util.stream.Collectors;
 
 public class SolidLike extends Block {
-    public SolidLike(BlockType type, Structure structure, Props p) {
-        super(type, structure, p);
+    public SolidLike(BlockType type, Props p) {
+        super(type, p);
     }
 
     @Override
@@ -59,7 +58,8 @@ public class SolidLike extends Block {
     @Override
     public void logic() {
         nextProps.signal = 0;
-        for (Block input : nextInputs().collect(Collectors.toSet())) {
+        var inputs = nextInputs().collect(Collectors.toSet());
+        for (Block input : inputs) {
             switch (input.type) {
                 case BlockType.AIR, BlockType.SOLID, BlockType.REDSTONE_BLOCK, BlockType.PORT:
                     break;

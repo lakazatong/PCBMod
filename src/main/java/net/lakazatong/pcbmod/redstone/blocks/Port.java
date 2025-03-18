@@ -4,11 +4,10 @@ import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.circuit.Block;
 import net.lakazatong.pcbmod.redstone.circuit.BlockType;
 import net.lakazatong.pcbmod.redstone.circuit.Props;
-import net.lakazatong.pcbmod.redstone.circuit.Structure;
 
 public class Port extends SolidLike {
-    public Port(Structure structure, Props initialProps) {
-        super(BlockType.PORT, structure, initialProps);
+    public Port(Props initialProps) {
+        super(BlockType.PORT, initialProps);
     }
 
     @Override

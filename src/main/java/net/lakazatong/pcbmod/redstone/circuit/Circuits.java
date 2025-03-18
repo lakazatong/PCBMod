@@ -1,6 +1,5 @@
 package net.lakazatong.pcbmod.redstone.circuit;
 
-import net.lakazatong.pcbmod.Utils;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.RegistryWrapper;
@@ -11,15 +10,12 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import static net.lakazatong.pcbmod.PCBMod.MOD_ID;
-import static net.lakazatong.pcbmod.PCBMod.STRUCTURES_PATH;
 
 public final class Circuits extends PersistentState implements Map<String, Circuit> {
 
@@ -44,16 +40,9 @@ public final class Circuits extends PersistentState implements Map<String, Circu
     private static Circuits createFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
         Circuits r = new Circuits();
         for (String circuitName : tag.getKeys()) {
-            try {
-                NbtElement circuitData = tag.get(circuitName);
-                String structureName = Utils.structureNameFrom(circuitName);
-                Path structurePath = STRUCTURES_PATH.resolve(structureName + ".nbt");
-                Structure structure = new Structure(structurePath);
-                Circuit circuit = Circuit.load(circuitData, structure);
-                r.put(circuitName, circuit);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            NbtElement circuitData = tag.get(circuitName);
+            Circuit circuit = Circuit.load(circuitData);
+            r.put(circuitName, circuit);
         }
         return r;
     }

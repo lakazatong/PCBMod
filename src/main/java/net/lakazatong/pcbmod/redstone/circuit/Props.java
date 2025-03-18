@@ -7,6 +7,7 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtIntArray;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -90,7 +91,7 @@ public class Props {
         return tag;
     }
 
-    public static Props load(NbtElement tag, Structure structure) {
+    public static Props load(NbtElement tag, Map<Integer, Block> graph) {
         NbtCompound t = ((NbtCompound) tag);
         Props props =  Props.defaults();
 
@@ -109,7 +110,7 @@ public class Props {
 
         props.neighbors = new HashSet<>();
         for (int neighbor : t.getIntArray("neighbors"))
-            props.neighbors.add(structure.getBlock(Vec3.fromHash(neighbor)));
+            props.neighbors.add(graph.get(neighbor));
 
         props.portType = PortBlock.PortType.of(t.getInt("portType"));
         props.portNumber = t.getInt("portNumber");

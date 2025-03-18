@@ -4,11 +4,10 @@ import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.circuit.Block;
 import net.lakazatong.pcbmod.redstone.circuit.BlockType;
 import net.lakazatong.pcbmod.redstone.circuit.Props;
-import net.lakazatong.pcbmod.redstone.circuit.Structure;
 
 public class Button extends Block {
-    public Button(Structure structure, Props p) {
-        super(BlockType.BUTTON, structure, p);
+    public Button(Props p) {
+        super(BlockType.BUTTON, p);
     }
 
     @Override

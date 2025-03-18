@@ -60,7 +60,7 @@ public class Structure {
             Vec3 pos = new Vec3(tmp.get(0).intValue(), tmp.get(1).intValue(), tmp.get(2).intValue());
             BlockBuilder builder = palette.get(bTag.getInt("state").getValue());
             if (builder == null) continue;
-            Block block = builder.apply(this, pos);
+            Block block = builder.apply(pos);
             if (block instanceof Port port) {
                 CompoundTag bNbt = bTag.get("nbt");
                 port.props.signal = bNbt.getInt("signal").intValue();

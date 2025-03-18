@@ -2,14 +2,12 @@ package net.lakazatong.pcbmod.redstone.circuit;
 
 import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.blocks.*;
+import net.lakazatong.pcbmod.redstone.blocks.Comparator;
 import net.lakazatong.pcbmod.redstone.utils.Vec3;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,7 +15,6 @@ abstract public class Block {
     public Circuit circuit = null;
 
     public final BlockType type;
-    public final Structure structure;
     public int uuid;
 
     // here as it's managed within the same tick
@@ -26,9 +23,8 @@ abstract public class Block {
     public Props props;
     public Props nextProps;
 
-    protected Block(BlockType type, Structure structure, Props initialProps) {
+    protected Block(BlockType type, Props initialProps) {
         this.type = type;
-        this.structure = structure;
         this.props = initialProps;
 
         this.uuid = this.props.coords.hashCode();
@@ -37,13 +33,14 @@ abstract public class Block {
     // stuff that must wait until all Blocks are initialized (within a circuit)
     // should be called at the end of the overridden init
     public void init() {
-        this.nextProps = props.dup();
+        nextProps = props.dup();
+        var x = 0;
     }
 
     public static class BlockBuilder {
         @FunctionalInterface
         public interface BlockConstructor {
-            Block apply(Structure structure, Props initialProps);
+            Block apply(Props initialProps);
         }
 
         private final BlockConstructor cons;
@@ -68,14 +65,14 @@ abstract public class Block {
             };
         }
 
-        public Block apply(Structure structure, Vec3 coords) {
+        public Block apply(Vec3 coords) {
             Props initialProps = commonInitialProps.dup();
             initialProps.coords = coords;
-            return cons.apply(structure, initialProps);
+            return cons.apply(initialProps);
         }
 
-        public Block apply(Structure structure, Props initialProps) {
-            return cons.apply(structure, initialProps);
+        public Block apply(Props initialProps) {
+            return cons.apply(initialProps);
         }
     }
 
@@ -281,7 +278,7 @@ abstract public class Block {
         return tag;
     }
 
-    public static Block load(NbtElement tag, Structure structure) {
+    public static Block load(NbtElement tag, Map<Integer, Block> graph) {
         NbtCompound t = ((NbtCompound) tag);
 
         int type = t.getInt("type");
@@ -291,10 +288,10 @@ abstract public class Block {
         NbtElement nextProps = t.get("nextProps");
 
         BlockBuilder builder = new BlockBuilder(Arrays.stream(BlockType.values()).toList().get(type));
-        Block b = builder.apply(structure, Props.load(props, structure));
+        Block b = builder.apply(Props.load(props, graph));
         b.uuid = uuid;
         b.dirty = dirty;
-        b.nextProps = Props.load(nextProps, structure);
+        b.nextProps = Props.load(nextProps, graph);
 
         if (b instanceof Delayed delayed) {
             delayed.prevShouldPowered = t.getBoolean("prevShouldPowered");

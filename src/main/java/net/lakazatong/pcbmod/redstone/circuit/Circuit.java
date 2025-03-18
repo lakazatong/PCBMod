@@ -50,28 +50,30 @@ public class Circuit {
         this.structure = structure;
         this.graph = graph;
 
-        if (graph.isEmpty()) {
-            structure.blocks().forEach(b -> graph.put(b.uuid, b));
-            for (Block b : graph.values())
-                b.props.neighbors.addAll(structure.getNeighbors(b));
-            graph.values().stream().filter(b -> b instanceof SolidLike).forEach(Block::init);
-            graph.values().stream().filter(b -> !(b instanceof SolidLike)).forEach(Block::init);
-        }
-
-        if (PCBMod.DEBUG) {
-            Path framesDir = structure.path.resolveSibling("frames");
-            try (Stream<Path> paths = Files.walk(framesDir)) {
-                paths.sorted(Comparator.reverseOrder())
-                        .map(Path::toFile)
-                        .forEach(File::delete);
-            } catch (IOException ignored) {
+        if (structure != null) {
+            if (graph.isEmpty()) {
+                structure.blocks().forEach(b -> graph.put(b.uuid, b));
+                for (Block b : graph.values())
+                    b.props.neighbors.addAll(structure.getNeighbors(b));
+                graph.values().stream().filter(b -> b instanceof SolidLike).forEach(Block::init);
+                graph.values().stream().filter(b -> !(b instanceof SolidLike)).forEach(Block::init);
             }
 
-            structure.path.resolveSibling(PathUtils.getBaseName(structure.path) + ".mp4").toFile().delete();
+            if (PCBMod.DEBUG) {
+                Path framesDir = structure.path.resolveSibling("frames");
+                try (Stream<Path> paths = Files.walk(framesDir)) {
+                    paths.sorted(Comparator.reverseOrder())
+                            .map(Path::toFile)
+                            .forEach(File::delete);
+                } catch (IOException ignored) {
+                }
 
-            try {
-                Files.createDirectory(framesDir);
-            } catch (IOException ignored) {
+                structure.path.resolveSibling(PathUtils.getBaseName(structure.path) + ".mp4").toFile().delete();
+
+                try {
+                    Files.createDirectory(framesDir);
+                } catch (IOException ignored) {
+                }
             }
         }
 
@@ -88,6 +90,10 @@ public class Circuit {
 
     public Circuit(Path nbtPath) throws IOException {
         this(new Structure(nbtPath));
+    }
+
+    public Circuit(Map<Integer, Block> graph) {
+        this(null, graph);
     }
 
     private boolean update() {
@@ -120,8 +126,6 @@ public class Circuit {
         while (!queue.isEmpty()) {
             int sccId = queue.poll();
             Set<Block> blocks = sccGraph.sccs.get(sccId);
-
-            var x = 0;
 
             do {
                 Set<Block> dirtyBlocks = blocks.stream().filter(b -> b.dirty).collect(Collectors.toSet());
@@ -192,6 +196,7 @@ public class Circuit {
     }
 
     public void animate() {
+        assert structure != null;
         Path framesDir = structure.path.resolveSibling("frames");
         Path outputPath = structure.path.resolveSibling(PathUtils.getBaseName(structure.path) + ".mp4").toAbsolutePath();
 
@@ -220,6 +225,7 @@ public class Circuit {
     }
 
     private FrameProducer getFrameProducer(int maxWidth, int maxHeight, Path framesDir, int frameCount) {
+        assert structure != null;
         return new FrameProducer() {
             private long index = 0;
             private BufferedImage cachedLastFrame = null;
@@ -264,6 +270,7 @@ public class Circuit {
     }
 
     public void saveAsDot() {
+        assert structure != null;
         String dotPath = structure.path.resolveSibling("frames/" + PathUtils.getBaseName(structure.path) + time + ".dot").toAbsolutePath().toString();
         String pngPath = structure.path.resolveSibling("frames/" + PathUtils.getBaseName(structure.path) + time + ".png").toAbsolutePath().toString();
 
@@ -294,15 +301,15 @@ public class Circuit {
         return tag;
     }
 
-    public static Circuit load(NbtElement tag, Structure structure) {
+    public static Circuit load(NbtElement tag) {
         NbtCompound t = ((NbtCompound) tag);
 
         Map<Integer, Block> graph = new HashMap<>();
         t.getList("graph", NbtElement.COMPOUND_TYPE).forEach(blockTag -> {
-            Block b = Block.load(blockTag, structure);
+            Block b = Block.load(blockTag, graph);
             graph.put(b.uuid, b);
         });
-        Circuit circuit = new Circuit(structure, graph);
+        Circuit circuit = new Circuit(graph);
         circuit.time = t.getLong("time");
         t.getList("hubs", NbtElement.INT_ARRAY_TYPE).forEach(e -> {
             NbtIntArray pos = (NbtIntArray) e;

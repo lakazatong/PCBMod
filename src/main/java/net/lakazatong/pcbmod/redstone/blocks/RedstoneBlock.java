@@ -3,11 +3,10 @@ package net.lakazatong.pcbmod.redstone.blocks;
 import net.lakazatong.pcbmod.redstone.circuit.Block;
 import net.lakazatong.pcbmod.redstone.circuit.BlockType;
 import net.lakazatong.pcbmod.redstone.circuit.Props;
-import net.lakazatong.pcbmod.redstone.circuit.Structure;
 
 public class RedstoneBlock extends Constant {
-    public RedstoneBlock(Structure structure, Props p) {
-        super(BlockType.REDSTONE_BLOCK, structure, p);
+    public RedstoneBlock(Props p) {
+        super(BlockType.REDSTONE_BLOCK, p);
     }
 
     @Override

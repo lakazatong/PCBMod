@@ -4,11 +4,10 @@ import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.circuit.Block;
 import net.lakazatong.pcbmod.redstone.circuit.BlockType;
 import net.lakazatong.pcbmod.redstone.circuit.Props;
-import net.lakazatong.pcbmod.redstone.circuit.Structure;
 
 public class Lever extends Constant {
-    public Lever(Structure structure, Props p) {
-        super(BlockType.LEVER, structure, p);
+    public Lever(Props p) {
+        super(BlockType.LEVER, p);
     }
 
     @Override

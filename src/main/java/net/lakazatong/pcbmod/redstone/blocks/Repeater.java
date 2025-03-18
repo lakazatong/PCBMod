@@ -4,14 +4,13 @@ import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.circuit.Block;
 import net.lakazatong.pcbmod.redstone.circuit.BlockType;
 import net.lakazatong.pcbmod.redstone.circuit.Props;
-import net.lakazatong.pcbmod.redstone.circuit.Structure;
 import net.lakazatong.pcbmod.redstone.utils.Vec3;
 
 import java.util.stream.Collectors;
 
 public class Repeater extends Delayed {
-    public Repeater(Structure structure, Props p) {
-        super(BlockType.REPEATER, structure, p);
+    public Repeater(Props p) {
+        super(BlockType.REPEATER, p);
         props.facings = facings().stream().map(Vec3::opposite).collect(Collectors.toSet());
     }
 
