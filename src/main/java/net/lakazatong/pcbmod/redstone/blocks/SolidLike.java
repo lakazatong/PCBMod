@@ -11,37 +11,37 @@ public class SolidLike extends Block {
         super(type, p);
     }
 
-    @Override
-    public void init() {
-        props.signal = 0;
-        outer:
-        for (Block input : inputs().collect(Collectors.toSet())) {
-            switch (input.type) {
-                case BlockType.AIR, BlockType.SOLID, BlockType.REDSTONE_BLOCK, BlockType.PORT:
-                    break;
-                case BlockType.REPEATER, BlockType.TORCH, BlockType.BUTTON, BlockType.LEVER:
-                    if (input.signal() > 0) {
-                        props.weakPowered = false;
-                        props.signal = 15;
-                        break outer;
-                    }
-                    break;
-                case BlockType.COMPARATOR:
-                    if (input.signal() > props.signal) {
-                        props.weakPowered = false;
-                        props.signal = input.signal();
-                    }
-                    break;
-                case BlockType.DUST:
-                    if (input.signal() > props.signal) {
-                        props.weakPowered = !input.isAbove(this) && !input.getFacing(this).up;
-                        props.signal = input.signal();
-                    }
-                    break;
-            }
-        }
-        super.init();
-    }
+//    @Override
+//    public void init() {
+//        props.signal = 0;
+//        outer:
+//        for (Block input : inputs().collect(Collectors.toSet())) {
+//            switch (input.type) {
+//                case BlockType.AIR, BlockType.SOLID, BlockType.REDSTONE_BLOCK, BlockType.PORT:
+//                    break;
+//                case BlockType.REPEATER, BlockType.TORCH, BlockType.BUTTON, BlockType.LEVER:
+//                    if (input.signal() > 0) {
+//                        props.weakPowered = false;
+//                        props.signal = 15;
+//                        break outer;
+//                    }
+//                    break;
+//                case BlockType.COMPARATOR:
+//                    if (input.signal() > props.signal) {
+//                        props.weakPowered = false;
+//                        props.signal = input.signal();
+//                    }
+//                    break;
+//                case BlockType.DUST:
+//                    if (input.signal() > props.signal) {
+//                        props.weakPowered = !input.isAbove(this) && !input.getFacing(this).up;
+//                        props.signal = input.signal();
+//                    }
+//                    break;
+//            }
+//        }
+//        super.init();
+//    }
 
     @Override
     public boolean isInputOf(Block neighbor) {
@@ -78,6 +78,8 @@ public class SolidLike extends Block {
                 case BlockType.DUST:
                     if (input.nextSignal() > nextSignal()) {
                         decay = true;
+                        // TODO: just wrong
+                        // shouldnt be hard powered just because the dust is above
                         nextProps.weakPowered = !input.isAbove(this) && !input.getFacing(this).up;
                         nextProps.signal = input.nextSignal();
                     }

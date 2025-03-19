@@ -61,8 +61,7 @@ public class Circuit {
                 structure.blocks().forEach(b -> graph.put(b.uuid, b));
                 for (Block b : graph.values())
                     b.props.neighbors.addAll(structure.getNeighbors(b));
-                graph.values().stream().filter(b -> b instanceof SolidLike).forEach(Block::init);
-                graph.values().stream().filter(b -> !(b instanceof SolidLike)).forEach(Block::init);
+                graph.values().forEach(Block::init);
             }
 
             if (PCBMod.DEBUG) {
@@ -104,7 +103,7 @@ public class Circuit {
         this(null, graph);
     }
 
-    private boolean update(boolean markAllDirty) {
+    private boolean update() {
         boolean changing = false;
         for (Block b : graph.values()) {
 
@@ -117,8 +116,7 @@ public class Circuit {
                 changing = true;
             }
 
-            if (markAllDirty
-                || b instanceof Delayed
+            if (b instanceof Delayed
                 || b instanceof Button
                 || b instanceof Port
             )
@@ -153,7 +151,22 @@ public class Circuit {
     }
 
     public void firstStep() {
-        update(true);
+        // TODO
+        // comparator_test:
+
+        // from structure
+        // 14 15 ? 15 14
+        // 15 15 ? 15 15
+        // ->
+        // 0 tick later (expected state after this function)
+        // 14 14 14 14 14
+        // 13 15 15 15 15
+
+        for (Block b : graph.values()) {
+            if (b.isInstant())
+                b.dirty = true;
+            b.props = b.nextProps.dup();
+        }
         tick();
         if (PCBMod.DEBUG)
             saveAsDot();
@@ -162,7 +175,7 @@ public class Circuit {
 
     // return if the circuit is stable
     public boolean step(long timeout) {
-        boolean changing = update(false);
+        boolean changing = update();
         if (PCBMod.DEBUG)
             saveAsDot();
         // time + 1 > timeout instead of time >= timeout allows for no timeout if timeout is Long.MAX_VALUE
