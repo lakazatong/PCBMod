@@ -78,9 +78,7 @@ public class SolidLike extends Block {
                     break;
                 case BlockType.DUST:
                     if (input.nextSignal() > nextProps.signal) {
-                        Direction dir = input.getFacing(this);
-                        assert dir != null;
-                        nextProps.weakPowered = !dir.up;
+                        nextProps.weakPowered = !input.isAbove(this) && !input.getFacing(this).up;
 
                         nextProps.signal = input.nextSignal();
                     }
