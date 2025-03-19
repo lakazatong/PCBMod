@@ -2,11 +2,11 @@ package net.lakazatong.pcbmod.screen;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.lakazatong.pcbmod.Utils;
-import net.lakazatong.pcbmod.block.custom.HubBlock.Side;
 import net.lakazatong.pcbmod.block.entity.HubBlockEntity;
 import net.lakazatong.pcbmod.payloads.UpdateHubPayload;
 import net.lakazatong.pcbmod.redstone.circuit.Circuit;
 import net.lakazatong.pcbmod.redstone.circuit.Circuits;
+import net.lakazatong.pcbmod.redstone.utils.Direction;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.EditBoxWidget;
@@ -20,6 +20,7 @@ import java.util.List;
 
 import static net.lakazatong.pcbmod.PCBMod.CIRCUITS;
 import static net.lakazatong.pcbmod.PCBMod.STRUCTURES_PATH;
+import static net.lakazatong.pcbmod.PCBModClient.colorAt;
 
 public class HubScreen extends CommonScreen<HubBlockEntity> {
 
@@ -107,7 +108,7 @@ public class HubScreen extends CommonScreen<HubBlockEntity> {
                 Utils.translate("word", "down")
         };
         for (int i = 0; i < 6; i++) {
-            context.drawText(textRenderer, sides[i], portNumberFields[i].getX(), portNumberFields[i].getY() - 10, Side.colorAt(i), true);
+            context.drawText(textRenderer, sides[i], portNumberFields[i].getX(), portNumberFields[i].getY() - 10, colorAt(i), true);
         }
 
         circuitNameField.render(context, mouseX, mouseY, delta);
@@ -116,7 +117,8 @@ public class HubScreen extends CommonScreen<HubBlockEntity> {
         }
     }
 
-    private int getPortNumberAt(int side) {
+    private int getPortNumberAt(Direction dir) {
+        int side = dir.side;
         String txt = portNumberFields[side].getText();
         return txt.isEmpty()
             ? 0
@@ -149,9 +151,9 @@ public class HubScreen extends CommonScreen<HubBlockEntity> {
         }
 
         List<Integer> portNumbers = List.of(
-                getPortNumberAt(Side.FRONT.ordinal()), getPortNumberAt(Side.BACK.ordinal()),
-                getPortNumberAt(Side.LEFT.ordinal()), getPortNumberAt(Side.RIGHT.ordinal()),
-                getPortNumberAt(Side.UP.ordinal()), getPortNumberAt(Side.DOWN.ordinal())
+                getPortNumberAt(Direction.NORTH), getPortNumberAt(Direction.SOUTH),
+                getPortNumberAt(Direction.WEST), getPortNumberAt(Direction.EAST),
+                getPortNumberAt(Direction.UP), getPortNumberAt(Direction.DOWN)
         );
 
         ClientPlayNetworking.send(new UpdateHubPayload(pos, structureName, instanceId, portNumbers));

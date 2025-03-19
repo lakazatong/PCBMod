@@ -7,7 +7,7 @@ import net.lakazatong.pcbmod.block.custom.PortBlock.PortType;
 import net.lakazatong.pcbmod.block.entity.HubBlockEntity;
 import net.lakazatong.pcbmod.payloads.OpenHubScreenPayload;
 import net.lakazatong.pcbmod.redstone.circuit.Circuit;
-import net.lakazatong.pcbmod.redstone.utils.Vec3;
+import net.lakazatong.pcbmod.redstone.utils.Direction;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -20,10 +20,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
@@ -125,77 +123,32 @@ public class HubBlock extends HorizontalFacingBlock implements BlockEntityProvid
     }
 
     @Override
-    protected int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+    protected int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, net.minecraft.util.math.Direction mDirection) {
         if (world.getBlockEntity(pos) instanceof HubBlockEntity be) {
             Circuit circuit = PCBMod.CIRCUITS.get(be.getCircuitName());
             if (circuit == null) return 0;
-            int portNumber = be.getPortNumberAt(Side.fromDirection(Vec3.fromMinecraft(direction.getOpposite()).toRelative(Vec3.fromMinecraft(state.get(FACING)))).ordinal());
-            return circuit.getSignalOfPortNumber(portNumber);
+            Direction opposite = Direction.fromMinecraft(mDirection.getOpposite());
+            Direction facing = be.getFacing(state);
+            int side = opposite.toRelative(facing).side;
+            int portNumber = be.getPortNumberAt(side);
+            return circuit.getOutputSignal(portNumber);
         }
         return 0;
     }
 
     @Override
-    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, net.minecraft.util.math.Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
         if (world.getBlockEntity(pos) instanceof HubBlockEntity be) {
             Circuit circuit = PCBMod.CIRCUITS.get(be.getCircuitName());
             if (circuit == null) return state;
-            Vec3 facing = Vec3.fromMinecraft(state.get(FACING)); // 1, 0, 0
-            Vec3 aligned = Vec3.fromMinecraft(direction).toRelative(facing); // -1, 0, 0
-            int side = Side.fromDirection(aligned).ordinal(); // 2
+            Direction facing = be.getFacing(state); // 1, 0, 0
+            Direction aligned = Direction.fromMinecraft(direction).toRelative(facing); // -1, 0, 0
+            int side = aligned.side; // 2
             int portNumber = be.getPortNumberAt(side); // 1
             BlockPos offset = pos.offset(direction); // -10 56 13
             int signal = world.getBlockState(offset).getStrongRedstonePower(world, offset, direction.getOpposite()); // 15
-            circuit.setSignalOfPortNumber(portNumber, signal);
+            circuit.setInputSignal(portNumber, signal);
         }
         return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
-    }
-
-    public enum Side implements StringIdentifiable {
-        FRONT, BACK,
-        LEFT, RIGHT,
-        UP, DOWN,
-        NONE;
-
-        private final int color;
-
-        Side() {
-            this.color = colorAt(this.ordinal());
-        }
-
-        public static int colorAt(int side) {
-            return switch (side) {
-                case 0 -> 0xFF0000;  // Red
-                case 1 -> 0x00FF00;  // Green
-                case 2 -> 0x0000FF;  // Blue
-                case 3 -> 0xFFFF00;  // Yellow
-                case 4 -> 0xFF00FF;  // Magenta
-                case 5 -> 0x00FFFF;  // Cyan
-                default -> 0xFFFFFF; // White
-            };
-        }
-
-        public int color() {
-            return color;
-        }
-
-        @Override
-        public String asString() {
-            return name().toLowerCase();
-        }
-
-        public Side next() {
-            return values()[(this.ordinal() + 1) % values().length];
-        }
-
-        public static Side fromDirection(Vec3 dir) {
-            if (dir.equals(Vec3.NORTH)) return Side.FRONT;
-            if (dir.equals(Vec3.SOUTH)) return Side.BACK;
-            if (dir.equals(Vec3.WEST)) return Side.LEFT;
-            if (dir.equals(Vec3.EAST)) return Side.RIGHT;
-            if (dir.equals(Vec3.UP)) return Side.UP;
-            if (dir.equals(Vec3.DOWN)) return Side.DOWN;
-            throw new IllegalArgumentException();
-        }
     }
 }

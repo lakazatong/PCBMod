@@ -7,6 +7,7 @@ import dev.dewy.nbt.tags.primitive.IntTag;
 import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.blocks.*;
 import net.lakazatong.pcbmod.redstone.circuit.Block.BlockBuilder;
+import net.lakazatong.pcbmod.redstone.utils.Direction;
 import net.lakazatong.pcbmod.redstone.utils.Vec3;
 import org.apache.commons.io.file.PathUtils;
 
@@ -236,12 +237,14 @@ public class Structure {
                     }
 
                     // dust
-                    Vec3 tmp = Vec3.fromCardinal(key);
+                    Direction tmp = Direction.fromCardinal(key);
                     if (tmp != null) {
                         if (value.equals("side"))
                             builder.commonInitialProps.facings.add(tmp);
-                        else if (value.equals("up"))
-                            builder.commonInitialProps.facings.add(tmp.add(new Vec3(0, 1, 0)));
+                        else if (value.equals("up")) {
+                            tmp.up = true;
+                            builder.commonInitialProps.facings.add(tmp);
+                        }
                     }
                 }
 
@@ -249,14 +252,14 @@ public class Structure {
                 if (hasFace) {
                     if (faceValue.equals("wall")) {
                         builder.commonInitialProps.onWall = true;
-                        builder.commonInitialProps.facings.add(Vec3.fromCardinal(facingValue));
+                        builder.commonInitialProps.facings.add(Direction.fromCardinal(facingValue));
                     } else if (faceValue.equals("floor")) {
-                        builder.commonInitialProps.facings.add(Vec3.fromCardinal("up"));
+                        builder.commonInitialProps.facings.add(Direction.fromCardinal("up"));
                     } else if (faceValue.equals("ceiling")) {
-                        builder.commonInitialProps.facings.add(Vec3.fromCardinal("down"));
+                        builder.commonInitialProps.facings.add(Direction.fromCardinal("down"));
                     }
                 } else if (hasFacing) {
-                    builder.commonInitialProps.facings.add(Vec3.fromCardinal(facingValue));
+                    builder.commonInitialProps.facings.add(Direction.fromCardinal(facingValue));
                 }
             }
 

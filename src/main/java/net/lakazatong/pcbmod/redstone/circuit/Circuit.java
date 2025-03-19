@@ -9,15 +9,19 @@ import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.parse.Parser;
 import net.lakazatong.pcbmod.PCBMod;
 import net.lakazatong.pcbmod.block.custom.PortBlock;
+import net.lakazatong.pcbmod.block.entity.HubBlockEntity;
 import net.lakazatong.pcbmod.redstone.blocks.Button;
 import net.lakazatong.pcbmod.redstone.blocks.Delayed;
 import net.lakazatong.pcbmod.redstone.blocks.Port;
 import net.lakazatong.pcbmod.redstone.blocks.SolidLike;
+import net.lakazatong.pcbmod.redstone.utils.Direction;
 import net.lakazatong.pcbmod.redstone.utils.SccGraph;
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtIntArray;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import org.apache.commons.io.file.PathUtils;
 
@@ -37,6 +41,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Circuit {
+    private ServerWorld world;
+
     public final Structure structure;
     public final Map<Integer, Block> graph;
     public long time = 0; // in game ticks
@@ -100,8 +106,14 @@ public class Circuit {
         boolean changing = false;
         for (Block b : graph.values()) {
 
-            if (!b.props.equals(b.nextProps) || (b instanceof Delayed delayed && delayed.stableTime > 0))
+            if (!b.props.equals(b.nextProps)) {
                 changing = true;
+                if (b instanceof Port port)
+                    sendOutputSignal(port);
+            }
+            else if (b instanceof Delayed delayed && delayed.stableTime > 0) {
+                changing = true;
+            }
 
             if (b instanceof Delayed
                 || b instanceof Button
@@ -320,15 +332,34 @@ public class Circuit {
         return circuit;
     }
 
-    public int getSignalOfPortNumber(int portNumber) {
+    public int getOutputSignal(int portNumber) {
         Block p = portNumbers.get(portNumber);
         return p != null && p.portType() == PortBlock.PortType.OUTPUT ? p.signal() : 0;
     }
 
-    public void setSignalOfPortNumber(int portNumber, int signal) {
+    public void setInputSignal(int portNumber, int signal) {
         Block p = portNumbers.get(portNumber);
         if (p != null && p.portType() == PortBlock.PortType.INPUT) {
             portUpdates.put(p.uuid, signal);
         }
+    }
+
+    private void sendOutputSignal(Port port) {
+        for (BlockPos pos : hubs) {
+            if (world.getBlockEntity(pos) instanceof HubBlockEntity be) {
+                Integer side = be.getSideOf(port.portNumber());
+                if (side != null) {
+                    BlockState state = world.getBlockState(pos);
+                    Direction facing = be.getFacing(state);
+                    Direction dir = Direction.fromSide(side);
+                    Direction aligned = dir.toRelative(facing);
+                    world.updateNeighbor(pos.offset(aligned.toMinecraft()), state.getBlock(), null);
+                }
+            }
+        }
+    }
+
+    public void setCurrentServerWorld(ServerWorld serverWorld) {
+        world = serverWorld;
     }
 }

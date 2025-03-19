@@ -4,7 +4,7 @@ import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.circuit.Block;
 import net.lakazatong.pcbmod.redstone.circuit.BlockType;
 import net.lakazatong.pcbmod.redstone.circuit.Props;
-import net.lakazatong.pcbmod.redstone.utils.Vec3;
+import net.lakazatong.pcbmod.redstone.utils.Direction;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class Comparator extends Delayed {
     public Comparator(Props p) {
         super(BlockType.COMPARATOR, p);
-        props.facings = facings().stream().map(Vec3::opposite).collect(Collectors.toSet());
+        props.facings = facings().stream().map(Direction::opposite).collect(Collectors.toSet());
     }
 
     @Override

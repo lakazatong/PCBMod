@@ -16,10 +16,10 @@ public class Dust extends Block {
     public boolean isInputOf(Block neighbor) {
         return switch (neighbor.type) {
             case AIR, TORCH, BUTTON, LEVER, REDSTONE_BLOCK -> false;
-            case SOLID -> isFacingHorizontally(neighbor) || isAbove(neighbor);
-            case PORT -> neighbor.portType().equals(PortBlock.PortType.OUTPUT) && (isFacingHorizontally(neighbor) || isAbove(neighbor));
+            case SOLID -> isFacing(neighbor) || isAbove(neighbor);
+            case PORT -> neighbor.portType().equals(PortBlock.PortType.OUTPUT) && (isFacing(neighbor) || isAbove(neighbor));
             case DUST -> true;
-            case REPEATER -> !neighbor.locked() && neighbor.isFacingAwayHorizontally(this);
+            case REPEATER -> !neighbor.locked() && neighbor.isFacingAway(this);
             case COMPARATOR -> !neighbor.isFacing(this);
         };
     }

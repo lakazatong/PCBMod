@@ -1,6 +1,7 @@
 package net.lakazatong.pcbmod.redstone.circuit;
 
 import net.lakazatong.pcbmod.block.custom.PortBlock;
+import net.lakazatong.pcbmod.redstone.utils.Direction;
 import net.lakazatong.pcbmod.redstone.utils.Vec3;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -14,7 +15,7 @@ public class Props {
     public boolean onWall; // button, torch
     public boolean locked; // repeater
     public boolean subtract; // comparator
-    public Set<Vec3> facings; // button, delayed, dust
+    public Set<Direction> facings; // button, delayed, dust
     public int signal;
     public boolean weakPowered; // solid
     public Vec3 coords;
@@ -22,7 +23,7 @@ public class Props {
     public PortBlock.PortType portType; // port
     public int portNumber; // port
 
-    private Props(long delay, boolean onWall, boolean locked, boolean subtract, Set<Vec3> facings, int signal, boolean weakPowered, Vec3 coords, Set<Block> neighbors, PortBlock.PortType portType, int portNumber) {
+    private Props(long delay, boolean onWall, boolean locked, boolean subtract, Set<Direction> facings, int signal, boolean weakPowered, Vec3 coords, Set<Block> neighbors, PortBlock.PortType portType, int portNumber) {
         this.delay = delay;
         this.onWall = onWall;
         this.locked = locked;
@@ -75,7 +76,7 @@ public class Props {
         tag.putBoolean("locked", locked);
         tag.putBoolean("subtract", subtract);
 
-        tag.put("facings", new NbtIntArray(facings.stream().map(Vec3::hashCode).toList()));
+        tag.put("facings", new NbtIntArray(facings.stream().map(d -> d.side).toList()));
 
         tag.putInt("signal", signal);
         tag.putBoolean("weakPowered", weakPowered);
@@ -101,8 +102,8 @@ public class Props {
         props.subtract = t.getBoolean("subtract");
 
         props.facings = new HashSet<>();
-        for (int facing : t.getIntArray("facings"))
-            props.facings.add(Vec3.fromHash(facing));
+        for (int side : t.getIntArray("facings"))
+            props.facings.add(Direction.fromSide(side));
 
         props.signal = t.getInt("signal");
         props.weakPowered = t.getBoolean("weakPowered");

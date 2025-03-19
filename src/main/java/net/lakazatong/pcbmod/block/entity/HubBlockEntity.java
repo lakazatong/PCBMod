@@ -3,6 +3,7 @@ package net.lakazatong.pcbmod.block.entity;
 import net.lakazatong.pcbmod.block.ModBlockEntities;
 import net.lakazatong.pcbmod.block.custom.HubBlock;
 import net.lakazatong.pcbmod.block.custom.PortBlock;
+import net.lakazatong.pcbmod.redstone.utils.Direction;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -21,6 +22,10 @@ public class HubBlockEntity extends BlockEntity {
 
     public HubBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.HUB, pos, state);
+    }
+
+    public Direction getFacing(BlockState state) {
+        return Direction.fromMinecraft(state.get(HubBlock.FACING));
     }
 
     public PortBlock.PortType getPortTypeAt(int side) {
@@ -62,6 +67,14 @@ public class HubBlockEntity extends BlockEntity {
 
     public int getPortNumberAt(int side) {
         return portNumbers[side];
+    }
+
+    public Integer getSideOf(int portNumber) {
+        for (Direction dir : Direction.values()) {
+            if (portNumbers[dir.side] == portNumber)
+                return dir.side;
+        }
+        return null;
     }
 
     public int[] getPortNumbers() {

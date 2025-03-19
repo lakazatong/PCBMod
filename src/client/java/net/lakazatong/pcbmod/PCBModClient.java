@@ -4,7 +4,6 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.lakazatong.pcbmod.block.ModBlocks;
-import net.lakazatong.pcbmod.block.custom.HubBlock;
 import net.lakazatong.pcbmod.payloads.OpenHubScreenPayload;
 import net.lakazatong.pcbmod.payloads.OpenPortScreenPayload;
 import net.lakazatong.pcbmod.screen.HubScreen;
@@ -20,10 +19,22 @@ public class PCBModClient implements ClientModInitializer {
         MinecraftClient.getInstance().setScreen(new HubScreen(payload.pos()));
     }
 
+    public static int colorAt(int side) {
+        return switch (side) {
+            case 0 -> 0xFF0000;  // Red
+            case 1 -> 0x00FF00;  // Green
+            case 2 -> 0x0000FF;  // Blue
+            case 3 -> 0xFFFF00;  // Yellow
+            case 4 -> 0xFF00FF;  // Magenta
+            case 5 -> 0x00FFFF;  // Cyan
+            default -> 0xFFFFFF; // White
+        };
+    }
+
     @Override
     public void onInitializeClient() {
         ColorProviderRegistry.BLOCK.register(
-                (state, view, pos, tintIndex) -> HubBlock.Side.colorAt(tintIndex)
+                (state, view, pos, tintIndex) -> colorAt(tintIndex)
                 , ModBlocks.HUB);
 
         // Payload handlers

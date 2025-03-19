@@ -2,6 +2,7 @@ package net.lakazatong.pcbmod.redstone.circuit;
 
 import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.redstone.blocks.*;
+import net.lakazatong.pcbmod.redstone.utils.Direction;
 import net.lakazatong.pcbmod.redstone.utils.Vec3;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -78,6 +79,10 @@ abstract public class Block {
         }
     }
 
+    public Direction getFacing(Block other) {
+        return facings().stream().filter(dir -> coords().add(dir).equals(other.coords())).findFirst().orElse(null);
+    }
+
     public boolean isAbove(Block other) {
         return this.coords().y() > other.coords().y();
     }
@@ -98,31 +103,11 @@ abstract public class Block {
         return facings().stream().anyMatch(f -> coords().subtract(f).equals(other.coords()));
     }
 
-    public boolean isFacingHorizontally(Block other) {
-        return facings().stream().anyMatch(f -> {
-            Vec3 adjusted = adjustHorizontalOnly(f);
-            return coords().add(adjusted).equals(other.coords());
-        });
-    }
-
-    public boolean isFacingAwayHorizontally(Block other) {
-        return facings().stream().anyMatch(f -> {
-            Vec3 adjusted = adjustHorizontalOnly(f);
-            return coords().subtract(adjusted).equals(other.coords());
-        });
-    }
-
-    private Vec3 adjustHorizontalOnly(Vec3 f) {
-        return (f.x() != 0 || f.z() != 0) && f.y() != 0
-                ? new Vec3(f.x(), 0, f.z())
-                : f;
-    }
-
     abstract public boolean isInputOf(Block neighbor);
 
     public boolean isSideInputOf(Block neighbor) {
-        List<Vec3> neighborFacings = neighbor.facings().stream().toList();
-        return isFacing(neighbor) && (facings().isEmpty() ? Collections.singleton(neighbor.coords().subtract(coords())) : facings())
+        List<Direction> neighborFacings = neighbor.facings().stream().toList();
+        return isFacing(neighbor) && (facings().isEmpty() ? Collections.singleton(Direction.fromBlockDiff(coords(), neighbor.coords())) : facings())
                 .stream().allMatch(f -> neighborFacings.stream().allMatch(f::isPerpendicular));
     }
 
@@ -176,11 +161,11 @@ abstract public class Block {
         return nextProps.subtract;
     }
 
-    public Set<Vec3> facings() {
+    public Set<Direction> facings() {
         return props.facings;
     }
 
-    public Set<Vec3> nextFacings() {
+    public Set<Direction> nextFacings() {
         return nextProps.facings;
     }
 
