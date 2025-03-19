@@ -19,7 +19,7 @@ public class SolidLike extends Block {
             switch (input.type) {
                 case BlockType.AIR, BlockType.SOLID, BlockType.REDSTONE_BLOCK, BlockType.PORT:
                     break;
-                case BlockType.LEVER, BlockType.REPEATER, BlockType.TORCH, BlockType.BUTTON:
+                case BlockType.REPEATER, BlockType.TORCH, BlockType.BUTTON, BlockType.LEVER:
                     if (input.signal() > 0) {
                         props.weakPowered = false;
                         props.signal = 15;
@@ -34,7 +34,7 @@ public class SolidLike extends Block {
                     break;
                 case BlockType.DUST:
                     if (input.signal() > props.signal) {
-                        props.weakPowered = true;
+                        props.weakPowered = !input.isAbove(this) && !input.getFacing(this).up;
                         props.signal = input.signal();
                     }
                     break;
@@ -56,9 +56,8 @@ public class SolidLike extends Block {
 
     @Override
     public void logic() {
-        nextProps.signal = 0;
-        var inputs = nextInputs().collect(Collectors.toSet());
-        for (Block input : inputs) {
+        boolean decay = true;
+        for (Block input : nextInputs().collect(Collectors.toSet())) {
             switch (input.type) {
                 case BlockType.AIR, BlockType.SOLID, BlockType.REDSTONE_BLOCK, BlockType.PORT:
                     break;
@@ -70,19 +69,22 @@ public class SolidLike extends Block {
                     }
                     break;
                 case BlockType.COMPARATOR:
-                    if (input.nextSignal() > nextProps.signal) {
+                    if (input.nextSignal() >= nextSignal()) {
+                        decay = false;
                         nextProps.weakPowered = false;
                         nextProps.signal = input.nextSignal();
                     }
                     break;
                 case BlockType.DUST:
-                    if (input.nextSignal() > nextProps.signal) {
+                    if (input.nextSignal() > nextSignal()) {
+                        decay = true;
                         nextProps.weakPowered = !input.isAbove(this) && !input.getFacing(this).up;
-
                         nextProps.signal = input.nextSignal();
                     }
                     break;
             }
         }
+        if (decay && nextSignal() > 0)
+            nextProps.signal--;
     }
 }

@@ -27,7 +27,6 @@ public class Dust extends Block {
     @Override
     public void logic() {
         boolean decay = true;
-        nextProps.signal = 0;
         for (Block input : nextInputs().collect(Collectors.toSet())) {
             switch (input.type) {
                 case BlockType.AIR:
@@ -39,26 +38,26 @@ public class Dust extends Block {
                     }
                     break;
                 case BlockType.SOLID:
-                    if (input.nextSignal() > nextProps.signal && !input.nextWeakPowered()) {
+                    if (input.nextSignal() > nextSignal() && !input.nextWeakPowered()) {
                         decay = false;
                         nextProps.signal = input.nextSignal();
                     }
                     break;
                 case BlockType.PORT, BlockType.COMPARATOR:
-                    if (input.nextSignal() > nextProps.signal) {
+                    if (input.nextSignal() >= nextSignal()) {
                         decay = false;
                         nextProps.signal = input.nextSignal();
                     }
                     break;
                 case BlockType.DUST:
-                    if (input.nextSignal() > nextProps.signal) {
+                    if (input.nextSignal() > nextSignal()) {
                         decay = true;
                         nextProps.signal = input.nextSignal();
                     }
                     break;
             }
         }
-        if (decay && nextProps.signal > 0)
+        if (decay && nextSignal() > 0)
             nextProps.signal--;
     }
 }

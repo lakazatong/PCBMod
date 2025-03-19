@@ -88,6 +88,8 @@ public class Circuit {
                 portNumbers.put(b.props.portNumber, b);
             b.circuit = this;
         }
+
+        firstStep();
     }
 
     public Circuit(Structure structure) {
@@ -102,7 +104,7 @@ public class Circuit {
         this(null, graph);
     }
 
-    private boolean update() {
+    private boolean update(boolean markAllDirty) {
         boolean changing = false;
         for (Block b : graph.values()) {
 
@@ -115,7 +117,8 @@ public class Circuit {
                 changing = true;
             }
 
-            if (b instanceof Delayed
+            if (markAllDirty
+                || b instanceof Delayed
                 || b instanceof Button
                 || b instanceof Port
             )
@@ -145,20 +148,28 @@ public class Circuit {
                 dirtyBlocks.forEach(Block::tick);
             } while (true);
 
-            queue.addAll(sccGraph.outputs(sccId));
+            sccGraph.outputs(sccId).stream().filter(i -> !queue.contains(i)).forEach(queue::add);
         }
+    }
+
+    public void firstStep() {
+        update(true);
+        tick();
+        if (PCBMod.DEBUG)
+            saveAsDot();
+        time++;
     }
 
     // return if the circuit is stable
     public boolean step(long timeout) {
-        boolean changing = update();
+        boolean changing = update(false);
         if (PCBMod.DEBUG)
             saveAsDot();
         // time + 1 > timeout instead of time >= timeout allows for no timeout if timeout is Long.MAX_VALUE
-        if ((time > 0 && !changing && portUpdates.isEmpty()) || time + 1 > timeout)
+        if ((!changing && portUpdates.isEmpty()) || time + 1 > timeout)
             return true;
-        tick();
         time++;
+        tick();
         return false;
     }
 
