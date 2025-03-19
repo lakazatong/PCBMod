@@ -362,4 +362,12 @@ public class Circuit {
     public void setCurrentServerWorld(ServerWorld serverWorld) {
         world = serverWorld;
     }
+
+    public static String structureNameFrom(String circuitName) {
+        return circuitName.replaceFirst("\\d+$", "");
+    }
+
+    public static int instanceIdFrom(String circuitName) {
+        return Integer.parseInt(circuitName.replaceFirst(".+?(\\d+)$", "$1"));
+    }
 }

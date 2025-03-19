@@ -3,7 +3,6 @@ package net.lakazatong.pcbmod.redstone.blocks;
 import net.lakazatong.pcbmod.redstone.circuit.Block;
 import net.lakazatong.pcbmod.redstone.circuit.BlockType;
 import net.lakazatong.pcbmod.redstone.circuit.Props;
-import net.lakazatong.pcbmod.redstone.utils.Direction;
 
 import java.util.stream.Collectors;
 

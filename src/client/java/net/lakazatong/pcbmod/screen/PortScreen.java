@@ -1,7 +1,6 @@
 package net.lakazatong.pcbmod.screen;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.lakazatong.pcbmod.Utils;
 import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.block.entity.PortBlockEntity;
 import net.lakazatong.pcbmod.payloads.UpdatePortPayload;
@@ -12,6 +11,8 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 
+import static net.lakazatong.pcbmod.PCBMod.translate;
+
 public class PortScreen extends CommonScreen<PortBlockEntity> {
 
     private EditBoxWidget portNumberField;
@@ -19,7 +20,7 @@ public class PortScreen extends CommonScreen<PortBlockEntity> {
     private PortBlock.PortType initialPortType;
 
     public PortScreen(BlockPos pos) {
-        super(Utils.translate("screen", "port", "title"), pos);
+        super(translate("screen", "port", "title"), pos);
     }
 
     @Override
@@ -64,8 +65,8 @@ public class PortScreen extends CommonScreen<PortBlockEntity> {
         int buttonsWidth = (maxWidth - horizontalSpacingWidth) / 2;
 
         MutableText[] buttonTexts = {
-                Utils.translate("word", "done"),
-                Utils.translate("word", "cancel")
+                translate("word", "done"),
+                translate("word", "cancel")
         };
         ButtonWidget.PressAction[] buttonCallbacks = {button -> onDone(), button -> onCancel()};
         for (int k = 0; k < 2; k++) {
@@ -90,7 +91,7 @@ public class PortScreen extends CommonScreen<PortBlockEntity> {
 
         context.drawText(textRenderer, title, titleLabelX, titleLabelY, 0xFFFFFF, true);
 
-        context.drawText(textRenderer, Utils.translate("screen", "port", "port_number"), portNumberField.getX(), portNumberField.getY() - 10, 0xA0A0A0, true);
+        context.drawText(textRenderer, translate("screen", "port", "port_number"), portNumberField.getX(), portNumberField.getY() - 10, 0xA0A0A0, true);
 
         portNumberField.render(context, mouseX, mouseY, delta);
     }

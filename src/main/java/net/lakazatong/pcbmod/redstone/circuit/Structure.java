@@ -85,12 +85,6 @@ public class Structure {
                 .collect(Collectors.toList());
     }
 
-    public Block getBlock(Vec3 coords) {
-        return xyzGrid.get(coords.x())
-                .get(coords.y())
-                .get(coords.z());
-    }
-
     public void setBlock(Block block) {
         ensureCapacity(block.coords());
         xyzGrid.get(block.coords().x())
@@ -132,20 +126,6 @@ public class Structure {
             output.append("\n");
         }
         return output.toString();
-    }
-
-    public Block getFirstBlock() {
-        for (List<List<Block>> yzPlane : xyzGrid) {
-            if (yzPlane.isEmpty()) continue;
-            for (List<Block> zLine : yzPlane) {
-                if (zLine.isEmpty()) continue;
-                for (Block block : zLine) {
-                    if (block != null)
-                        return block;
-                }
-            }
-        }
-        return null;
     }
 
     public Stream<Block> blocks() {

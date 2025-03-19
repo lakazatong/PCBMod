@@ -1,8 +1,8 @@
 package net.lakazatong.pcbmod.screen;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.lakazatong.pcbmod.Utils;
 import net.lakazatong.pcbmod.block.entity.HubBlockEntity;
+import net.lakazatong.pcbmod.payloads.NewCircuitPayload;
 import net.lakazatong.pcbmod.payloads.UpdateHubPayload;
 import net.lakazatong.pcbmod.redstone.circuit.Circuit;
 import net.lakazatong.pcbmod.redstone.circuit.Circuits;
@@ -14,12 +14,10 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-import static net.lakazatong.pcbmod.PCBMod.CIRCUITS;
-import static net.lakazatong.pcbmod.PCBMod.STRUCTURES_PATH;
+import static net.lakazatong.pcbmod.PCBMod.*;
 import static net.lakazatong.pcbmod.PCBModClient.colorAt;
 
 public class HubScreen extends CommonScreen<HubBlockEntity> {
@@ -29,7 +27,7 @@ public class HubScreen extends CommonScreen<HubBlockEntity> {
     private final EditBoxWidget[] portNumberFields = new EditBoxWidget[6];
 
     public HubScreen(BlockPos pos) {
-        super(Utils.translate("screen", "hub", "title"), pos);
+        super(translate("screen", "hub", "title"), pos);
     }
 
     @Override
@@ -78,8 +76,8 @@ public class HubScreen extends CommonScreen<HubBlockEntity> {
         int buttonsWidth = (maxWidth - horizontalSpacingWidth) / 2;
 
         MutableText[] buttonTexts = {
-                Utils.translate("word", "done"),
-                Utils.translate("word", "cancel")
+                translate("word", "done"),
+                translate("word", "cancel")
         };
         ButtonWidget.PressAction[] buttonCallbacks = {button -> onDone(), button -> onCancel()};
         for (int k = 0; k < 2; k++) {
@@ -97,15 +95,15 @@ public class HubScreen extends CommonScreen<HubBlockEntity> {
         super.render(context, mouseX, mouseY, delta);
 
         context.drawText(textRenderer, title, titleLabelX, titleLabelY, 0xFFFFFF, true);
-        context.drawText(textRenderer, Utils.translate("screen", "hub", "circuit_name"), circuitNameField.getX(), circuitNameField.getY() - 10, 0xA0A0A0, true);
+        context.drawText(textRenderer, translate("screen", "hub", "circuit_name"), circuitNameField.getX(), circuitNameField.getY() - 10, 0xA0A0A0, true);
 
         MutableText[] sides = {
-                Utils.translate("word", "front"),
-                Utils.translate("word", "back"),
-                Utils.translate("word", "left"),
-                Utils.translate("word", "right"),
-                Utils.translate("word", "up"),
-                Utils.translate("word", "down")
+                translate("word", "front"),
+                translate("word", "back"),
+                translate("word", "left"),
+                translate("word", "right"),
+                translate("word", "up"),
+                translate("word", "down")
         };
         for (int i = 0; i < 6; i++) {
             context.drawText(textRenderer, sides[i], portNumberFields[i].getX(), portNumberFields[i].getY() - 10, colorAt(i), true);
@@ -134,19 +132,13 @@ public class HubScreen extends CommonScreen<HubBlockEntity> {
         int instanceId = be.getInstanceId();
 
         if (Circuits.isValidCircuitName(circuitName)) {
-            String tmp = Utils.structureNameFrom(circuitName);
+            String tmp = Circuit.structureNameFrom(circuitName);
             Path structurePath = STRUCTURES_PATH.resolve(tmp + ".nbt");
             if (structurePath.toFile().exists()) {
                 structureName = tmp;
-                instanceId = Utils.instanceIdFrom(circuitName);
-                if (!CIRCUITS.containsKey(circuitName)) {
-                    try {
-                        CIRCUITS.put(circuitName, new Circuit(structurePath));
-                        System.out.println("New circuit with structure at: " + structurePath.toAbsolutePath() + " (structureName: " + structureName + ", instanceId: " + instanceId + ")");
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+                instanceId = Circuit.instanceIdFrom(circuitName);
+                if (!CIRCUITS.containsKey(circuitName))
+                    ClientPlayNetworking.send(new NewCircuitPayload(circuitName, structurePath.toString()));
             }
         }
 

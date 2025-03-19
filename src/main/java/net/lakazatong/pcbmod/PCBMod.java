@@ -10,15 +10,16 @@ import net.lakazatong.pcbmod.block.custom.PortBlock;
 import net.lakazatong.pcbmod.block.entity.HubBlockEntity;
 import net.lakazatong.pcbmod.block.entity.PortBlockEntity;
 import net.lakazatong.pcbmod.item.ModItems;
-import net.lakazatong.pcbmod.payloads.OpenHubScreenPayload;
-import net.lakazatong.pcbmod.payloads.OpenPortScreenPayload;
-import net.lakazatong.pcbmod.payloads.UpdateHubPayload;
-import net.lakazatong.pcbmod.payloads.UpdatePortPayload;
+import net.lakazatong.pcbmod.payloads.*;
+import net.lakazatong.pcbmod.redstone.circuit.Circuit;
 import net.lakazatong.pcbmod.redstone.circuit.Circuits;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.BlockPos;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 public class PCBMod implements ModInitializer {
@@ -30,6 +31,10 @@ public class PCBMod implements ModInitializer {
     public static Circuits CIRCUITS;
 
     public static boolean DEBUG = true;
+
+    public static MutableText translate(String category, String... keys) {
+        return Text.translatable(String.join(".", category, PCBMod.MOD_ID, String.join(".", keys)));
+    }
 
     private static void handleUpdatePortPayload(UpdatePortPayload payload, ServerPlayNetworking.Context context) {
         if (context.player().getServerWorld().getBlockEntity(payload.pos()) instanceof PortBlockEntity be) {
@@ -51,6 +56,17 @@ public class PCBMod implements ModInitializer {
         }
     }
 
+    private static void handleNewCircuitPayload(NewCircuitPayload payload, ServerPlayNetworking.Context context) {
+        try {
+            String circuitName = payload.circuitName();
+            Path structurePath = Path.of(payload.structurePath());
+            Circuit circuit = new Circuit(structurePath);
+            CIRCUITS.put(circuitName, circuit);
+            System.out.println("New circuit with structure at: " + structurePath.toAbsolutePath() + " (structureName: " + Circuit.structureNameFrom(circuitName) + ", instanceId: " + Circuit.instanceIdFrom(circuitName) + ")");
+        } catch (IOException ignored) {
+        }
+    }
+
     public void onInitialize() {
         DEBUG = false;
 
@@ -66,10 +82,12 @@ public class PCBMod implements ModInitializer {
 
         PayloadTypeRegistry.playC2S().register(UpdatePortPayload.ID, UpdatePortPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(UpdateHubPayload.ID, UpdateHubPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(NewCircuitPayload.ID, NewCircuitPayload.CODEC);
 
         // Payload handlers
         ServerPlayNetworking.registerGlobalReceiver(UpdatePortPayload.ID, PCBMod::handleUpdatePortPayload);
         ServerPlayNetworking.registerGlobalReceiver(UpdateHubPayload.ID, PCBMod::handleUpdateHubPayload);
+        ServerPlayNetworking.registerGlobalReceiver(NewCircuitPayload.ID, PCBMod::handleNewCircuitPayload);
     }
 
     private void onServerStart(MinecraftServer server) {

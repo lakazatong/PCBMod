@@ -3,7 +3,6 @@ package net.lakazatong.pcbmod.item;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.lakazatong.pcbmod.PCBMod;
-import net.lakazatong.pcbmod.Utils;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -14,6 +13,8 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 
 import java.util.function.Function;
+
+import static net.lakazatong.pcbmod.PCBMod.translate;
 
 public class ModItems {
     public static void initialize() {
@@ -27,7 +28,7 @@ public class ModItems {
     public static final RegistryKey<ItemGroup> MOD_TAB_KEY = RegistryKey.of(Registries.ITEM_GROUP.getKey(), Identifier.of(PCBMod.MOD_ID, "item_group"));
     public static final ItemGroup MOD_TAB = FabricItemGroup.builder()
             .icon(() -> new ItemStack(ModItems.SUSPICIOUS_SUBSTANCE))
-            .displayName(Utils.translate("tab", "title"))
+            .displayName(translate("tab", "title"))
             .build();
 
     public static Item register(String name, Function<Item.Settings, Item> itemFactory, Item.Settings settings) {

@@ -13,13 +13,11 @@ import java.util.function.BooleanSupplier;
 @Mixin(ServerWorld.class)
 public abstract class ServerWorldMixin {
 
-    @Inject(method = "<init>", at = @At("TAIL"))
-    private void onConstruct(CallbackInfo ci) {
-        PCBMod.CIRCUITS.values().forEach(circuit -> circuit.setCurrentServerWorld((ServerWorld)(Object)this));
-    }
-
     @Inject(method = "tick", at = @At(value = "HEAD"))
     private void tickCircuits(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-        PCBMod.CIRCUITS.values().forEach(Circuit::step);
+        for (Circuit circuit : PCBMod.CIRCUITS.values()) {
+            circuit.setCurrentServerWorld((ServerWorld)(Object)this);
+            circuit.step();
+        }
     }
 }
