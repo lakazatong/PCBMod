@@ -1,11 +1,11 @@
 {
-	"required": true,
-	"package": "net.lakazatong.pcbmod.mixins",
-	"compatibilityLevel": "JAVA_21",
-	"mixins": [
-		"ServerWorldMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
+  "required": true,
+  "package": "net.lakazatong.pcbmod.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "ServerWorldMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
 	}
 }

@@ -17,6 +17,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.ActionResult;
@@ -26,6 +27,7 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
+import net.minecraft.world.block.WireOrientation;
 import net.minecraft.world.tick.ScheduledTickView;
 
 import javax.annotation.Nullable;
@@ -140,7 +142,7 @@ public class HubBlock extends HorizontalFacingBlock implements BlockEntityProvid
     protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, net.minecraft.util.math.Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
         if (world.getBlockEntity(pos) instanceof HubBlockEntity be) {
             Circuit circuit = PCBMod.CIRCUITS.get(be.getCircuitName());
-            if (circuit == null) return state;
+            if (circuit == null) return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
             Direction facing = be.getFacing(state); // 1, 0, 0
             Direction aligned = Direction.fromMinecraft(direction).toRelative(facing); // -1, 0, 0
             int side = aligned.side; // 2
@@ -151,4 +153,25 @@ public class HubBlock extends HorizontalFacingBlock implements BlockEntityProvid
         }
         return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
+
+    @Override
+    protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (world.getBlockEntity(pos) instanceof HubBlockEntity be) {
+            Circuit circuit = PCBMod.CIRCUITS.get(be.getCircuitName());
+            if (circuit == null) {
+                super.scheduledTick(state, world, pos, random);
+                return;
+            }
+            circuit.setCurrentServerWorld(world);
+            circuit.step();
+            world.scheduleBlockTick(pos, world.getBlockState(pos).getBlock(), 1);
+        }
+        super.scheduledTick(state, world, pos, random);
+    }
+//
+//    @Override
+//    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @org.jetbrains.annotations.Nullable WireOrientation wireOrientation, boolean notify) {
+//        if (!world.isClient)
+//            world.scheduleBlockTick(pos, this, 1);
+//    }
 }

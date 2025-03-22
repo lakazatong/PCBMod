@@ -13,7 +13,6 @@ import net.lakazatong.pcbmod.block.entity.HubBlockEntity;
 import net.lakazatong.pcbmod.redstone.blocks.Button;
 import net.lakazatong.pcbmod.redstone.blocks.Delayed;
 import net.lakazatong.pcbmod.redstone.blocks.Port;
-import net.lakazatong.pcbmod.redstone.blocks.SolidLike;
 import net.lakazatong.pcbmod.redstone.utils.Direction;
 import net.lakazatong.pcbmod.redstone.utils.SccGraph;
 import net.minecraft.block.BlockState;
